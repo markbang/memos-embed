@@ -1,7 +1,7 @@
 {
   "name": "memos-embed-workspace",
   "private": true,
-  "packageManager": "pnpm@9.12.2",
+  "packageManager": "pnpm@10.28.0",
   "scripts": {
     "dev": "pnpm --filter @memos-embed/site dev",
     "build": "pnpm --filter @memos-embed/site build",
@@ -14,9 +14,9 @@
   "devDependencies": {
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
+    "happy-dom": "^15.10.2",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
-    "vitest": "^3.2.4",
-    "happy-dom": "^15.10.2"
+    "vitest": "^3.2.4"
   }
 }
