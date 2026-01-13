@@ -1,6 +1,6 @@
 {
 	"name": "@memos-embed/wc",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"type": "module",
 	"repository": {
 		"type": "git",
@@ -21,7 +21,9 @@
 			"require": "./dist/register.cjs"
 		}
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"build": "tsup src/index.ts src/register.ts --format esm,cjs --dts --clean",
 		"test": "vitest run"
