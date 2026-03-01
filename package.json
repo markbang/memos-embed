@@ -10,7 +10,7 @@
 		"dev": "pnpm --filter @memos-embed/site dev",
 		"build": "pnpm --filter @memos-embed/site build",
 		"preview": "pnpm --filter @memos-embed/site preview",
-		"test": "pnpm -r test",
+		"test": "pnpm --filter memos-embed build && pnpm -r test",
 		"lint": "pnpm -r lint",
 		"format": "pnpm -r format",
 		"check": "pnpm -r check"
