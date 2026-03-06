@@ -2,6 +2,14 @@ import type { EmbedHtmlOptions, EmbedRenderOptions, Memo } from "./types";
 import { renderMarkdown } from "./markdown";
 import { resolveTheme } from "./theme";
 
+const escapeHtml = (value: string) =>
+	value
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#39;");
+
 const formatTime = (value?: string, locale?: string) => {
 	if (!value) {
 		return "";
@@ -421,14 +429,24 @@ export const renderMemoHtml = (
   `.trim();
 };
 
-export const renderMemoHtmlSnippet = (
-	memo: Memo,
-	options: EmbedHtmlOptions = {},
-) => {
-	const content = renderMemoHtml(memo, options);
-	if (!options.includeStyles) {
+const wrapHtmlSnippet = (content: string, includeStyles = true) => {
+	if (!includeStyles) {
 		return content;
 	}
 
 	return `<style>${buildEmbedCss()}</style>${content}`;
 };
+
+export const renderMemoHtmlSnippet = (
+	memo: Memo,
+	options: EmbedHtmlOptions = {},
+) => wrapHtmlSnippet(renderMemoHtml(memo, options), options.includeStyles);
+
+export const renderMemoStateHtmlSnippet = (
+	message: string,
+	options: Pick<EmbedHtmlOptions, "includeStyles"> = {},
+) =>
+	wrapHtmlSnippet(
+		`<div class="memos-embed__state">${escapeHtml(message)}</div>`,
+		options.includeStyles,
+	);

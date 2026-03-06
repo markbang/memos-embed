@@ -3,6 +3,7 @@ export type {
 	EmbedHtmlOptions,
 	EmbedRenderOptions,
 	EmbedTheme,
+	FetchMemoHtmlSnippetOptions,
 	FetchMemoOptions,
 	IframeEmbedOptions,
 	Memo,
@@ -15,7 +16,12 @@ export type {
 	UserApiResponse,
 } from "./types";
 
-export { fetchMemo } from "./api";
-export { buildEmbedCss, renderMemoHtml, renderMemoHtmlSnippet } from "./render";
+export { fetchMemo, fetchMemoHtmlSnippet } from "./api";
+export {
+	buildEmbedCss,
+	renderMemoHtml,
+	renderMemoHtmlSnippet,
+	renderMemoStateHtmlSnippet,
+} from "./render";
 export { buildEmbedUrl, renderIframeHtml } from "./iframe";
 export { themePresets, defaultTheme, resolveTheme } from "./theme";

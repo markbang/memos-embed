@@ -1,7 +1,7 @@
 import {
-	buildEmbedCss,
 	fetchMemo,
-	renderMemoHtml,
+	renderMemoHtmlSnippet,
+	renderMemoStateHtmlSnippet,
 	type EmbedRenderOptions,
 	type ThemeInput,
 } from "memos-embed";
@@ -69,20 +69,24 @@ export class MemosEmbedElement extends HTMLElementBase {
 		const baseUrl = this.getAttribute("base-url");
 
 		if (!memoId || !baseUrl) {
-			this.shadowRootRef.innerHTML = `<style>${buildEmbedCss()}</style><div class="memos-embed__state">Missing memo-id or base-url.</div>`;
+			this.shadowRootRef.innerHTML = renderMemoStateHtmlSnippet(
+				"Missing memo-id or base-url.",
+			);
 			return;
 		}
 
-		this.shadowRootRef.innerHTML = `<style>${buildEmbedCss()}</style><div class="memos-embed__state">Loading memo…</div>`;
+		this.shadowRootRef.innerHTML = renderMemoStateHtmlSnippet("Loading memo…");
 
 		try {
 			const memo = await fetchMemo({ baseUrl, memoId });
-			const html = renderMemoHtml(memo, this.getRenderOptions());
-			this.shadowRootRef.innerHTML = `<style>${buildEmbedCss()}</style>${html}`;
+			this.shadowRootRef.innerHTML = renderMemoHtmlSnippet(
+				memo,
+				this.getRenderOptions(),
+			);
 		} catch (error) {
 			const message =
 				error instanceof Error ? error.message : "Failed to load memo.";
-			this.shadowRootRef.innerHTML = `<style>${buildEmbedCss()}</style><div class="memos-embed__state">${message}</div>`;
+			this.shadowRootRef.innerHTML = renderMemoStateHtmlSnippet(message);
 		}
 	}
 }

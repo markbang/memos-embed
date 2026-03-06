@@ -1,4 +1,6 @@
+import { renderMemoHtmlSnippet } from "./render";
 import type {
+	FetchMemoHtmlSnippetOptions,
 	FetchMemoOptions,
 	Memo,
 	MemoApiResponse,
@@ -173,4 +175,11 @@ export const fetchMemo = async ({
 	}
 
 	return normalizeMemo(data, user);
+};
+
+export const fetchMemoHtmlSnippet = async (
+	options: FetchMemoHtmlSnippetOptions,
+) => {
+	const memo = await fetchMemo(options);
+	return renderMemoHtmlSnippet(memo, options);
 };
