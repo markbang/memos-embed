@@ -32,10 +32,13 @@ describe("defineMemosEmbedElement", () => {
 		await Promise.resolve();
 
 		expect(renderStateSpy).toHaveBeenCalledWith("Loading memo…");
-		expect(fetchMemoSpy).toHaveBeenCalledWith({
-			baseUrl: "https://demo.usememos.com",
-			memoId: "1",
-		});
+		expect(fetchMemoSpy).toHaveBeenCalledWith(
+			expect.objectContaining({
+				baseUrl: "https://demo.usememos.com",
+				memoId: "1",
+				signal: expect.any(AbortSignal),
+			}),
+		);
 		expect(renderSnippetSpy).toHaveBeenCalled();
 		expect(element.shadowRoot?.innerHTML).toContain("Hello");
 

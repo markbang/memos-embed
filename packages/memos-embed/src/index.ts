@@ -23,5 +23,11 @@ export {
 	renderMemoHtmlSnippet,
 	renderMemoStateHtmlSnippet,
 } from "./render";
-export { buildEmbedUrl, renderIframeHtml } from "./iframe";
+export {
+	buildEmbedUrl,
+	buildIframeResizeScript,
+	MEMOS_EMBED_MEASURE_MESSAGE_TYPE,
+	MEMOS_EMBED_RESIZE_MESSAGE_TYPE,
+	renderIframeHtml,
+} from "./iframe";
 export { themePresets, defaultTheme, resolveTheme } from "./theme";

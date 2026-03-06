@@ -33,6 +33,8 @@ export class MemosEmbedElement extends HTMLElementBase {
 	}
 
 	private readonly shadowRootRef: ShadowRoot;
+	private abortController?: AbortController;
+	private renderToken = 0;
 
 	constructor() {
 		super();
@@ -41,6 +43,10 @@ export class MemosEmbedElement extends HTMLElementBase {
 
 	connectedCallback() {
 		void this.render();
+	}
+
+	disconnectedCallback() {
+		this.abortController?.abort();
 	}
 
 	attributeChangedCallback() {
@@ -75,15 +81,30 @@ export class MemosEmbedElement extends HTMLElementBase {
 			return;
 		}
 
+		this.abortController?.abort();
+		const controller = new AbortController();
+		this.abortController = controller;
+		const currentToken = ++this.renderToken;
+
 		this.shadowRootRef.innerHTML = renderMemoStateHtmlSnippet("Loading memo…");
 
 		try {
-			const memo = await fetchMemo({ baseUrl, memoId });
+			const memo = await fetchMemo({
+				baseUrl,
+				memoId,
+				signal: controller.signal,
+			});
+			if (controller.signal.aborted || currentToken !== this.renderToken) {
+				return;
+			}
 			this.shadowRootRef.innerHTML = renderMemoHtmlSnippet(
 				memo,
 				this.getRenderOptions(),
 			);
 		} catch (error) {
+			if (controller.signal.aborted || currentToken !== this.renderToken) {
+				return;
+			}
 			const message =
 				error instanceof Error ? error.message : "Failed to load memo.";
 			this.shadowRootRef.innerHTML = renderMemoStateHtmlSnippet(message);

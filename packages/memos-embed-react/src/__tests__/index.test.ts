@@ -38,10 +38,13 @@ describe("MemoEmbed", () => {
 			await Promise.resolve();
 		});
 
-		expect(fetchMemoSpy).toHaveBeenCalledWith({
-			baseUrl: "https://demo.usememos.com",
-			memoId: "1",
-		});
+		expect(fetchMemoSpy).toHaveBeenCalledWith(
+			expect.objectContaining({
+				baseUrl: "https://demo.usememos.com",
+				memoId: "1",
+				signal: expect.any(AbortSignal),
+			}),
+		);
 		expect(renderSnippetSpy).toHaveBeenCalled();
 		expect(container.innerHTML).toContain("Hello");
 		expect(container.textContent).not.toContain("Loading memo…");

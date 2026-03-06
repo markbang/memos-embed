@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { EmbedHtmlOptions, EmbedRenderOptions, Memo, ThemeInput } from "memos-embed";
+import type {
+	EmbedHtmlOptions,
+	EmbedRenderOptions,
+	Memo,
+	ThemeInput,
+} from "memos-embed";
 import {
 	fetchMemo,
 	renderMemoHtmlSnippet,
@@ -67,20 +72,21 @@ export const MemoEmbed = ({
 	);
 
 	useEffect(() => {
+		const controller = new AbortController();
 		let isMounted = true;
 		setError(null);
 		setMemo(null);
 
-		fetchMemo({ baseUrl, memoId })
+		fetchMemo({ baseUrl, memoId, signal: controller.signal })
 			.then((data: Memo) => {
-				if (!isMounted) {
+				if (!isMounted || controller.signal.aborted) {
 					return;
 				}
 				setMemo(data);
 				onLoad?.(data);
 			})
 			.catch((fetchError: Error) => {
-				if (!isMounted) {
+				if (!isMounted || controller.signal.aborted) {
 					return;
 				}
 				setError(fetchError);
@@ -89,6 +95,7 @@ export const MemoEmbed = ({
 
 		return () => {
 			isMounted = false;
+			controller.abort();
 		};
 	}, [baseUrl, memoId, onError, onLoad]);
 

@@ -4,6 +4,7 @@ import type {
 	FetchMemoOptions,
 	Memo,
 	MemoApiResponse,
+	MemoAttachment,
 	User,
 	UserApiResponse,
 } from "./types";
@@ -30,19 +31,28 @@ const getInstanceOrigin = (value: string) => {
 	return trimmed;
 };
 
-const normalizeAvatarUrl = (avatarUrl: string | undefined, baseUrl: string) => {
-	if (!avatarUrl) {
+const normalizeResourceUrl = (resourceUrl: string | undefined, baseUrl: string) => {
+	if (!resourceUrl) {
 		return undefined;
 	}
-	if (avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://")) {
-		return avatarUrl;
-	}
+
 	const origin = getInstanceOrigin(baseUrl);
-	if (avatarUrl.startsWith("/")) {
-		return `${origin}${avatarUrl}`;
+
+	try {
+		return new URL(resourceUrl, `${origin}/`).toString();
+	} catch {
+		return resourceUrl;
 	}
-	return `${origin}/${avatarUrl}`;
 };
+
+const normalizeAttachment = (
+	attachment: MemoAttachment,
+	baseUrl: string,
+): MemoAttachment => ({
+	...attachment,
+	content: normalizeResourceUrl(attachment.content, baseUrl),
+	externalLink: normalizeResourceUrl(attachment.externalLink, baseUrl),
+});
 
 const getIdFromName = (name: string) => {
 	const parts = name.split("/");
@@ -60,10 +70,16 @@ const normalizeUser = (user: UserApiResponse): User => {
 	};
 };
 
-const normalizeMemo = (memo: MemoApiResponse, user?: User): Memo => {
+const normalizeMemo = (
+	memo: MemoApiResponse,
+	baseUrl: string,
+	user?: User,
+): Memo => {
 	const content = memo.content ?? "";
 	const tags = memo.tags ?? [];
-	const attachments = memo.attachments ?? [];
+	const attachments = (memo.attachments ?? []).map((attachment) =>
+		normalizeAttachment(attachment, baseUrl),
+	);
 	const reactions = memo.reactions ?? [];
 	const id = memo.name ? getIdFromName(memo.name) : "";
 	const creatorFallback = memo.creator
@@ -76,7 +92,7 @@ const normalizeMemo = (memo: MemoApiResponse, user?: User): Memo => {
 		creator: user?.username ?? creatorFallback,
 		creatorDisplayName: user?.displayName,
 		creatorUsername: user?.username,
-		creatorAvatarUrl: user?.avatarUrl,
+		creatorAvatarUrl: normalizeResourceUrl(user?.avatarUrl, baseUrl),
 		createTime: memo.createTime,
 		updateTime: memo.updateTime,
 		displayTime: memo.displayTime,
@@ -123,11 +139,7 @@ const fetchUser = async ({
 		return undefined;
 	}
 
-	const normalized = normalizeUser(data);
-	return {
-		...normalized,
-		avatarUrl: normalizeAvatarUrl(normalized.avatarUrl, baseUrl),
-	};
+	return normalizeUser(data);
 };
 
 export const fetchMemo = async ({
@@ -174,7 +186,7 @@ export const fetchMemo = async ({
 		});
 	}
 
-	return normalizeMemo(data, user);
+	return normalizeMemo(data, baseUrl, user);
 };
 
 export const fetchMemoHtmlSnippet = async (

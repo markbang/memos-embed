@@ -2,6 +2,7 @@ import {
 	HeadContent,
 	Scripts,
 	createRootRouteWithContext,
+	useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
@@ -53,13 +54,21 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 	shellComponent: RootDocument,
 });
 
+export const getRootBodyClassName = (pathname: string) =>
+	pathname.startsWith("/embed/") ? "memos-embed-route" : undefined;
+
 function RootDocument({ children }: { children: React.ReactNode }) {
+	const pathname = useRouterState({
+		select: (state) => state.location.pathname,
+	});
+	const bodyClassName = getRootBodyClassName(pathname);
+
 	return (
 		<html lang={getLocale()}>
 			<head>
 				<HeadContent />
 			</head>
-			<body>
+			<body className={bodyClassName}>
 				<Header />
 				{children}
 				<TanStackDevtools

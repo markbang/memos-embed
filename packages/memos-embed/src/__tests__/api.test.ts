@@ -36,6 +36,34 @@ describe("fetchMemo", () => {
 		expect(memo.tags).toEqual(["note"]);
 	});
 
+	it("normalizes attachment urls against the instance origin", async () => {
+		const memo = await fetchMemo({
+			baseUrl: "https://demo.usememos.com",
+			memoId: "123",
+			includeCreator: false,
+			fetcher: async () =>
+				({
+					ok: true,
+					json: async () => ({
+						name: "memos/123",
+						content: "Hello",
+						tags: [],
+						attachments: [
+							{
+								name: "attachments/1",
+								filename: "cover.png",
+								content: "/file/cover.png",
+							},
+						],
+					}),
+				} as Response),
+		});
+
+		expect(memo.attachments[0]?.content).toBe(
+			"https://demo.usememos.com/file/cover.png",
+		);
+	});
+
 	it("resolves creator details", async () => {
 		const fetcher = vi.fn(async (url: RequestInfo | URL) => {
 			const href = String(url);
@@ -69,6 +97,7 @@ describe("fetchMemo", () => {
 
 		expect(memo.creator).toBe("bangwu");
 		expect(memo.creatorUsername).toBe("bangwu");
+		expect(memo.creatorDisplayName).toBe("棒无");
 		expect(memo.creatorAvatarUrl).toBe(
 			"https://demo.usememos.com/api/v1/users/1/avatar",
 		);

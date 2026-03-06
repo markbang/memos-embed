@@ -11,5 +11,18 @@ pnpm add @memos-embed/react
 ```tsx
 import { MemoEmbed } from '@memos-embed/react'
 
-<MemoEmbed baseUrl="https://demo.usememos.com/api/v1" memoId="1" />
+<MemoEmbed
+  baseUrl="https://demo.usememos.com/api/v1"
+  memoId="1"
+  theme="glass"
+  density="comfortable"
+  showTags
+  showAttachments
+  showReactions
+  showMeta
+/>
 ```
+
+## Notes
+- Fetch requests are cancelled when props change or the component unmounts
+- Rendering is powered by the shared `memos-embed` core package, so output stays consistent with the iframe and Web Component versions
