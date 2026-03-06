@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { getMemo } from "@/data/memos";
-import { buildEmbedCss, renderMemoHtml } from "memos-embed";
+import {
+	renderMemoHtmlSnippet,
+	renderMemoStateHtmlSnippet,
+} from "memos-embed";
 import type { EmbedRenderOptions } from "memos-embed";
 
 type SearchParams = {
@@ -16,7 +19,7 @@ export const Route = createFileRoute("/embed/$memoId")({
 
 		if (!baseUrl) {
 			return {
-				html: `<style>${buildEmbedCss()}</style><div class="memos-embed__state">Missing baseUrl.</div>`,
+				html: renderMemoStateHtmlSnippet("Missing baseUrl."),
 			};
 		}
 
@@ -28,16 +31,14 @@ export const Route = createFileRoute("/embed/$memoId")({
 				},
 			});
 
-			const html = renderMemoHtml(memo, { theme, density });
-
 			return {
-				html: `<style>${buildEmbedCss()}</style>${html}`,
+				html: renderMemoHtmlSnippet(memo, { theme, density }),
 			};
 		} catch (error) {
 			const message =
 				error instanceof Error ? error.message : "Failed to load memo.";
 			return {
-				html: `<style>${buildEmbedCss()}</style><div class="memos-embed__state">${message}</div>`,
+				html: renderMemoStateHtmlSnippet(message),
 			};
 		}
 	},

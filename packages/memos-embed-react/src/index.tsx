@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type {
-	EmbedHtmlOptions,
-	EmbedRenderOptions,
-	Memo,
-	ThemeInput,
+import type { EmbedHtmlOptions, EmbedRenderOptions, Memo, ThemeInput } from "memos-embed";
+import {
+	fetchMemo,
+	renderMemoHtmlSnippet,
+	renderMemoStateHtmlSnippet,
 } from "memos-embed";
-import { buildEmbedCss, fetchMemo, renderMemoHtml } from "memos-embed";
 
 export type MemoEmbedProps = {
 	memoId: string;
@@ -97,16 +96,27 @@ export const MemoEmbed = ({
 		if (!memo || !containerRef.current) {
 			return;
 		}
-		const html = renderMemoHtml(memo, htmlOptions);
-		containerRef.current.innerHTML = `<style>${buildEmbedCss()}</style>${html}`;
+		containerRef.current.innerHTML = renderMemoHtmlSnippet(memo, htmlOptions);
 	}, [memo, htmlOptions]);
 
 	if (error) {
-		return <div className="memos-embed__state">Failed to load memo.</div>;
+		return (
+			<div
+				dangerouslySetInnerHTML={{
+					__html: renderMemoStateHtmlSnippet("Failed to load memo."),
+				}}
+			/>
+		);
 	}
 
 	if (!memo) {
-		return <div className="memos-embed__state">Loading memo…</div>;
+		return (
+			<div
+				dangerouslySetInnerHTML={{
+					__html: renderMemoStateHtmlSnippet("Loading memo…"),
+				}}
+			/>
+		);
 	}
 
 	return <div className="memos-embed__container" ref={containerRef} />;

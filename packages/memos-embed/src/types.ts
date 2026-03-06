@@ -151,6 +151,8 @@ export type EmbedHtmlOptions = EmbedRenderOptions & {
 	includeStyles?: boolean;
 };
 
+export type FetchMemoHtmlSnippetOptions = FetchMemoOptions & EmbedHtmlOptions;
+
 export type IframeEmbedOptions = {
 	embedBaseUrl: string;
 	baseUrl: string;

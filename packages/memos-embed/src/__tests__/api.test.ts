@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { fetchMemo } from "../api";
+import { fetchMemo, fetchMemoHtmlSnippet } from "../api";
 
 describe("fetchMemo", () => {
 	it("throws when baseUrl is missing", async () => {
@@ -96,5 +96,43 @@ describe("fetchMemo", () => {
 		const firstCall = calls[0];
 		const url = firstCall ? String(firstCall[0]) : "";
 		expect(url).toContain("https://demo.usememos.com/api/v1/memos/123");
+	});
+});
+
+describe("fetchMemoHtmlSnippet", () => {
+	it("returns a rendered html snippet", async () => {
+		const html = await fetchMemoHtmlSnippet({
+			baseUrl: "https://demo.usememos.com/api/v1",
+			memoId: "123",
+			fetcher: async () =>
+				({
+					ok: true,
+					json: async () => ({
+						name: "memos/123",
+						content: "Hello",
+						tags: [],
+					}),
+				} as Response),
+			includeCreator: false,
+			includeStyles: false,
+		});
+
+		expect(html).toContain("memos-embed");
+		expect(html).not.toContain("<style>");
+		expect(html).toContain("<p>Hello</p>");
+	});
+
+	it("rethrows fetch errors", async () => {
+		await expect(
+			fetchMemoHtmlSnippet({
+				baseUrl: "https://demo.usememos.com/api/v1",
+				memoId: "123",
+				fetcher: async () =>
+					({
+						ok: false,
+						status: 500,
+					} as Response),
+			}),
+		).rejects.toThrow("Failed to fetch memo (500)");
 	});
 });
