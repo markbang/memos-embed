@@ -122,9 +122,7 @@ export default function Header() {
 					<SheetContent side="left" className="pr-0">
 						<SheetHeader>
 							<SheetTitle>Memos Embed</SheetTitle>
-							<SheetDescription>
-								{m.nav_explore_desc()}
-							</SheetDescription>
+							<SheetDescription>{m.nav_explore_desc()}</SheetDescription>
 						</SheetHeader>
 						<nav className="mt-4 flex flex-col gap-4">
 							{navLinks.map((link) => (

@@ -170,9 +170,7 @@ export function HomePageContent({
 					<Card className="border-border/70 bg-card/80 shadow-lg">
 						<CardHeader>
 							<CardTitle>{m.hero_card_title()}</CardTitle>
-							<CardDescription>
-								{m.hero_card_desc()}
-							</CardDescription>
+							<CardDescription>{m.hero_card_desc()}</CardDescription>
 						</CardHeader>
 						<CardContent className="space-y-4">
 							<div className="rounded-xl border bg-muted/40 p-4 font-mono text-xs leading-6 text-muted-foreground sm:text-sm">
@@ -197,15 +195,9 @@ export function HomePageContent({
 									{m.hero_card_why_title()}
 								</p>
 								<ul className="mt-2 space-y-2">
-									<li>
-										• {m.hero_card_why_1()}
-									</li>
-									<li>
-										• {m.hero_card_why_2()}
-									</li>
-									<li>
-										• {m.hero_card_why_3()}
-									</li>
+									<li>• {m.hero_card_why_1()}</li>
+									<li>• {m.hero_card_why_2()}</li>
+									<li>• {m.hero_card_why_3()}</li>
 								</ul>
 							</div>
 						</CardContent>
@@ -248,9 +240,7 @@ export function HomePageContent({
 						<h2 className="text-3xl font-semibold tracking-tight">
 							{m.section_why_title()}
 						</h2>
-						<p className="text-muted-foreground">
-							{m.section_why_desc()}
-						</p>
+						<p className="text-muted-foreground">{m.section_why_desc()}</p>
 					</div>
 					<div className="grid grid-cols-1 gap-8 md:grid-cols-3">
 						{featureCards.map((feature) => (
@@ -275,9 +265,7 @@ export function HomePageContent({
 								<h2 className="text-3xl font-semibold tracking-tight">
 									{m.cta_title()}
 								</h2>
-								<p className="text-muted-foreground">
-									{m.cta_desc()}
-								</p>
+								<p className="text-muted-foreground">{m.cta_desc()}</p>
 							</div>
 							<div className="flex flex-wrap gap-3">
 								{heroButtons.map((button) => (

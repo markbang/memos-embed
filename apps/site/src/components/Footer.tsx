@@ -32,9 +32,7 @@ export default function Footer() {
 						{m.footer_badge()}
 					</div>
 					<div className="space-y-2">
-						<h2 className="text-xl font-semibold">
-							{m.footer_title()}
-						</h2>
+						<h2 className="text-xl font-semibold">{m.footer_title()}</h2>
 						<p className="max-w-xl text-sm text-muted-foreground">
 							{m.footer_desc()}
 						</p>

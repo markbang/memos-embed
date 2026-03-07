@@ -32,7 +32,9 @@ hljs.registerLanguage("markdown", markdown);
 hljs.registerLanguage("md", markdown);
 
 export function highlightCodeBlocks(container: HTMLElement) {
-	const blocks = container.querySelectorAll<HTMLElement>("pre[data-language] code");
+	const blocks = container.querySelectorAll<HTMLElement>(
+		"pre[data-language] code",
+	);
 	for (const block of blocks) {
 		const language = block.parentElement?.getAttribute("data-language") ?? "";
 		if (language && hljs.getLanguage(language)) {
