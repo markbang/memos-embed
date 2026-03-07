@@ -13,10 +13,13 @@ const createDomRect = (height: number): DOMRect =>
 		bottom: height,
 		left: 0,
 		toJSON: () => ({}),
-	} as DOMRect);
+	}) as DOMRect;
 
-let originalParentDescriptor = Object.getOwnPropertyDescriptor(window, "parent");
-let originalResizeObserverDescriptor = Object.getOwnPropertyDescriptor(
+const originalParentDescriptor = Object.getOwnPropertyDescriptor(
+	window,
+	"parent",
+);
+const originalResizeObserverDescriptor = Object.getOwnPropertyDescriptor(
 	globalThis,
 	"ResizeObserver",
 );
@@ -46,7 +49,6 @@ describe("EmbedPreview", () => {
 		class ResizeObserverMock {
 			observe = vi.fn();
 			disconnect = vi.fn();
-			constructor(_callback: ResizeObserverCallback) {}
 		}
 		Object.defineProperty(globalThis, "ResizeObserver", {
 			value: ResizeObserverMock,
@@ -70,7 +72,10 @@ describe("EmbedPreview", () => {
 		});
 
 		const { container, unmount } = render(
-			<EmbedPreview html="<article>Rendered memo</article>" frameId="frame-1" />,
+			<EmbedPreview
+				html="<article>Rendered memo</article>"
+				frameId="frame-1"
+			/>,
 		);
 		const root = container.firstElementChild as HTMLDivElement;
 		vi.spyOn(root, "getBoundingClientRect").mockReturnValue(createDomRect(180));

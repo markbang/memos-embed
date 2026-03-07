@@ -1,5 +1,8 @@
+import { MemoEmbed } from "@memos-embed/react";
 import { Check, Copy, Share2 } from "lucide-react";
+import { type ThemePresetName, themePresets } from "memos-embed";
 import { useEffect, useId, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -7,8 +10,8 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	Select,
 	SelectContent,
@@ -19,9 +22,6 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { MemoEmbed } from "@memos-embed/react";
-import { themePresets, type ThemePresetName } from "memos-embed";
 import {
 	buildEmbedPreviewUrl,
 	buildIframeCode,
@@ -71,16 +71,7 @@ export function PlaygroundExperience({
 
 	useEffect(() => {
 		setState(initialState);
-	}, [
-		initialState.baseUrl,
-		initialState.memoId,
-		initialState.theme,
-		initialState.density,
-		initialState.showTags,
-		initialState.showAttachments,
-		initialState.showReactions,
-		initialState.showMeta,
-	]);
+	}, [initialState]);
 
 	useEffect(() => {
 		void registerWebComponent?.();
@@ -94,19 +85,11 @@ export function PlaygroundExperience({
 
 	useEffect(() => {
 		onStateChange?.(state);
-	}, [
-		onStateChange,
-		state.baseUrl,
-		state.memoId,
-		state.theme,
-		state.density,
-		state.showTags,
-		state.showAttachments,
-		state.showReactions,
-		state.showMeta,
-	]);
+	}, [onStateChange, state]);
 
-	const previewUrl = embedBaseUrl ? buildEmbedPreviewUrl(embedBaseUrl, state) : "";
+	const previewUrl = embedBaseUrl
+		? buildEmbedPreviewUrl(embedBaseUrl, state)
+		: "";
 	const effectiveEmbedBaseUrl = embedBaseUrl || "https://your-embed-site.com";
 	const shareUrl = embedBaseUrl ? buildShareUrl(embedBaseUrl, state) : "";
 
@@ -137,7 +120,11 @@ export function PlaygroundExperience({
 			aria-label={`Copy ${label}`}
 			onClick={() => void handleCopy(key, value)}
 		>
-			{copiedKey === key ? <Check className="size-4" /> : <Copy className="size-4" />}
+			{copiedKey === key ? (
+				<Check className="size-4" />
+			) : (
+				<Copy className="size-4" />
+			)}
 			{copiedKey === key ? "Copied" : "Copy"}
 		</Button>
 	);

@@ -41,7 +41,18 @@ pnpm -r build
 ## Tests
 ```bash
 pnpm test
+pnpm test:artifacts
 ```
+
+## Validation
+```bash
+pnpm validate
+```
+
+## Releasing
+- Add a changeset for package changes with `pnpm changeset`
+- The `Publish Packages` workflow opens or updates a release PR on `main`
+- Merging the release PR publishes changed packages to npm
 
 ## Usage
 ### Core package
@@ -107,3 +118,5 @@ const iframe = renderIframeHtml({
 - The site uses source aliases so local changes in `packages/*` show up immediately in `apps/site`
 - The playground keeps its configuration in the URL for easy sharing
 - Package builds are powered by `tsup`; site builds use Vite + TanStack Start
+- CI runs `pnpm validate`, including lint, Biome checks, tests, package-consumer smoke tests, and the site build
+- Releases are managed with Changesets release PRs and publish automatically after the release PR lands on `main`

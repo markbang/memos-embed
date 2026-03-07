@@ -1,4 +1,11 @@
-import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import {
+	cleanup,
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+	within,
+} from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PlaygroundExperience } from "@/components/PlaygroundExperience";
 import { defaultPlaygroundState } from "@/lib/playground";
@@ -9,7 +16,10 @@ vi.mock("@memos-embed/react", () => ({
 
 describe("PlaygroundExperience", () => {
 	const writeText = vi.fn(async () => undefined);
-	const iframeAttributes = new WeakMap<HTMLIFrameElement, Map<string, string>>();
+	const iframeAttributes = new WeakMap<
+		HTMLIFrameElement,
+		Map<string, string>
+	>();
 	const originalSetAttribute = HTMLIFrameElement.prototype.setAttribute;
 	const originalGetAttribute = HTMLIFrameElement.prototype.getAttribute;
 
@@ -100,7 +110,9 @@ describe("PlaygroundExperience", () => {
 			expect(previewSrc).toContain("showAttachments=false");
 		});
 
-		const shareUrlInput = screen.getByLabelText("Share URL") as HTMLInputElement;
+		const shareUrlInput = screen.getByLabelText(
+			"Share URL",
+		) as HTMLInputElement;
 		expect(shareUrlInput.value).toContain(
 			"baseUrl=https%3A%2F%2Fmemos.example.com%2Fapi%2Fv1",
 		);
@@ -154,7 +166,9 @@ describe("PlaygroundExperience", () => {
 			);
 		});
 
-		const shareUrlInput = scoped.getByLabelText("Share URL") as HTMLInputElement;
+		const shareUrlInput = scoped.getByLabelText(
+			"Share URL",
+		) as HTMLInputElement;
 		expect(shareUrlInput.value).toContain("theme=midnight");
 		expect(shareUrlInput.value).toContain("density=compact");
 

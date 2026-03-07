@@ -1,9 +1,9 @@
 import {
 	buildEmbedUrl,
-	renderIframeHtml,
-	themePresets,
 	type EmbedRenderOptions,
+	renderIframeHtml,
 	type ThemePresetName,
+	themePresets,
 } from "memos-embed";
 
 export type PlaygroundState = {
@@ -114,10 +114,7 @@ export const buildEmbedPreviewUrl = (
 		showMeta: state.showMeta,
 	});
 
-export const buildIframeCode = (
-	embedBaseUrl: string,
-	state: PlaygroundState,
-) =>
+export const buildIframeCode = (embedBaseUrl: string, state: PlaygroundState) =>
 	renderIframeHtml({
 		embedBaseUrl,
 		baseUrl: state.baseUrl,
@@ -133,7 +130,9 @@ export const buildIframeCode = (
 		autoResize: true,
 	});
 
-export const buildWebComponentCode = (state: PlaygroundState) => `<script type="module" src="https://unpkg.com/@memos-embed/wc@latest/dist/register.js"></script>
+export const buildWebComponentCode = (
+	state: PlaygroundState,
+) => `<script type="module" src="https://unpkg.com/@memos-embed/wc@latest/dist/register.js"></script>
 <memos-embed
   base-url="${state.baseUrl}"
   memo-id="${state.memoId}"
@@ -145,7 +144,9 @@ export const buildWebComponentCode = (state: PlaygroundState) => `<script type="
   show-meta="${String(state.showMeta)}"
 ></memos-embed>`;
 
-export const buildReactCode = (state: PlaygroundState) => `import { MemoEmbed } from '@memos-embed/react'
+export const buildReactCode = (
+	state: PlaygroundState,
+) => `import { MemoEmbed } from '@memos-embed/react'
 
 <MemoEmbed
   baseUrl="${state.baseUrl}"

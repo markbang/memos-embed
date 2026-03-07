@@ -1,33 +1,47 @@
 {
-	"name": "@memos-embed/react",
-	"version": "0.3.0",
-	"type": "module",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/markbang/memos-embed.git"
-	},
-	"main": "./dist/index.cjs",
-	"module": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
-		}
-	},
-	"files": [
-		"dist"
-	],
-	"scripts": {
-		"build": "tsup src/index.tsx --format esm,cjs --dts --clean",
-		"test": "vitest run"
-	},
-	"peerDependencies": {
-		"react": ">=18.0.0",
-		"react-dom": ">=18.0.0"
-	},
-	"dependencies": {
-		"memos-embed": "workspace:*"
-	}
+  "name": "@memos-embed/react",
+  "version": "0.3.0",
+  "description": "React component wrapper for embedding Memos memo cards.",
+  "type": "module",
+  "homepage": "https://github.com/markbang/memos-embed/tree/main/packages/memos-embed-react#readme",
+  "bugs": {
+    "url": "https://github.com/markbang/memos-embed/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/markbang/memos-embed.git"
+  },
+  "keywords": [
+    "memos",
+    "embed",
+    "react",
+    "component"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.tsx --format esm,cjs --dts --clean",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "dependencies": {
+    "memos-embed": "workspace:*"
+  }
 }

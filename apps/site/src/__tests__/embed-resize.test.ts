@@ -1,3 +1,4 @@
+import { MEMOS_EMBED_MEASURE_MESSAGE_TYPE } from "memos-embed";
 import { describe, expect, it, vi } from "vitest";
 import {
 	bindEmbedAutoResize,
@@ -5,7 +6,6 @@ import {
 	isEmbedMeasureRequest,
 	measureEmbedHeight,
 } from "@/lib/embed-resize";
-import { MEMOS_EMBED_MEASURE_MESSAGE_TYPE } from "memos-embed";
 
 const createDomRect = (height: number): DOMRect =>
 	({
@@ -18,12 +18,14 @@ const createDomRect = (height: number): DOMRect =>
 		bottom: height,
 		left: 0,
 		toJSON: () => ({}),
-	} as DOMRect);
+	}) as DOMRect;
 
 describe("embed resize helpers", () => {
 	it("measures the tallest available embed height", () => {
 		const container = document.createElement("div");
-		vi.spyOn(container, "getBoundingClientRect").mockReturnValue(createDomRect(180));
+		vi.spyOn(container, "getBoundingClientRect").mockReturnValue(
+			createDomRect(180),
+		);
 		Object.defineProperty(document.documentElement, "scrollHeight", {
 			value: 240,
 			configurable: true,
@@ -59,7 +61,9 @@ describe("embed resize helpers", () => {
 	it("binds resize observers and responds to measurement requests", () => {
 		const parentWindow = { postMessage: vi.fn() };
 		const container = document.createElement("div");
-		vi.spyOn(container, "getBoundingClientRect").mockReturnValue(createDomRect(190));
+		vi.spyOn(container, "getBoundingClientRect").mockReturnValue(
+			createDomRect(190),
+		);
 		Object.defineProperty(document.documentElement, "scrollHeight", {
 			value: 210,
 			configurable: true,

@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import type { EmbedRenderOptions } from "memos-embed";
+import { renderMemoHtmlSnippet, renderMemoStateHtmlSnippet } from "memos-embed";
 import { useEffect, useRef } from "react";
 import { getMemo } from "@/data/memos";
 import { bindEmbedAutoResize } from "@/lib/embed-resize";
 import { normalizeBooleanSearchValue } from "@/lib/playground";
-import { renderMemoHtmlSnippet, renderMemoStateHtmlSnippet } from "memos-embed";
-import type { EmbedRenderOptions } from "memos-embed";
 
 type SearchParams = {
 	baseUrl?: string;
@@ -109,7 +109,7 @@ export function EmbedPreview({
 			frameId,
 			container: containerRef.current,
 		});
-	}, [frameId, html]);
+	}, [frameId]);
 
 	return <div ref={containerRef} />;
 }
