@@ -11,6 +11,7 @@ import { useId } from "react";
 import Footer from "@/components/Footer";
 import { buildPageHead, SITE_DESCRIPTION } from "@/lib/site-meta";
 import { buildThemeInitializationScript } from "@/lib/site-theme";
+import { m } from "@/paraglide/messages";
 import { getLocale } from "@/paraglide/runtime";
 import Header from "../components/Header";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
@@ -80,7 +81,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					href={`#${mainContentId}`}
 					className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-foreground"
 				>
-					Skip to content
+					{m.skip_to_content()}
 				</a>
 				<Header />
 				<main
