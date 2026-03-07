@@ -5,6 +5,10 @@ export default defineConfig({
 	resolve: {
 		alias: [
 			{
+				find: /^@\/paraglide\/messages$/,
+				replacement: resolve(__dirname, "src/test/paraglide-messages.mock.ts"),
+			},
+			{
 				find: /^@\/paraglide\/runtime$/,
 				replacement: resolve(__dirname, "src/test/paraglide-runtime.mock.ts"),
 			},
