@@ -23,23 +23,42 @@ import {
 	SITE_THEME_MEDIA_QUERY,
 	type SiteThemeMode,
 } from "@/lib/site-theme";
+import { m } from "@/paraglide/messages";
 import ParaglideLocaleSwitcher from "./LocaleSwitcher";
 
 const navLinks = [
-	{ to: "/", label: "Home" },
-	{ to: "/docs", label: "Docs" },
-	{ to: "/playground", label: "Playground" },
+	{ to: "/", labelKey: "nav_home" },
+	{ to: "/docs", labelKey: "nav_docs" },
+	{ to: "/playground", labelKey: "nav_playground" },
 ] as const;
+
+const getNavLabel = (key: string) => {
+	const labels: Record<string, () => string> = {
+		nav_home: () => m.nav_home(),
+		nav_docs: () => m.nav_docs(),
+		nav_playground: () => m.nav_playground(),
+	};
+	return labels[key]?.() ?? key;
+};
 
 const themeOptions: Array<{
 	value: SiteThemeMode;
-	label: string;
+	labelKey: string;
 	icon: typeof Sun;
 }> = [
-	{ value: "light", label: "Light", icon: Sun },
-	{ value: "dark", label: "Dark", icon: Moon },
-	{ value: "system", label: "System", icon: Monitor },
+	{ value: "light", labelKey: "theme_light", icon: Sun },
+	{ value: "dark", labelKey: "theme_dark", icon: Moon },
+	{ value: "system", labelKey: "theme_system", icon: Monitor },
 ];
+
+const getThemeLabel = (key: string) => {
+	const labels: Record<string, () => string> = {
+		theme_light: () => m.theme_light(),
+		theme_dark: () => m.theme_dark(),
+		theme_system: () => m.theme_system(),
+	};
+	return labels[key]?.() ?? key;
+};
 
 export default function Header() {
 	const [themeMode, setThemeMode] = useState<SiteThemeMode>(() =>
@@ -95,7 +114,7 @@ export default function Header() {
 							variant="ghost"
 							size="icon"
 							className="md:hidden"
-							aria-label="Open navigation menu"
+							aria-label={m.open_nav_menu()}
 						>
 							<Menu className="size-5" />
 						</Button>
@@ -103,9 +122,7 @@ export default function Header() {
 					<SheetContent side="left" className="pr-0">
 						<SheetHeader>
 							<SheetTitle>Memos Embed</SheetTitle>
-							<SheetDescription>
-								Explore the docs, playground, and open-source packages.
-							</SheetDescription>
+							<SheetDescription>{m.nav_explore_desc()}</SheetDescription>
 						</SheetHeader>
 						<nav className="mt-4 flex flex-col gap-4">
 							{navLinks.map((link) => (
@@ -114,7 +131,7 @@ export default function Header() {
 									to={link.to}
 									className="block px-2 py-1 text-lg"
 								>
-									{link.label}
+									{getNavLabel(link.labelKey)}
 								</Link>
 							))}
 						</nav>
@@ -137,12 +154,12 @@ export default function Header() {
 				<div className="flex min-w-0 flex-1 items-center gap-4">
 					<Link to="/" className="flex min-w-0 items-center gap-3">
 						<div className="hidden rounded-full border border-border/60 bg-muted/40 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground sm:inline-flex">
-							Open source
+							{m.open_source()}
 						</div>
 						<div className="min-w-0">
 							<p className="truncate font-semibold">Memos Embed</p>
 							<p className="hidden text-xs text-muted-foreground md:block">
-								Embeddable memo cards for Memos
+								{m.site_tagline()}
 							</p>
 						</div>
 					</Link>
@@ -155,7 +172,7 @@ export default function Header() {
 								className="text-foreground/60 transition-colors hover:text-foreground"
 								activeProps={{ className: "text-foreground" }}
 							>
-								{link.label}
+								{getNavLabel(link.labelKey)}
 							</Link>
 						))}
 					</nav>
@@ -179,7 +196,7 @@ export default function Header() {
 					</Button>
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" size="icon" aria-label="Toggle theme">
+							<Button variant="ghost" size="icon" aria-label={m.theme_toggle()}>
 								<Sun className="h-[1.15rem] w-[1.15rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
 								<Moon className="absolute h-[1.15rem] w-[1.15rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
 							</Button>
@@ -196,7 +213,7 @@ export default function Header() {
 									>
 										<span className="inline-flex items-center gap-2">
 											<Icon className="size-4" />
-											{option.label}
+											{getThemeLabel(option.labelKey)}
 										</span>
 										{isActive ? <Check className="size-4" /> : null}
 									</DropdownMenuItem>

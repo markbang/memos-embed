@@ -32,6 +32,10 @@ const createManualChunk = (id: string) => {
 		return "ui-icons";
 	}
 
+	if (id.includes("/node_modules/highlight.js/")) {
+		return "hljs-vendor";
+	}
+
 	return undefined;
 };
 

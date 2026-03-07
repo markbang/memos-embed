@@ -1,11 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ExternalLink, Github, Package } from "lucide-react";
-
-const productLinks = [
-	{ to: "/", label: "Home" },
-	{ to: "/docs", label: "Documentation" },
-	{ to: "/playground", label: "Playground" },
-];
+import { m } from "@/paraglide/messages";
 
 const resourceLinks = [
 	{
@@ -23,20 +18,23 @@ const resourceLinks = [
 const currentYear = new Date().getFullYear();
 
 export default function Footer() {
+	const productLinks = [
+		{ to: "/", label: m.footer_home() },
+		{ to: "/docs", label: m.footer_docs() },
+		{ to: "/playground", label: m.footer_playground() },
+	];
+
 	return (
 		<footer className="border-t bg-muted/20">
 			<div className="container mx-auto grid gap-10 px-4 py-10 md:grid-cols-[1.3fr_0.7fr]">
 				<div className="space-y-4">
 					<div className="inline-flex items-center rounded-full border border-border/60 bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
-						Open-source Memos embeds
+						{m.footer_badge()}
 					</div>
 					<div className="space-y-2">
-						<h2 className="text-xl font-semibold">
-							Ship polished memo embeds faster
-						</h2>
+						<h2 className="text-xl font-semibold">{m.footer_title()}</h2>
 						<p className="max-w-xl text-sm text-muted-foreground">
-							Use the hosted playground to tune your embed, then copy the
-							iframe, Web Component, or React snippet that fits your stack.
+							{m.footer_desc()}
 						</p>
 					</div>
 				</div>
@@ -44,7 +42,7 @@ export default function Footer() {
 				<div className="grid gap-8 sm:grid-cols-2">
 					<div className="space-y-3">
 						<h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-							Site
+							{m.footer_site()}
 						</h3>
 						<ul className="space-y-2 text-sm">
 							{productLinks.map((link) => (
@@ -62,7 +60,7 @@ export default function Footer() {
 
 					<div className="space-y-3">
 						<h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-							Resources
+							{m.footer_resources()}
 						</h3>
 						<ul className="space-y-2 text-sm">
 							{resourceLinks.map((link) => {
@@ -88,8 +86,8 @@ export default function Footer() {
 			</div>
 			<div className="border-t">
 				<div className="container mx-auto flex flex-col gap-2 px-4 py-4 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-					<p>© {currentYear} Memos Embed.</p>
-					<p>Built for blogs, changelogs, docs, and product updates.</p>
+					<p>{m.footer_copyright({ year: String(currentYear) })}</p>
+					<p>{m.footer_built_for()}</p>
 				</div>
 			</div>
 		</footer>
