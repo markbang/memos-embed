@@ -1,26 +1,41 @@
 {
-	"name": "memos-embed",
-	"version": "0.3.0",
-	"type": "module",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/markbang/memos-embed.git"
-	},
-	"main": "./dist/index.cjs",
-	"module": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
-		}
-	},
-	"files": [
-		"dist"
-	],
-	"scripts": {
-		"build": "tsup src/index.ts --format esm,cjs --dts --clean",
-		"test": "vitest run"
-	}
+  "name": "memos-embed",
+  "version": "0.3.0",
+  "description": "Core HTML renderer and iframe helpers for embedding Memos memo cards.",
+  "type": "module",
+  "homepage": "https://github.com/markbang/memos-embed/tree/main/packages/memos-embed#readme",
+  "bugs": {
+    "url": "https://github.com/markbang/memos-embed/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/markbang/memos-embed.git"
+  },
+  "keywords": [
+    "memos",
+    "embed",
+    "iframe",
+    "ssr",
+    "html"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "test": "vitest run"
+  }
 }

@@ -1,21 +1,16 @@
+import { TanStackDevtools } from "@tanstack/react-devtools";
+import type { QueryClient } from "@tanstack/react-query";
 import {
+	createRootRouteWithContext,
 	HeadContent,
 	Scripts,
-	createRootRouteWithContext,
 	useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { TanStackDevtools } from "@tanstack/react-devtools";
-
-import Header from "../components/Header";
-
-import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
-
 import { getLocale } from "@/paraglide/runtime";
-
+import Header from "../components/Header";
+import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
-
-import type { QueryClient } from "@tanstack/react-query";
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -62,6 +57,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 		select: (state) => state.location.pathname,
 	});
 	const bodyClassName = getRootBodyClassName(pathname);
+	const showDevtools = import.meta.env.DEV;
 
 	return (
 		<html lang={getLocale()}>
@@ -71,18 +67,20 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<body className={bodyClassName}>
 				<Header />
 				{children}
-				<TanStackDevtools
-					config={{
-						position: "bottom-right",
-					}}
-					plugins={[
-						{
-							name: "Tanstack Router",
-							render: <TanStackRouterDevtoolsPanel />,
-						},
-						TanStackQueryDevtools,
-					]}
-				/>
+				{showDevtools ? (
+					<TanStackDevtools
+						config={{
+							position: "bottom-right",
+						}}
+						plugins={[
+							{
+								name: "Tanstack Router",
+								render: <TanStackRouterDevtoolsPanel />,
+							},
+							TanStackQueryDevtools,
+						]}
+					/>
+				) : null}
 				<Scripts />
 			</body>
 		</html>

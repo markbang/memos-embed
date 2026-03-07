@@ -13,10 +13,7 @@ export const measureEmbedHeight = (
 		currentDocument.body.scrollHeight,
 	);
 
-export const createEmbedResizeMessage = (
-	frameId: string,
-	height: number,
-) => ({
+export const createEmbedResizeMessage = (frameId: string, height: number) => ({
 	type: MEMOS_EMBED_RESIZE_MESSAGE_TYPE,
 	frameId,
 	height,
@@ -44,17 +41,16 @@ export const bindEmbedAutoResize = ({
 	currentWindow = window,
 	currentDocument = document,
 	parentWindow = window.parent,
-	ResizeObserverCtor =
-		typeof ResizeObserver === "undefined" ? undefined : ResizeObserver,
+	ResizeObserverCtor = typeof ResizeObserver === "undefined"
+		? undefined
+		: ResizeObserver,
 }: {
 	frameId: string;
 	container: HTMLElement;
 	currentWindow?: Window & typeof globalThis;
 	currentDocument?: Document;
 	parentWindow?: Pick<Window, "postMessage">;
-	ResizeObserverCtor?:
-		| typeof ResizeObserver
-		| undefined;
+	ResizeObserverCtor?: typeof ResizeObserver | undefined;
 }) => {
 	const postHeight = () => {
 		parentWindow.postMessage(

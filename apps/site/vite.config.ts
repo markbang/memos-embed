@@ -1,14 +1,48 @@
-import { defineConfig } from "vite";
 import { resolve } from "node:path";
-import { devtools } from "@tanstack/devtools-vite";
 import { paraglideVitePlugin } from "@inlang/paraglide-js";
+import tailwindcss from "@tailwindcss/vite";
+import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
-import viteTsConfigPaths from "vite-tsconfig-paths";
-import tailwindcss from "@tailwindcss/vite";
 import { nitro } from "nitro/vite";
+import { defineConfig } from "vite";
+import viteTsConfigPaths from "vite-tsconfig-paths";
+
+const createManualChunk = (id: string) => {
+	if (!id.includes("node_modules")) {
+		return undefined;
+	}
+
+	if (
+		id.includes("/node_modules/react/") ||
+		id.includes("/node_modules/react-dom/")
+	) {
+		return "react-vendor";
+	}
+
+	if (id.includes("/node_modules/@tanstack/")) {
+		return "tanstack-vendor";
+	}
+
+	if (id.includes("/node_modules/@radix-ui/")) {
+		return "radix-vendor";
+	}
+
+	if (id.includes("/node_modules/lucide-react/")) {
+		return "ui-icons";
+	}
+
+	return undefined;
+};
 
 const config = defineConfig({
+	build: {
+		rollupOptions: {
+			output: {
+				manualChunks: createManualChunk,
+			},
+		},
+	},
 	resolve: {
 		alias: {
 			"memos-embed": resolve(

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { type ThemePresetName, themePresets } from "memos-embed";
 import {
 	Card,
 	CardContent,
@@ -6,7 +7,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { themePresets, type ThemePresetName } from "memos-embed";
 
 export const Route = createFileRoute("/docs/")({
 	component: DocsComponent,
@@ -16,7 +16,7 @@ const themeOptions = (Object.keys(themePresets) as ThemePresetName[]).map(
 	(name) => themePresets[name],
 );
 
-function DocsComponent() {
+export function DocsPageContent() {
 	return (
 		<div className="container mx-auto space-y-8 px-4 py-10">
 			<section className="max-w-3xl space-y-4">
@@ -99,12 +99,26 @@ const iframe = renderIframeHtml({
 					</CardHeader>
 					<CardContent>
 						<ul className="space-y-3 text-sm text-muted-foreground">
-							<li>• Richer markdown rendering with headings, task lists, quotes, and fenced code blocks.</li>
-							<li>• Image attachments render previews instead of plain file links.</li>
+							<li>
+								• Richer markdown rendering with headings, task lists, quotes,
+								and fenced code blocks.
+							</li>
+							<li>
+								• Image attachments render previews instead of plain file links.
+							</li>
 							<li>• Reactions are grouped into compact count badges.</li>
-							<li>• The playground now supports shareable URLs, copy-to-clipboard snippets, and auto-resizing iframe code.</li>
-							<li>• React and Web Component wrappers cancel stale fetches for safer updates.</li>
-							<li>• Iframe embeds can now resize automatically through a postMessage handshake.</li>
+							<li>
+								• The playground now supports shareable URLs, copy-to-clipboard
+								snippets, and auto-resizing iframe code.
+							</li>
+							<li>
+								• React and Web Component wrappers cancel stale fetches for
+								safer updates.
+							</li>
+							<li>
+								• Iframe embeds can now resize automatically through a
+								postMessage handshake.
+							</li>
 						</ul>
 					</CardContent>
 				</Card>
@@ -115,8 +129,8 @@ const iframe = renderIframeHtml({
 					<CardHeader>
 						<CardTitle>Rendering Options</CardTitle>
 						<CardDescription>
-							Most options are shared across HTML, React, and Web Component entry
-							points.
+							Most options are shared across HTML, React, and Web Component
+							entry points.
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
@@ -175,7 +189,8 @@ const iframe = renderIframeHtml({
 					<CardHeader>
 						<CardTitle>Theme Presets</CardTitle>
 						<CardDescription>
-							The same presets work in the playground, iframe route, and npm APIs.
+							The same presets work in the playground, iframe route, and npm
+							APIs.
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-3">
@@ -197,9 +212,15 @@ const iframe = renderIframeHtml({
 										</p>
 									</div>
 									<div className="flex gap-2">
-										<ColorSwatch color={theme.tokens.background} label="Background" />
+										<ColorSwatch
+											color={theme.tokens.background}
+											label="Background"
+										/>
 										<ColorSwatch color={theme.tokens.accent} label="Accent" />
-										<ColorSwatch color={theme.tokens.codeBackground} label="Code" />
+										<ColorSwatch
+											color={theme.tokens.codeBackground}
+											label="Code"
+										/>
 									</div>
 								</div>
 							</div>
@@ -209,6 +230,10 @@ const iframe = renderIframeHtml({
 			</div>
 		</div>
 	);
+}
+
+function DocsComponent() {
+	return <DocsPageContent />;
 }
 
 function DocSection({ title, code }: { title: string; code: string }) {
