@@ -4,6 +4,7 @@ import { renderMemoHtmlSnippet, renderMemoStateHtmlSnippet } from "memos-embed";
 import { useEffect, useRef } from "react";
 import { getMemo } from "@/data/memos";
 import { bindEmbedAutoResize } from "@/lib/embed-resize";
+import { highlightCodeBlocks } from "@/lib/highlight";
 import { normalizeBooleanSearchValue } from "@/lib/playground";
 
 type SearchParams = {
@@ -95,6 +96,7 @@ export function EmbedPreview({
 			return;
 		}
 		containerRef.current.innerHTML = html;
+		highlightCodeBlocks(containerRef.current);
 	}, [html]);
 
 	useEffect(() => {

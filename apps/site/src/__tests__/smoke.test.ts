@@ -13,23 +13,23 @@ describe("site smoke", () => {
 		render(createElement(HomePageContent));
 
 		expect(
-			screen.getByRole("heading", { name: /share your thoughts/i }),
+			screen.getByRole("heading", { name: /hero_title_main/i }),
 		).toBeTruthy();
 		expect(
 			screen
-				.getAllByRole("link", { name: "Open Playground" })[0]
+				.getAllByRole("link", { name: "hero_btn_playground" })[0]
 				.getAttribute("href"),
 		).toBe("/playground");
 		expect(
 			screen.getByRole("heading", {
-				name: "Choose the integration that fits your stack",
+				name: "section_integration_title",
 			}),
 		).toBeTruthy();
 		expect(
-			screen.getByRole("heading", { name: "Beautiful Embeds" }),
+			screen.getByRole("heading", { name: "feature_beautiful_title" }),
 		).toBeTruthy();
 		expect(
-			screen.getByRole("heading", { name: "Developer Friendly" }),
+			screen.getByRole("heading", { name: "feature_developer_title" }),
 		).toBeTruthy();
 	});
 
