@@ -1,14 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useState } from "react";
-import { PlaygroundExperience } from "@/components/PlaygroundExperience";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import {
 	normalizePlaygroundSearch,
 	type PlaygroundState,
 } from "@/lib/playground";
+import { buildPageHead } from "@/lib/site-meta";
+
+const PlaygroundExperience = lazy(() =>
+	import("@/components/PlaygroundExperience").then((mod) => ({
+		default: mod.PlaygroundExperience,
+	})),
+);
 
 export const Route = createFileRoute("/playground/")({
 	validateSearch: normalizePlaygroundSearch,
 	component: PlaygroundComponent,
+	head: () =>
+		buildPageHead({
+			title: "Playground",
+			description:
+				"Preview Memos embeds, tweak themes and visibility, and copy iframe, Web Component, or React snippets.",
+		}),
 });
 
 function PlaygroundComponent() {
@@ -50,11 +62,33 @@ function PlaygroundComponent() {
 	}, []);
 
 	return (
-		<PlaygroundExperience
-			initialState={search}
-			embedBaseUrl={embedBaseUrl}
-			onStateChange={handleStateChange}
-			registerWebComponent={registerWebComponent}
-		/>
+		<Suspense fallback={<PlaygroundLoadingState />}>
+			<PlaygroundExperience
+				initialState={search}
+				embedBaseUrl={embedBaseUrl}
+				onStateChange={handleStateChange}
+				registerWebComponent={registerWebComponent}
+			/>
+		</Suspense>
+	);
+}
+
+const loadingCardKeys = ["config", "share", "snippets"] as const;
+
+function PlaygroundLoadingState() {
+	return (
+		<div className="container mx-auto px-4 py-10">
+			<div className="grid gap-8 lg:grid-cols-2">
+				<div className="space-y-6">
+					{loadingCardKeys.map((key) => (
+						<div
+							key={key}
+							className="h-48 animate-pulse rounded-2xl border bg-muted/30"
+						/>
+					))}
+				</div>
+				<div className="h-[640px] animate-pulse rounded-2xl border bg-muted/30" />
+			</div>
+		</div>
 	);
 }

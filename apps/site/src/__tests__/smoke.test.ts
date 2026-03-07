@@ -9,15 +9,22 @@ afterEach(() => {
 });
 
 describe("site smoke", () => {
-	it("renders the homepage hero and feature cards", () => {
+	it("renders the homepage hero, integration section, and feature cards", () => {
 		render(createElement(HomePageContent));
 
 		expect(
 			screen.getByRole("heading", { name: /share your thoughts/i }),
 		).toBeTruthy();
 		expect(
-			screen.getByRole("link", { name: "Get Started" }).getAttribute("href"),
-		).toBe("/docs");
+			screen
+				.getAllByRole("link", { name: "Open Playground" })[0]
+				.getAttribute("href"),
+		).toBe("/playground");
+		expect(
+			screen.getByRole("heading", {
+				name: "Choose the integration that fits your stack",
+			}),
+		).toBeTruthy();
 		expect(
 			screen.getByRole("heading", { name: "Beautiful Embeds" }),
 		).toBeTruthy();

@@ -87,7 +87,7 @@ describe("PlaygroundExperience", () => {
 			/>,
 		);
 
-		expect(registerWebComponent).toHaveBeenCalledTimes(1);
+		expect(registerWebComponent).not.toHaveBeenCalled();
 
 		const previewFrame = screen.getByTitle("Preview") as HTMLIFrameElement;
 		expect(previewFrame.getAttribute("src") ?? "").toContain(
@@ -134,6 +134,26 @@ describe("PlaygroundExperience", () => {
 					showAttachments: false,
 				}),
 			);
+		});
+
+		const previewCard = screen
+			.getByText("Preview")
+			.closest('[data-slot="card"]');
+		if (!previewCard) {
+			throw new Error("Preview card not found");
+		}
+
+		const previewScope = within(previewCard);
+		const webComponentPreviewTab = previewScope.getByRole("tab", {
+			name: "Web Component",
+		});
+		fireEvent.mouseDown(webComponentPreviewTab);
+		fireEvent.mouseUp(webComponentPreviewTab);
+		fireEvent.click(webComponentPreviewTab);
+
+		await waitFor(() => {
+			expect(registerWebComponent).toHaveBeenCalledTimes(1);
+			expect(webComponentPreviewTab.getAttribute("data-state")).toBe("active");
 		});
 	});
 
