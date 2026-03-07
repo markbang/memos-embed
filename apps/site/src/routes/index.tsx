@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
 
 type LinkButton = {
 	to: string;
-	labelKey: string;
+	label: string;
 	variant?: "default" | "outline";
 };
 
@@ -31,11 +31,11 @@ type LinkRenderer = (props: LinkButton) => ReactNode;
 
 const defaultRenderLink: LinkRenderer = ({
 	to,
-	labelKey,
+	label,
 	variant = "default",
 }) => (
 	<Button asChild size="lg" variant={variant}>
-		<a href={to}>{labelKey}</a>
+		<a href={to}>{label}</a>
 	</Button>
 );
 
@@ -115,8 +115,8 @@ export function HomePageContent({
 	];
 
 	const heroButtons: readonly LinkButton[] = [
-		{ to: "/playground", labelKey: m.hero_btn_playground() },
-		{ to: "/docs", labelKey: m.hero_btn_docs(), variant: "outline" },
+		{ to: "/playground", label: m.hero_btn_playground() },
+		{ to: "/docs", label: m.hero_btn_docs(), variant: "outline" },
 	];
 
 	return (
@@ -283,9 +283,9 @@ export function HomePageContent({
 function App() {
 	return (
 		<HomePageContent
-			renderLink={({ to, labelKey, variant = "default" }) => (
+			renderLink={({ to, label, variant = "default" }) => (
 				<Button asChild size="lg" variant={variant}>
-					<Link to={to}>{labelKey}</Link>
+					<Link to={to}>{label}</Link>
 				</Button>
 			)}
 		/>
