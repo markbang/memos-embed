@@ -7,9 +7,16 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { buildPageHead } from "@/lib/site-meta";
 
 export const Route = createFileRoute("/docs/")({
 	component: DocsComponent,
+	head: () =>
+		buildPageHead({
+			title: "Documentation",
+			description:
+				"Learn how to ship Memos embeds as server-rendered HTML, iframe routes, Web Components, or React components.",
+		}),
 });
 
 const themeOptions = (Object.keys(themePresets) as ThemePresetName[]).map(
@@ -25,6 +32,22 @@ export function DocsPageContent() {
 					Memos Embed gives you three ways to ship beautiful memo cards:
 					server-rendered HTML snippets, a React component, and a Web Component.
 				</p>
+				<div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+					<a
+						href="/playground"
+						className="rounded-full border border-border/70 bg-background px-3 py-1 transition-colors hover:text-foreground"
+					>
+						Open the playground
+					</a>
+					<a
+						href="https://www.npmjs.com/package/memos-embed"
+						target="_blank"
+						rel="noreferrer"
+						className="rounded-full border border-border/70 bg-background px-3 py-1 transition-colors hover:text-foreground"
+					>
+						View npm package
+					</a>
+				</div>
 			</section>
 
 			<div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">

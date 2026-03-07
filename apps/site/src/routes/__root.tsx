@@ -7,6 +7,10 @@ import {
 	useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { useId } from "react";
+import Footer from "@/components/Footer";
+import { buildPageHead, SITE_DESCRIPTION } from "@/lib/site-meta";
+import { buildThemeInitializationScript } from "@/lib/site-theme";
 import { getLocale } from "@/paraglide/runtime";
 import Header from "../components/Header";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
@@ -35,8 +39,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				content: "width=device-width, initial-scale=1",
 			},
 			{
-				title: "Memos Embed",
+				name: "theme-color",
+				content: "#111827",
 			},
+			...buildPageHead({
+				description: SITE_DESCRIPTION,
+			}).meta,
 		],
 		links: [
 			{
@@ -57,16 +65,31 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 		select: (state) => state.location.pathname,
 	});
 	const bodyClassName = getRootBodyClassName(pathname);
+	const isEmbedRoute = bodyClassName === "memos-embed-route";
+	const mainContentId = useId();
 	const showDevtools = import.meta.env.DEV;
 
 	return (
 		<html lang={getLocale()}>
 			<head>
 				<HeadContent />
+				<script>{buildThemeInitializationScript()}</script>
 			</head>
 			<body className={bodyClassName}>
+				<a
+					href={`#${mainContentId}`}
+					className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-foreground"
+				>
+					Skip to content
+				</a>
 				<Header />
-				{children}
+				<main
+					id={mainContentId}
+					className={isEmbedRoute ? undefined : "flex-1"}
+				>
+					{children}
+				</main>
+				{isEmbedRoute ? null : <Footer />}
 				{showDevtools ? (
 					<TanStackDevtools
 						config={{

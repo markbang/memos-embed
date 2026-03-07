@@ -58,7 +58,11 @@ export function PlaygroundExperience({
 }: PlaygroundExperienceProps) {
 	const [state, setState] = useState<PlaygroundState>(initialState);
 	const [copiedKey, setCopiedKey] = useState<string | null>(null);
+	const [previewTab, setPreviewTab] = useState<"iframe" | "wc" | "react">(
+		"iframe",
+	);
 	const copyTimeoutRef = useRef<number | null>(null);
+	const hasRegisteredWebComponentRef = useRef(false);
 
 	const baseUrlId = useId();
 	const memoIdId = useId();
@@ -74,14 +78,25 @@ export function PlaygroundExperience({
 	}, [initialState]);
 
 	useEffect(() => {
-		void registerWebComponent?.();
-
 		return () => {
 			if (copyTimeoutRef.current !== null) {
 				window.clearTimeout(copyTimeoutRef.current);
 			}
 		};
-	}, [registerWebComponent]);
+	}, []);
+
+	useEffect(() => {
+		if (
+			previewTab !== "wc" ||
+			hasRegisteredWebComponentRef.current ||
+			!registerWebComponent
+		) {
+			return;
+		}
+
+		hasRegisteredWebComponentRef.current = true;
+		void registerWebComponent();
+	}, [previewTab, registerWebComponent]);
 
 	useEffect(() => {
 		onStateChange?.(state);
@@ -376,7 +391,13 @@ export function PlaygroundExperience({
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="h-[560px]">
-						<Tabs defaultValue="iframe" className="h-full">
+						<Tabs
+							value={previewTab}
+							onValueChange={(value) =>
+								setPreviewTab(value as "iframe" | "wc" | "react")
+							}
+							className="h-full"
+						>
 							<TabsList className="grid w-full grid-cols-3">
 								<TabsTrigger value="iframe">Iframe</TabsTrigger>
 								<TabsTrigger value="wc">Web Component</TabsTrigger>
