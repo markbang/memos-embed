@@ -54,6 +54,7 @@ pnpm validate
 ## Releasing
 - Add a changeset for package changes with `pnpm changeset`
 - The `Publish Packages` workflow opens or updates a release PR on `main`
+- If your repository disables PR creation for the default Actions token, add a `CHANGESETS_GITHUB_TOKEN` secret with repo write access, or enable **Settings → Actions → General → Allow GitHub Actions to create and approve pull requests**
 - Merging the release PR publishes changed packages to npm
 
 ## Usage
