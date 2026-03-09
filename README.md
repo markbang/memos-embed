@@ -212,4 +212,4 @@ const iframe = renderIframeHtml({
 - The playground keeps its configuration in the URL for easy sharing
 - Package builds are powered by `tsup`; site builds use Vite + TanStack Start
 - CI runs `pnpm validate`, including lint, Biome checks, tests, package-consumer smoke tests, and the site build
-- Releases are managed with Changesets release PRs and publish automatically after the release PR lands on `main`
+- Releases are managed with Changesets on `main`: the workflow versions packages, commits the release changes, and publishes to npm automatically
