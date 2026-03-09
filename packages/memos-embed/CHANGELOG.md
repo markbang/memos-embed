@@ -1,5 +1,11 @@
 # memos-embed
 
+## 0.4.1
+
+### Patch Changes
+
+- 2099822: Patch release to verify the direct-on-main Changesets publishing flow after the 0.4.0 release.
+
 ## 0.4.0
 
 ### Minor Changes
