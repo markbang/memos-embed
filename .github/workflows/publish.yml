@@ -54,7 +54,7 @@ jobs:
       - name: Read release version
         if: steps.changesets.outputs.has_changesets == 'true'
         id: release_version
-        run: echo "tag=v$(node -p \"require('./packages/memos-embed/package.json').version\")" >> "$GITHUB_OUTPUT"
+        run: echo "tag=v$(jq -r '.version' packages/memos-embed/package.json)" >> "$GITHUB_OUTPUT"
 
       - name: Commit versioned packages to main
         if: steps.changesets.outputs.has_changesets == 'true'
