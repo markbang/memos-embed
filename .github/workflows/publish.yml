@@ -79,12 +79,29 @@ jobs:
           git tag "${{ steps.release_version.outputs.tag }}"
           git push origin "${{ steps.release_version.outputs.tag }}"
 
-      - name: Create GitHub release
+      - name: Read previous release tag
+        if: steps.changesets.outputs.has_changesets == 'true'
+        id: previous_tag
+        run: |
+          previous_tag=$(git tag --sort=-v:refname | sed -n '2p')
+          echo "tag=$previous_tag" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub release with changelogithub
         if: steps.changesets.outputs.has_changesets == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.CHANGESETS_GITHUB_TOKEN || github.token }}
         run: |
-          gh release view "${{ steps.release_version.outputs.tag }}" >/dev/null 2>&1 || \
-            gh release create "${{ steps.release_version.outputs.tag }}" \
-              --title "${{ steps.release_version.outputs.tag }}" \
-              --generate-notes
+          if [ -n "${{ steps.previous_tag.outputs.tag }}" ]; then
+            pnpm exec changelogithub \
+              --github "${{ github.repository }}" \
+              --from "${{ steps.previous_tag.outputs.tag }}" \
+              --to "${{ steps.release_version.outputs.tag }}" \
+              --name "${{ steps.release_version.outputs.tag }}" \
+              --contributors
+          else
+            pnpm exec changelogithub \
+              --github "${{ github.repository }}" \
+              --to "${{ steps.release_version.outputs.tag }}" \
+              --name "${{ steps.release_version.outputs.tag }}" \
+              --contributors
+          fi

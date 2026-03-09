@@ -22,12 +22,14 @@
     "check": "pnpm -r check",
     "validate": "pnpm lint && pnpm check && pnpm test && pnpm test:artifacts && pnpm build",
     "version-packages": "changeset version",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "release:github": "changelogithub"
   },
   "devDependencies": {
     "@changesets/cli": "^2.30.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "changelogithub": "^14.0.0",
     "happy-dom": "^15.11.7",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
