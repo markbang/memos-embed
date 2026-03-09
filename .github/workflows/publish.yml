@@ -51,6 +51,11 @@ jobs:
         if: steps.changesets.outputs.has_changesets == 'true'
         run: pnpm version-packages
 
+      - name: Read release version
+        if: steps.changesets.outputs.has_changesets == 'true'
+        id: release_version
+        run: echo "tag=v$(node -p \"require('./packages/memos-embed/package.json').version\")" >> "$GITHUB_OUTPUT"
+
       - name: Commit versioned packages to main
         if: steps.changesets.outputs.has_changesets == 'true'
         run: |
@@ -61,8 +66,25 @@ jobs:
           git push origin HEAD:main
 
       - name: Publish packages
+        if: steps.changesets.outputs.has_changesets == 'true'
         run: pnpm release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
+
+      - name: Create release tag
+        if: steps.changesets.outputs.has_changesets == 'true'
+        run: |
+          git tag "${{ steps.release_version.outputs.tag }}"
+          git push origin "${{ steps.release_version.outputs.tag }}"
+
+      - name: Create GitHub release
+        if: steps.changesets.outputs.has_changesets == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.CHANGESETS_GITHUB_TOKEN || github.token }}
+        run: |
+          gh release view "${{ steps.release_version.outputs.tag }}" >/dev/null 2>&1 || \
+            gh release create "${{ steps.release_version.outputs.tag }}" \
+              --title "${{ steps.release_version.outputs.tag }}" \
+              --generate-notes

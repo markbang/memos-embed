@@ -53,9 +53,9 @@ pnpm validate
 
 ## Releasing
 - Add a changeset for package changes with `pnpm changeset`
-- The `Publish Packages` workflow opens or updates a release PR on `main`
-- If your repository disables PR creation for the default Actions token, add a `CHANGESETS_GITHUB_TOKEN` secret with repo write access, or enable **Settings → Actions → General → Allow GitHub Actions to create and approve pull requests**
-- Merging the release PR publishes changed packages to npm
+- The `Publish Packages` workflow versions changed packages directly on `main`, publishes them to npm, then creates a Git tag and GitHub Release
+- If your `main` branch blocks workflow pushes or release creation, add a `CHANGESETS_GITHUB_TOKEN` secret with repo write access
+- Set `NPM_TOKEN` so package publishing can authenticate with npm
 
 ## Usage
 ### Core package
@@ -212,4 +212,4 @@ const iframe = renderIframeHtml({
 - The playground keeps its configuration in the URL for easy sharing
 - Package builds are powered by `tsup`; site builds use Vite + TanStack Start
 - CI runs `pnpm validate`, including lint, Biome checks, tests, package-consumer smoke tests, and the site build
-- Releases are managed with Changesets on `main`: the workflow versions packages, commits the release changes, and publishes to npm automatically
+- Releases are managed with Changesets on `main`: the workflow versions packages, commits the release changes, publishes to npm, and creates a Git tag plus GitHub Release automatically
