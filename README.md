@@ -10,6 +10,7 @@ Embeddable memo cards for Memos, delivered as a website and npm packages.
 ## Features
 - Rich memo cards with themes, density presets, and extendable design tokens
 - Core HTML renderer for SSR and static-site workflows
+- Batch multi-memo fetching and shared-style list rendering for note digests and weekly roundups
 - React component wrapper with optional pre-fetched memo rendering
 - Web Component wrapper with exposed `::part(...)` hooks
 - Iframe embed route for no-build integrations
@@ -85,6 +86,22 @@ const html = renderMemoHtmlSnippet(memo, {
   showAttachments: true,
   showReactions: true,
   linkTarget: '_blank',
+})
+```
+
+### Multiple memos on one page
+```ts
+import { fetchMemos, renderMemoListHtmlSnippet } from 'memos-embed'
+
+const memos = await fetchMemos({
+  baseUrl: 'https://demo.usememos.com/api/v1',
+  memoIds: ['1', '2', '3'],
+})
+
+const html = renderMemoListHtmlSnippet(memos, {
+  layout: 'stack',
+  gap: '20px',
+  theme: 'paper',
 })
 ```
 

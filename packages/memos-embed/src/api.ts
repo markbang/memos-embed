@@ -1,7 +1,9 @@
-import { renderMemoHtmlSnippet } from "./render";
+import { renderMemoHtmlSnippet, renderMemoListHtmlSnippet } from "./render";
 import type {
 	FetchMemoHtmlSnippetOptions,
+	FetchMemoListHtmlSnippetOptions,
 	FetchMemoOptions,
+	FetchMemosOptions,
 	Memo,
 	MemoApiResponse,
 	MemoAttachment,
@@ -31,7 +33,10 @@ const getInstanceOrigin = (value: string) => {
 	return trimmed;
 };
 
-const normalizeResourceUrl = (resourceUrl: string | undefined, baseUrl: string) => {
+const normalizeResourceUrl = (
+	resourceUrl: string | undefined,
+	baseUrl: string,
+) => {
 	if (!resourceUrl) {
 		return undefined;
 	}
@@ -58,6 +63,9 @@ const getIdFromName = (name: string) => {
 	const parts = name.split("/");
 	return parts[parts.length - 1];
 };
+
+const normalizeMemoId = (memoId: string) =>
+	memoId.includes("/") ? getIdFromName(memoId) : memoId;
 
 const normalizeUser = (user: UserApiResponse): User => {
 	const id = user.name ? getIdFromName(user.name) : "";
@@ -106,40 +114,111 @@ const normalizeMemo = (
 	};
 };
 
-const fetchUser = async ({
-	baseUrl,
-	userId,
-	fetcher,
-	signal,
-}: {
+type FetchContext = {
 	baseUrl: string;
-	userId: string;
-	fetcher: typeof fetch;
+	normalizedBaseUrl: string;
+	fetchImpl: typeof fetch;
 	signal?: AbortSignal;
+	includeCreator: boolean;
+	userCache: Map<string, Promise<User | undefined>>;
+};
+
+const fetchUserWithCache = async ({
+	context,
+	userId,
+}: {
+	context: FetchContext;
+	userId: string;
 }): Promise<User | undefined> => {
 	if (!userId) {
 		return undefined;
 	}
 
-	const normalizedBaseUrl = normalizeBaseUrl(baseUrl);
 	const id = userId.includes("/") ? getIdFromName(userId) : userId;
-	const endpoint = `${normalizedBaseUrl}/users/${id}`;
+	const cached = context.userCache.get(id);
+	if (cached) {
+		return cached;
+	}
 
-	const response = await fetcher(endpoint, {
+	const request = (async () => {
+		const endpoint = `${context.normalizedBaseUrl}/users/${id}`;
+		const response = await context.fetchImpl(endpoint, {
+			method: "GET",
+			signal: context.signal,
+		});
+
+		if (!response.ok) {
+			return undefined;
+		}
+
+		const data = (await response.json()) as UserApiResponse;
+		if (!data || typeof data.name !== "string") {
+			return undefined;
+		}
+
+		return normalizeUser(data);
+	})();
+
+	context.userCache.set(id, request);
+	return request;
+};
+
+const fetchMemoWithContext = async ({
+	memoId,
+	context,
+}: {
+	memoId: string;
+	context: FetchContext;
+}): Promise<Memo> => {
+	if (!memoId) {
+		throw new Error("memoId is required");
+	}
+
+	const id = normalizeMemoId(memoId);
+	const endpoint = `${context.normalizedBaseUrl}/memos/${id}`;
+	const response = await context.fetchImpl(endpoint, {
 		method: "GET",
-		signal,
+		signal: context.signal,
 	});
 
 	if (!response.ok) {
-		return undefined;
+		throw new Error(`Failed to fetch memo (${response.status})`);
 	}
 
-	const data = (await response.json()) as UserApiResponse;
+	const data = (await response.json()) as MemoApiResponse;
 	if (!data || typeof data.name !== "string") {
-		return undefined;
+		throw new Error("Invalid memo response");
 	}
 
-	return normalizeUser(data);
+	let user: User | undefined;
+	if (context.includeCreator && data.creator) {
+		user = await fetchUserWithCache({
+			context,
+			userId: data.creator,
+		});
+	}
+
+	return normalizeMemo(data, context.baseUrl, user);
+};
+
+const createFetchContext = ({
+	baseUrl,
+	includeCreator = true,
+	fetcher,
+	signal,
+}: Omit<FetchMemoOptions, "memoId">): FetchContext => {
+	if (!baseUrl) {
+		throw new Error("baseUrl is required");
+	}
+
+	return {
+		baseUrl,
+		normalizedBaseUrl: normalizeBaseUrl(baseUrl),
+		fetchImpl: fetcher ?? fetch,
+		signal,
+		includeCreator,
+		userCache: new Map<string, Promise<User | undefined>>(),
+	};
 };
 
 export const fetchMemo = async ({
@@ -149,44 +228,50 @@ export const fetchMemo = async ({
 	fetcher,
 	signal,
 }: FetchMemoOptions): Promise<Memo> => {
-	if (!baseUrl) {
-		throw new Error("baseUrl is required");
-	}
-	if (!memoId) {
-		throw new Error("memoId is required");
-	}
-
-	const normalizedBaseUrl = normalizeBaseUrl(baseUrl);
-	const id = memoId.includes("/") ? getIdFromName(memoId) : memoId;
-	const endpoint = `${normalizedBaseUrl}/memos/${id}`;
-	const fetchImpl = fetcher ?? fetch;
-
-	const response = await fetchImpl(endpoint, {
-		method: "GET",
+	const context = createFetchContext({
+		baseUrl,
+		includeCreator,
+		fetcher,
 		signal,
 	});
 
-	if (!response.ok) {
-		throw new Error(`Failed to fetch memo (${response.status})`);
-	}
+	return fetchMemoWithContext({
+		memoId,
+		context,
+	});
+};
 
-	const data = (await response.json()) as MemoApiResponse;
+export const fetchMemos = async ({
+	baseUrl,
+	memoIds,
+	includeCreator = true,
+	fetcher,
+	signal,
+}: FetchMemosOptions): Promise<Memo[]> => {
+	const context = createFetchContext({
+		baseUrl,
+		includeCreator,
+		fetcher,
+		signal,
+	});
+	const memoCache = new Map<string, Promise<Memo>>();
 
-	if (!data || typeof data.name !== "string") {
-		throw new Error("Invalid memo response");
-	}
+	return Promise.all(
+		memoIds.map((memoId) => {
+			const id = normalizeMemoId(memoId);
+			const cached = memoCache.get(id);
+			if (cached) {
+				return cached;
+			}
 
-	let user: User | undefined;
-	if (includeCreator && data.creator) {
-		user = await fetchUser({
-			baseUrl,
-			userId: data.creator,
-			fetcher: fetchImpl,
-			signal,
-		});
-	}
-
-	return normalizeMemo(data, baseUrl, user);
+			const request = fetchMemoWithContext({
+				memoId,
+				context,
+			});
+			memoCache.set(id, request);
+			return request;
+		}),
+	);
 };
 
 export const fetchMemoHtmlSnippet = async (
@@ -194,4 +279,11 @@ export const fetchMemoHtmlSnippet = async (
 ) => {
 	const memo = await fetchMemo(options);
 	return renderMemoHtmlSnippet(memo, options);
+};
+
+export const fetchMemoListHtmlSnippet = async (
+	options: FetchMemoListHtmlSnippetOptions,
+) => {
+	const memos = await fetchMemos(options);
+	return renderMemoListHtmlSnippet(memos, options);
 };

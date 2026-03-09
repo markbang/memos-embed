@@ -8,8 +8,9 @@ pnpm add memos-embed
 ```
 
 ## What it includes
-- `fetchMemo` for loading and normalizing memo data from a Memos instance
+- `fetchMemo` / `fetchMemos` for loading and normalizing memo data from a Memos instance
 - `renderMemoHtml` / `renderMemoHtmlSnippet` for generating themed embed markup
+- `renderMemoListHtml` / `renderMemoListHtmlSnippet` for note collections, digests, and roundups with shared styles
 - `buildEmbedCss` for extracting the shared styles
 - `buildEmbedUrl` / `renderIframeHtml` for iframe-based embeds, including optional auto-resize support
 
@@ -56,6 +57,22 @@ const iframe = renderIframeHtml({
 })
 ```
 
+### `fetchMemos` + `renderMemoListHtmlSnippet`
+```ts
+import { fetchMemos, renderMemoListHtmlSnippet } from 'memos-embed'
+
+const memos = await fetchMemos({
+  baseUrl: 'https://demo.usememos.com/api/v1',
+  memoIds: ['1', '2', '3'],
+})
+
+const html = renderMemoListHtmlSnippet(memos, {
+  layout: 'grid',
+  gap: '20px',
+  theme: 'paper',
+})
+```
+
 ## Custom blog theming
 ```ts
 import { extendTheme, renderMemoHtmlSnippet } from 'memos-embed'
@@ -87,5 +104,6 @@ The renderer supports:
 - image previews for attachment URLs
 - grouped reaction counts
 - optional postMessage-based iframe auto-resize
+- stack or grid list rendering for multi-memo pages
 - theme presets: `minimal`, `glass`, `paper`, `midnight`, `terminal`
 - `extendTheme()` for blog-aligned design tokens and CSS variable-based theming

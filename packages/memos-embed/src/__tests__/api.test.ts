@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { fetchMemo, fetchMemoHtmlSnippet } from "../api";
+import {
+	fetchMemo,
+	fetchMemoHtmlSnippet,
+	fetchMemoListHtmlSnippet,
+	fetchMemos,
+} from "../api";
 
 describe("fetchMemo", () => {
 	it("throws when baseUrl is missing", async () => {
@@ -128,6 +133,69 @@ describe("fetchMemo", () => {
 	});
 });
 
+describe("fetchMemos", () => {
+	it("fetches multiple memos in order and shares creator lookups", async () => {
+		const fetcher = vi.fn(async (url: RequestInfo | URL) => {
+			const href = String(url);
+			if (href.includes("/users/1")) {
+				return {
+					ok: true,
+					json: async () => ({
+						name: "users/1",
+						username: "bangwu",
+						displayName: "棒无",
+						avatarUrl: "/api/v1/users/1/avatar",
+					}),
+				} as Response;
+			}
+
+			const memoId = href.endsWith("/memos/2") ? "2" : "1";
+			return {
+				ok: true,
+				json: async () => ({
+					name: `memos/${memoId}`,
+					creator: "users/1",
+					content: `Memo ${memoId}`,
+					tags: [],
+				}),
+			} as Response;
+		});
+
+		const memos = await fetchMemos({
+			baseUrl: "https://demo.usememos.com/api/v1",
+			memoIds: ["1", "2"],
+			fetcher,
+		});
+
+		expect(memos.map((memo) => memo.id)).toEqual(["1", "2"]);
+		expect(memos[0]?.creatorDisplayName).toBe("棒无");
+		expect(fetcher).toHaveBeenCalledTimes(3);
+	});
+
+	it("reuses duplicate memo ids inside a single batch request", async () => {
+		const fetcher = vi.fn(async (url: RequestInfo | URL) => ({
+			ok: true,
+			json: async () => ({
+				name: "memos/1",
+				content: `Fetched ${String(url)}`,
+				tags: [],
+			}),
+		} as Response));
+
+		const memos = await fetchMemos({
+			baseUrl: "https://demo.usememos.com/api/v1",
+			memoIds: ["1", "memos/1"],
+			includeCreator: false,
+			fetcher,
+		});
+
+		expect(memos).toHaveLength(2);
+		expect(memos[0]?.id).toBe("1");
+		expect(memos[1]?.id).toBe("1");
+		expect(fetcher).toHaveBeenCalledTimes(1);
+	});
+});
+
 describe("fetchMemoHtmlSnippet", () => {
 	it("returns a rendered html snippet", async () => {
 		const html = await fetchMemoHtmlSnippet({
@@ -163,5 +231,34 @@ describe("fetchMemoHtmlSnippet", () => {
 					} as Response),
 			}),
 		).rejects.toThrow("Failed to fetch memo (500)");
+	});
+});
+
+describe("fetchMemoListHtmlSnippet", () => {
+	it("returns a single styled snippet for multiple memos", async () => {
+		const html = await fetchMemoListHtmlSnippet({
+			baseUrl: "https://demo.usememos.com/api/v1",
+			memoIds: ["1", "2"],
+			includeCreator: false,
+			layout: "grid",
+			gap: "20px",
+			fetcher: async (url: RequestInfo | URL) => {
+				const href = String(url);
+				const memoId = href.endsWith("/memos/2") ? "2" : "1";
+				return {
+					ok: true,
+					json: async () => ({
+						name: `memos/${memoId}`,
+						content: `Hello ${memoId}`,
+						tags: [],
+					}),
+				} as Response;
+			},
+		});
+
+		expect(html).toContain("<style>");
+		expect(html).toContain("memos-embed-list--grid");
+		expect(html).toContain("Hello 1");
+		expect(html).toContain("Hello 2");
 	});
 });

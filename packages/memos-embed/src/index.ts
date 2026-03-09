@@ -4,11 +4,15 @@ export type {
 	EmbedRenderOptions,
 	EmbedTheme,
 	FetchMemoHtmlSnippetOptions,
+	FetchMemoListHtmlSnippetOptions,
 	FetchMemoOptions,
+	FetchMemosOptions,
 	IframeEmbedOptions,
 	Memo,
 	MemoApiResponse,
 	MemoAttachment,
+	MemoListLayout,
+	MemoListRenderOptions,
 	MemoReaction,
 	ThemeInput,
 	ThemeOverrides,
@@ -17,11 +21,18 @@ export type {
 	UserApiResponse,
 } from "./types";
 
-export { fetchMemo, fetchMemoHtmlSnippet } from "./api";
+export {
+	fetchMemo,
+	fetchMemoHtmlSnippet,
+	fetchMemoListHtmlSnippet,
+	fetchMemos,
+} from "./api";
 export {
 	buildEmbedCss,
 	renderMemoHtml,
 	renderMemoHtmlSnippet,
+	renderMemoListHtml,
+	renderMemoListHtmlSnippet,
 	renderMemoStateHtmlSnippet,
 } from "./render";
 export {

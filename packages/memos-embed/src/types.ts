@@ -125,6 +125,10 @@ export type FetchMemoOptions = {
 	signal?: AbortSignal;
 };
 
+export type FetchMemosOptions = Omit<FetchMemoOptions, "memoId"> & {
+	memoIds: readonly string[];
+};
+
 export type UserApiResponse = {
 	name: string;
 	username?: string;
@@ -155,7 +159,17 @@ export type EmbedHtmlOptions = EmbedRenderOptions & {
 	includeStyles?: boolean;
 };
 
+export type MemoListLayout = "stack" | "grid";
+
+export type MemoListRenderOptions = EmbedHtmlOptions & {
+	layout?: MemoListLayout;
+	gap?: string;
+};
+
 export type FetchMemoHtmlSnippetOptions = FetchMemoOptions & EmbedHtmlOptions;
+
+export type FetchMemoListHtmlSnippetOptions =
+	FetchMemosOptions & MemoListRenderOptions;
 
 export type IframeEmbedOptions = {
 	embedBaseUrl: string;

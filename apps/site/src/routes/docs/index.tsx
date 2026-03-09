@@ -145,6 +145,21 @@ const html = renderMemoHtmlSnippet(memo, {
 })`}
 						/>
 						<DocSection
+							title="Multiple memos on one page"
+							code={`import { fetchMemos, renderMemoListHtmlSnippet } from 'memos-embed'
+
+const memos = await fetchMemos({
+  baseUrl: 'https://demo.usememos.com/api/v1',
+  memoIds: ['1', '2', '3'],
+})
+
+const html = renderMemoListHtmlSnippet(memos, {
+  layout: 'stack',
+  gap: '20px',
+  theme: 'paper',
+})`}
+						/>
+						<DocSection
 							title="React"
 							code={`pnpm add @memos-embed/react
 
@@ -232,6 +247,11 @@ const iframe = renderIframeHtml({
 								easier to match personal blogs and docs sites.
 							</li>
 							<li>
+								• `fetchMemos()` and `renderMemoListHtmlSnippet()` help note
+								roundups and weekly digests render multiple memos with shared
+								styles.
+							</li>
+							<li>
 								• Iframe embeds can now resize automatically through a
 								postMessage handshake.
 							</li>
@@ -274,6 +294,11 @@ const iframe = renderIframeHtml({
 										name="includeStyles"
 										type="boolean"
 										description="Disable the built-in style block for bring-your-own CSS setups in core, React, and Web Component flows."
+									/>
+									<TableRow
+										name="layout / gap"
+										type="stack | grid / string"
+										description="Arrange multiple memos with shared list styles for roundups and archive pages."
 									/>
 									<TableRow
 										name="showMeta"

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
 	renderMemoHtml,
 	renderMemoHtmlSnippet,
+	renderMemoListHtmlSnippet,
 	renderMemoStateHtmlSnippet,
 } from "../render";
 import type { Memo } from "../types";
@@ -74,6 +75,20 @@ describe("renderMemoHtmlSnippet", () => {
 
 		expect(html).not.toContain("<style>");
 		expect(html).toContain("memos-embed");
+	});
+});
+
+describe("renderMemoListHtmlSnippet", () => {
+	it("renders multiple memos with shared list styles", () => {
+		const html = renderMemoListHtmlSnippet([memo, { ...memo, id: "2", name: "memos/2" }], {
+			layout: "grid",
+			gap: "24px",
+		});
+
+		expect(html).toContain("<style>");
+		expect(html).toContain("memos-embed-list--grid");
+		expect(html).toContain("--me-list-gap:24px");
+		expect(html.match(/class=\"memos-embed\"/g)?.length).toBe(2);
 	});
 });
 
