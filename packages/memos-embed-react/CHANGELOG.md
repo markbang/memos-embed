@@ -1,5 +1,16 @@
 # @memos-embed/react
 
+## 0.4.0
+
+### Minor Changes
+
+- c56d489: Add theme extension and bring-your-own-style ergonomics for blog integrations, plus richer docs and examples for Next.js, MDX, Astro, and static-site embeds. Also add multi-memo fetching, shared-style list rendering helpers, a shared memo client for cross-embed caching, and a React roundup component for roundups and archive pages.
+
+### Patch Changes
+
+- Updated dependencies [c56d489]
+  - memos-embed@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes
