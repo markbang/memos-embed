@@ -40,6 +40,7 @@ describe("site smoke", () => {
 		expect(screen.getByText("Quick Start")).toBeTruthy();
 		expect(screen.getByText("Multiple memos on one page")).toBeTruthy();
 		expect(screen.getByText("React memo roundup")).toBeTruthy();
+		expect(screen.getByText("Shared React memo client")).toBeTruthy();
 		expect(screen.getByText("Rendering Options")).toBeTruthy();
 		expect(screen.getByText("includeStyles")).toBeTruthy();
 		expect(screen.getByText("Theme Presets")).toBeTruthy();

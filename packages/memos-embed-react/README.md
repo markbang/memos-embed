@@ -37,6 +37,19 @@ import { MemoEmbedList } from '@memos-embed/react'
 />
 ```
 
+## Shared client usage
+```tsx
+import { createMemoClient } from 'memos-embed'
+import { MemoClientProvider, MemoEmbed, MemoEmbedList } from '@memos-embed/react'
+
+const client = createMemoClient()
+
+<MemoClientProvider client={client}>
+  <MemoEmbed baseUrl="https://demo.usememos.com/api/v1" memoId="1" />
+  <MemoEmbedList baseUrl="https://demo.usememos.com/api/v1" memoIds={["2", "3"]} />
+</MemoClientProvider>
+```
+
 ## Pre-fetched usage
 ```tsx
 import { fetchMemo } from 'memos-embed'
@@ -76,8 +89,9 @@ If you want to bring all styles yourself, pass `includeStyles={false}` and rende
 ## Notes
 - Pass `memo` to render already-fetched data and avoid a client-side request waterfall
 - Use `MemoEmbedList` when you want multiple memo cards with one shared style block in React
+- Use `MemoClientProvider` with `createMemoClient()` when many embeds on one page should share request/cache state
 - `fetcher` and `includeCreator` are forwarded to the shared `fetchMemo()` / `fetchMemos()` helpers when components fetch their own data
 - `linkTarget` keeps markdown and attachment links consistent with iframe and Web Component embeds
 - `includeStyles={false}` disables the built-in `<style>` block for bring-your-own styling setups
-- Fetch requests are cancelled when props change or the component unmounts
+- Fetch requests are cancelled when props change or the component unmounts when you are not using a shared client; shared clients favor deduped requests over per-component aborting
 - Rendering is powered by the shared `memos-embed` core package, so output stays consistent with the iframe and Web Component versions

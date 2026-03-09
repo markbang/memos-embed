@@ -2,14 +2,21 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { describe, expect, it, vi } from "vitest";
 import * as memosEmbed from "memos-embed";
-import { MemoEmbed, MemoEmbedList } from "../index";
+import {
+	MemoClientProvider,
+	MemoEmbed,
+	MemoEmbedList,
+	useMemoClient,
+} from "../index";
 
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
 describe("@memos-embed/react", () => {
-	it("exports components", () => {
+	it("exports components and hooks", () => {
 		expect(typeof MemoEmbed).toBe("function");
 		expect(typeof MemoEmbedList).toBe("function");
+		expect(typeof MemoClientProvider).toBe("function");
+		expect(typeof useMemoClient).toBe("function");
 	});
 
 	it("renders single loaded content through core snippet helper", async () => {
@@ -199,5 +206,77 @@ describe("@memos-embed/react", () => {
 		container.remove();
 		fetchMemosSpy.mockRestore();
 		renderListSpy.mockRestore();
+	});
+
+	it("can use a shared memo client from provider and prime prefetched data", async () => {
+		const memo = {
+			id: "1",
+			name: "memos/1",
+			content: "Shared",
+			tags: [],
+			attachments: [],
+			reactions: [],
+		};
+		const memos = [memo, { ...memo, id: "2", name: "memos/2", content: "More" }];
+		const client = {
+			fetchMemo: vi.fn(async () => memo),
+			fetchMemos: vi.fn(async () => memos),
+			primeMemo: vi.fn(),
+			primeMemos: vi.fn(),
+			clear: vi.fn(),
+		};
+		const coreFetchMemoSpy = vi.spyOn(memosEmbed, "fetchMemo");
+		const coreFetchMemosSpy = vi.spyOn(memosEmbed, "fetchMemos");
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		const root = createRoot(container);
+
+		await act(async () => {
+			root.render(
+				createElement(
+					MemoClientProvider,
+					{ client },
+					createElement("div", null, [
+						createElement(MemoEmbed, {
+							key: "single",
+							baseUrl: "https://demo.usememos.com/api/v1",
+							memo,
+						}),
+						createElement(MemoEmbedList, {
+							key: "list",
+							baseUrl: "https://demo.usememos.com/api/v1",
+							memoIds: ["1", "2"],
+							className: "provider-list",
+						}),
+					]),
+				),
+			);
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(client.primeMemo).toHaveBeenCalledWith(
+			expect.objectContaining({
+				baseUrl: "https://demo.usememos.com/api/v1",
+				memo: expect.objectContaining({ content: "Shared" }),
+			}),
+		);
+		expect(client.fetchMemos).toHaveBeenCalledWith(
+			expect.objectContaining({
+				baseUrl: "https://demo.usememos.com/api/v1",
+				memoIds: ["1", "2"],
+			}),
+		);
+		expect(coreFetchMemoSpy).not.toHaveBeenCalled();
+		expect(coreFetchMemosSpy).not.toHaveBeenCalled();
+		expect(container.querySelector(".provider-list")).toBeTruthy();
+		expect(container.innerHTML).toContain("More");
+
+		await act(async () => {
+			root.unmount();
+		});
+		container.remove();
+		coreFetchMemoSpy.mockRestore();
+		coreFetchMemosSpy.mockRestore();
 	});
 });

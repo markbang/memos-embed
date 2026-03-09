@@ -199,6 +199,18 @@ const memo = await fetchMemo({
 />`}
 						/>
 						<DocSection
+							title="Shared React memo client"
+							code={`import { createMemoClient } from 'memos-embed'
+import { MemoClientProvider, MemoEmbed, MemoEmbedList } from '@memos-embed/react'
+
+const client = createMemoClient()
+
+<MemoClientProvider client={client}>
+  <MemoEmbed baseUrl="https://demo.usememos.com/api/v1" memoId="1" />
+  <MemoEmbedList baseUrl="https://demo.usememos.com/api/v1" memoIds={["2", "3"]} />
+</MemoClientProvider>`}
+						/>
+						<DocSection
 							title="Web Component"
 							code={`pnpm add @memos-embed/wc
 
@@ -252,8 +264,9 @@ const iframe = renderIframeHtml({
 							<li>
 								• React and Web Component wrappers cancel stale fetches for
 								safer updates, React can render pre-fetched memo data without a
-								client-side waterfall, and `MemoEmbedList` helps roundup pages
-								share one style block.
+								client-side waterfall, `MemoEmbedList` helps roundup pages share
+								one style block, and shared clients can dedupe fetches across a
+								whole page.
 							</li>
 							<li>
 								• `extendTheme()` and bring-your-own-style controls make it

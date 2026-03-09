@@ -129,6 +129,10 @@ export type FetchMemosOptions = Omit<FetchMemoOptions, "memoId"> & {
 	memoIds: readonly string[];
 };
 
+export type MemoClientConfig = {
+	fetcher?: typeof fetch;
+};
+
 export type UserApiResponse = {
 	name: string;
 	username?: string;
@@ -170,6 +174,26 @@ export type FetchMemoHtmlSnippetOptions = FetchMemoOptions & EmbedHtmlOptions;
 
 export type FetchMemoListHtmlSnippetOptions =
 	FetchMemosOptions & MemoListRenderOptions;
+
+export type PrimeMemoOptions = {
+	baseUrl: string;
+	memo: Memo;
+	includeCreator?: boolean;
+};
+
+export type PrimeMemosOptions = {
+	baseUrl: string;
+	memos: readonly Memo[];
+	includeCreator?: boolean;
+};
+
+export type MemoClient = {
+	fetchMemo: (options: FetchMemoOptions) => Promise<Memo>;
+	fetchMemos: (options: FetchMemosOptions) => Promise<Memo[]>;
+	primeMemo: (options: PrimeMemoOptions) => void;
+	primeMemos: (options: PrimeMemosOptions) => void;
+	clear: () => void;
+};
 
 export type IframeEmbedOptions = {
 	embedBaseUrl: string;
