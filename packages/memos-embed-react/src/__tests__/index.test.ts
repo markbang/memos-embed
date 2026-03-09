@@ -29,7 +29,11 @@ describe("@memos-embed/react", () => {
 			attachments: [],
 			reactions: [],
 		});
-		const renderSnippetSpy = vi.spyOn(memosEmbed, "renderMemoHtmlSnippet");
+		const renderSnippetSpy = vi
+			.spyOn(memosEmbed, "renderMemoHtmlSnippet")
+			.mockImplementation((memo, options) =>
+				`<article data-include-styles="${String(options?.includeStyles)}">${memo.content}</article>`,
+			);
 		const container = document.createElement("div");
 		document.body.appendChild(container);
 		const root = createRoot(container);
@@ -89,7 +93,13 @@ describe("@memos-embed/react", () => {
 			reactions: [],
 		};
 		const fetchMemoSpy = vi.spyOn(memosEmbed, "fetchMemo");
-		const renderSnippetSpy = vi.spyOn(memosEmbed, "renderMemoHtmlSnippet");
+		const renderSnippetSpy = vi
+			.spyOn(memosEmbed, "renderMemoHtmlSnippet")
+			.mockImplementation((memo, options) =>
+				options?.includeStyles === false
+					? `<article>${memo.content}</article>`
+					: `<style>.memo{}</style><article>${memo.content}</article>`,
+			);
 		const onLoad = vi.fn();
 		const container = document.createElement("div");
 		document.body.appendChild(container);
@@ -151,7 +161,11 @@ describe("@memos-embed/react", () => {
 		const fetchMemosSpy = vi
 			.spyOn(memosEmbed, "fetchMemos")
 			.mockResolvedValue(memos);
-		const renderListSpy = vi.spyOn(memosEmbed, "renderMemoListHtmlSnippet");
+		const renderListSpy = vi
+			.spyOn(memosEmbed, "renderMemoListHtmlSnippet")
+			.mockImplementation((memoList, options) =>
+				`<section class="memos-embed-list memos-embed-list--${options?.layout ?? "stack"}">${memoList.map((memo) => memo.content).join(" ")}</section>`,
+			);
 		const onLoad = vi.fn();
 		const container = document.createElement("div");
 		document.body.appendChild(container);
@@ -278,5 +292,78 @@ describe("@memos-embed/react", () => {
 		container.remove();
 		coreFetchMemoSpy.mockRestore();
 		coreFetchMemosSpy.mockRestore();
+	});
+
+	it("primes both single and list caches when provider receives prefetched data", async () => {
+		const memo = {
+			id: "1",
+			name: "memos/1",
+			content: "Hero memo",
+			tags: [],
+			attachments: [],
+			reactions: [],
+		};
+		const memos = [
+			{ id: "2", name: "memos/2", content: "Two", tags: [], attachments: [], reactions: [] },
+			{ id: "3", name: "memos/3", content: "Three", tags: [], attachments: [], reactions: [] },
+		];
+		const client = {
+			fetchMemo: vi.fn(async () => memo),
+			fetchMemos: vi.fn(async () => memos),
+			primeMemo: vi.fn(),
+			primeMemos: vi.fn(),
+			clear: vi.fn(),
+		};
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		const root = createRoot(container);
+
+		await act(async () => {
+			root.render(
+				createElement(
+					MemoClientProvider,
+					{ client },
+					createElement("div", null, [
+						createElement(MemoEmbed, {
+							key: "single",
+							baseUrl: "https://demo.usememos.com/api/v1",
+							memo,
+						}),
+						createElement(MemoEmbedList, {
+							key: "list",
+							baseUrl: "https://demo.usememos.com/api/v1",
+							memos,
+							className: "prefetched-list",
+						}),
+					]),
+				),
+			);
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(client.primeMemo).toHaveBeenCalledWith(
+			expect.objectContaining({
+				baseUrl: "https://demo.usememos.com/api/v1",
+				memo,
+			}),
+		);
+		expect(client.primeMemos).toHaveBeenCalledWith(
+			expect.objectContaining({
+				baseUrl: "https://demo.usememos.com/api/v1",
+				memos,
+			}),
+		);
+		expect(client.fetchMemo).not.toHaveBeenCalled();
+		expect(client.fetchMemos).not.toHaveBeenCalled();
+		expect(container.querySelector(".prefetched-list")).toBeTruthy();
+		expect(container.innerHTML).toContain("Hero memo");
+		expect(container.innerHTML).toContain("Two");
+		expect(container.innerHTML).toContain("Three");
+
+		await act(async () => {
+			root.unmount();
+		});
+		container.remove();
 	});
 });

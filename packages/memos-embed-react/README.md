@@ -56,6 +56,40 @@ const client = createMemoClient()
 </MemoClientProvider>
 ```
 
+Use a shared client when multiple embeds on one page should reuse memo and creator fetches instead of opening duplicate requests.
+
+## Shared client with server-prefetched memo data
+```tsx
+import { createMemoClient, fetchMemo, fetchMemos } from 'memos-embed'
+import { MemoClientProvider, MemoEmbed, MemoEmbedList } from '@memos-embed/react'
+
+const client = createMemoClient()
+
+const [heroMemo, roundupMemos] = await Promise.all([
+  fetchMemo({
+    baseUrl: 'https://demo.usememos.com/api/v1',
+    memoId: '1',
+  }),
+  fetchMemos({
+    baseUrl: 'https://demo.usememos.com/api/v1',
+    memoIds: ['2', '3'],
+  }),
+])
+
+<MemoClientProvider client={client}>
+  <MemoEmbed
+    baseUrl="https://demo.usememos.com/api/v1"
+    memo={heroMemo}
+  />
+  <MemoEmbedList
+    baseUrl="https://demo.usememos.com/api/v1"
+    memos={roundupMemos}
+  />
+</MemoClientProvider>
+```
+
+Passing `memo` or `memos` while a `MemoClientProvider` is active primes the shared client cache, so later embeds for the same memo ids can reuse that data.
+
 ## Pre-fetched usage
 ```tsx
 import { fetchMemo } from 'memos-embed'
