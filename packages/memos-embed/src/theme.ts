@@ -1,6 +1,7 @@
 import type {
 	EmbedTheme,
 	ThemeInput,
+	ThemeOverrides,
 	ThemePresetName,
 	ThemeTokens,
 } from "./types";
@@ -124,5 +125,26 @@ export const resolveTheme = (input?: ThemeInput): EmbedTheme => {
 		radius: input.radius ?? base.radius,
 		fontFamily: input.fontFamily ?? base.fontFamily,
 		monoFontFamily: input.monoFontFamily ?? base.monoFontFamily,
+	};
+};
+
+export const extendTheme = (
+	base: ThemeInput = defaultTheme,
+	overrides: ThemeOverrides = {},
+): EmbedTheme => {
+	const resolvedBaseTheme = resolveTheme(base);
+
+	return {
+		...resolvedBaseTheme,
+		...overrides,
+		tokens: {
+			...resolvedBaseTheme.tokens,
+			...overrides.tokens,
+		},
+		name: overrides.name ?? resolvedBaseTheme.name,
+		radius: overrides.radius ?? resolvedBaseTheme.radius,
+		fontFamily: overrides.fontFamily ?? resolvedBaseTheme.fontFamily,
+		monoFontFamily:
+			overrides.monoFontFamily ?? resolvedBaseTheme.monoFontFamily,
 	};
 };

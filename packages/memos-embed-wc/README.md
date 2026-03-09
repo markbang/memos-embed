@@ -15,6 +15,7 @@ pnpm add @memos-embed/wc
   memo-id="1"
   theme="minimal"
   density="comfortable"
+  link-target="_blank"
   show-tags="true"
   show-attachments="true"
   show-reactions="true"
@@ -35,9 +36,26 @@ defineMemosEmbedElement()
 - `theme`
 - `density`
 - `locale`
+- `link-target`
+- `include-styles`
 - `show-tags`
 - `show-attachments`
 - `show-reactions`
 - `show-meta`
+
+## Styling from your site
+Keep the built-in styles and tweak the exposed parts:
+
+```css
+memos-embed::part(container) {
+  border-radius: 24px;
+}
+
+memos-embed::part(user-name) {
+  color: var(--brand-fg);
+}
+```
+
+If you want to bring all styles yourself, set `include-styles="false"` and target the exposed `::part(...)` hooks from your site stylesheet.
 
 The custom element aborts stale requests when attributes change rapidly, making it safer for dynamic dashboards and previews.

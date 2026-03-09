@@ -111,6 +111,10 @@ export type EmbedTheme = {
 	monoFontFamily: string;
 };
 
+export type ThemeOverrides = Partial<Omit<EmbedTheme, "tokens">> & {
+	tokens?: Partial<ThemeTokens>;
+};
+
 export type ThemeInput = ThemePresetName | Partial<EmbedTheme>;
 
 export type FetchMemoOptions = {
@@ -119,6 +123,10 @@ export type FetchMemoOptions = {
 	includeCreator?: boolean;
 	fetcher?: typeof fetch;
 	signal?: AbortSignal;
+};
+
+export type FetchMemosOptions = Omit<FetchMemoOptions, "memoId"> & {
+	memoIds: readonly string[];
 };
 
 export type UserApiResponse = {
@@ -151,7 +159,17 @@ export type EmbedHtmlOptions = EmbedRenderOptions & {
 	includeStyles?: boolean;
 };
 
+export type MemoListLayout = "stack" | "grid";
+
+export type MemoListRenderOptions = EmbedHtmlOptions & {
+	layout?: MemoListLayout;
+	gap?: string;
+};
+
 export type FetchMemoHtmlSnippetOptions = FetchMemoOptions & EmbedHtmlOptions;
+
+export type FetchMemoListHtmlSnippetOptions =
+	FetchMemosOptions & MemoListRenderOptions;
 
 export type IframeEmbedOptions = {
 	embedBaseUrl: string;

@@ -4,23 +4,35 @@ export type {
 	EmbedRenderOptions,
 	EmbedTheme,
 	FetchMemoHtmlSnippetOptions,
+	FetchMemoListHtmlSnippetOptions,
 	FetchMemoOptions,
+	FetchMemosOptions,
 	IframeEmbedOptions,
 	Memo,
 	MemoApiResponse,
 	MemoAttachment,
+	MemoListLayout,
+	MemoListRenderOptions,
 	MemoReaction,
 	ThemeInput,
+	ThemeOverrides,
 	ThemePresetName,
 	User,
 	UserApiResponse,
 } from "./types";
 
-export { fetchMemo, fetchMemoHtmlSnippet } from "./api";
+export {
+	fetchMemo,
+	fetchMemoHtmlSnippet,
+	fetchMemoListHtmlSnippet,
+	fetchMemos,
+} from "./api";
 export {
 	buildEmbedCss,
 	renderMemoHtml,
 	renderMemoHtmlSnippet,
+	renderMemoListHtml,
+	renderMemoListHtmlSnippet,
 	renderMemoStateHtmlSnippet,
 } from "./render";
 export {
@@ -30,4 +42,4 @@ export {
 	MEMOS_EMBED_RESIZE_MESSAGE_TYPE,
 	renderIframeHtml,
 } from "./iframe";
-export { themePresets, defaultTheme, resolveTheme } from "./theme";
+export { themePresets, defaultTheme, resolveTheme, extendTheme } from "./theme";

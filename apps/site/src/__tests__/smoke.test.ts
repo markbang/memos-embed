@@ -33,13 +33,20 @@ describe("site smoke", () => {
 		).toBeTruthy();
 	});
 
-	it("renders docs quick start and rendering options sections", () => {
+	it("renders docs quick start, customization, and integration guide sections", () => {
 		render(createElement(DocsPageContent));
 
 		expect(screen.getByRole("heading", { name: "Documentation" })).toBeTruthy();
 		expect(screen.getByText("Quick Start")).toBeTruthy();
+		expect(screen.getByText("Multiple memos on one page")).toBeTruthy();
+		expect(screen.getByText("React memo roundup")).toBeTruthy();
 		expect(screen.getByText("Rendering Options")).toBeTruthy();
-		expect(screen.getByText("showAttachments")).toBeTruthy();
+		expect(screen.getByText("includeStyles")).toBeTruthy();
 		expect(screen.getByText("Theme Presets")).toBeTruthy();
+		expect(screen.getByText("Match your blog theme")).toBeTruthy();
+		expect(
+			screen.getByRole("heading", { name: "Blog Integration Guides" }),
+		).toBeTruthy();
+		expect(screen.getByText("Next.js App Router")).toBeTruthy();
 	});
 });

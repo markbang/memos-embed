@@ -2,6 +2,7 @@ import {
 	fetchMemo,
 	renderMemoHtmlSnippet,
 	renderMemoStateHtmlSnippet,
+	type EmbedHtmlOptions,
 	type EmbedRenderOptions,
 	type ThemeInput,
 } from "memos-embed";
@@ -12,6 +13,9 @@ const attributeToBoolean = (value: string | null) => {
 	}
 	return value === "" || value === "true";
 };
+
+const attributeToLinkTarget = (value: string | null) =>
+	value === "_blank" || value === "_self" ? value : undefined;
 
 const HTMLElementBase =
 	(globalThis as { HTMLElement?: typeof HTMLElement }).HTMLElement ??
@@ -29,6 +33,8 @@ export class MemosEmbedElement extends HTMLElementBase {
 			"show-attachments",
 			"show-reactions",
 			"show-meta",
+			"link-target",
+			"include-styles",
 		];
 	}
 
@@ -67,6 +73,14 @@ export class MemosEmbedElement extends HTMLElementBase {
 			),
 			showReactions: attributeToBoolean(this.getAttribute("show-reactions")),
 			showMeta: attributeToBoolean(this.getAttribute("show-meta")),
+			linkTarget: attributeToLinkTarget(this.getAttribute("link-target")),
+		};
+	}
+
+	private getHtmlOptions(): EmbedHtmlOptions {
+		return {
+			...this.getRenderOptions(),
+			includeStyles: attributeToBoolean(this.getAttribute("include-styles")),
 		};
 	}
 
@@ -77,6 +91,7 @@ export class MemosEmbedElement extends HTMLElementBase {
 		if (!memoId || !baseUrl) {
 			this.shadowRootRef.innerHTML = renderMemoStateHtmlSnippet(
 				"Missing memo-id or base-url.",
+				{ includeStyles: attributeToBoolean(this.getAttribute("include-styles")) },
 			);
 			return;
 		}
@@ -86,7 +101,9 @@ export class MemosEmbedElement extends HTMLElementBase {
 		this.abortController = controller;
 		const currentToken = ++this.renderToken;
 
-		this.shadowRootRef.innerHTML = renderMemoStateHtmlSnippet("Loading memo…");
+		this.shadowRootRef.innerHTML = renderMemoStateHtmlSnippet("Loading memo…", {
+			includeStyles: attributeToBoolean(this.getAttribute("include-styles")),
+		});
 
 		try {
 			const memo = await fetchMemo({
@@ -99,7 +116,7 @@ export class MemosEmbedElement extends HTMLElementBase {
 			}
 			this.shadowRootRef.innerHTML = renderMemoHtmlSnippet(
 				memo,
-				this.getRenderOptions(),
+				this.getHtmlOptions(),
 			);
 		} catch (error) {
 			if (controller.signal.aborted || currentToken !== this.renderToken) {
@@ -107,7 +124,9 @@ export class MemosEmbedElement extends HTMLElementBase {
 			}
 			const message =
 				error instanceof Error ? error.message : "Failed to load memo.";
-			this.shadowRootRef.innerHTML = renderMemoStateHtmlSnippet(message);
+			this.shadowRootRef.innerHTML = renderMemoStateHtmlSnippet(message, {
+				includeStyles: attributeToBoolean(this.getAttribute("include-styles")),
+			});
 		}
 	}
 }

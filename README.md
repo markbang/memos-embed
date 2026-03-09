@@ -8,10 +8,11 @@
 Embeddable memo cards for Memos, delivered as a website and npm packages.
 
 ## Features
-- Rich memo cards with themes and density presets
+- Rich memo cards with themes, density presets, and extendable design tokens
 - Core HTML renderer for SSR and static-site workflows
-- React component wrapper
-- Web Component wrapper
+- Batch multi-memo fetching and shared-style list rendering for note digests and weekly roundups
+- React components for single embeds and multi-memo roundups, with optional pre-fetched memo rendering
+- Web Component wrapper with exposed `::part(...)` hooks
 - Iframe embed route for no-build integrations
 - Lightweight markdown support for headings, lists, task lists, quotes, links, and fenced code blocks
 - Attachment previews for images and grouped reaction badges
@@ -57,20 +58,50 @@ pnpm validate
 ## Usage
 ### Core package
 ```ts
-import { fetchMemo, renderMemoHtmlSnippet } from 'memos-embed'
+import { extendTheme, fetchMemo, renderMemoHtmlSnippet } from 'memos-embed'
 
 const memo = await fetchMemo({
   baseUrl: 'https://demo.usememos.com/api/v1',
   memoId: '1',
 })
 
+const blogTheme = extendTheme('paper', {
+  radius: 'var(--radius)',
+  fontFamily: 'inherit',
+  tokens: {
+    background: 'var(--card)',
+    foreground: 'var(--card-foreground)',
+    border: 'var(--border)',
+    accent: 'var(--primary)',
+    accentForeground: 'var(--primary-foreground)',
+    mutedForeground: 'var(--muted-foreground)',
+    codeBackground: 'var(--muted)',
+  },
+})
+
 const html = renderMemoHtmlSnippet(memo, {
   includeStyles: true,
-  theme: 'paper',
+  theme: blogTheme,
   density: 'comfortable',
   showAttachments: true,
   showReactions: true,
   linkTarget: '_blank',
+})
+```
+
+### Multiple memos on one page
+```ts
+import { fetchMemos, renderMemoListHtmlSnippet } from 'memos-embed'
+
+const memos = await fetchMemos({
+  baseUrl: 'https://demo.usememos.com/api/v1',
+  memoIds: ['1', '2', '3'],
+})
+
+const html = renderMemoListHtmlSnippet(memos, {
+  layout: 'stack',
+  gap: '20px',
+  theme: 'paper',
 })
 ```
 
@@ -83,8 +114,35 @@ import { MemoEmbed } from '@memos-embed/react'
   memoId="1"
   theme="glass"
   density="compact"
+  linkTarget="_blank"
   showAttachments
   showReactions
+/>
+```
+
+### React with pre-fetched data
+```tsx
+import { fetchMemo } from 'memos-embed'
+import { MemoEmbed } from '@memos-embed/react'
+
+const memo = await fetchMemo({
+  baseUrl: 'https://demo.usememos.com/api/v1',
+  memoId: '1',
+})
+
+<MemoEmbed memo={memo} />
+```
+
+### React roundup component
+```tsx
+import { MemoEmbedList } from '@memos-embed/react'
+
+<MemoEmbedList
+  baseUrl="https://demo.usememos.com/api/v1"
+  memoIds={["1", "2", "3"]}
+  layout="stack"
+  gap="20px"
+  theme="paper"
 />
 ```
 
@@ -95,10 +153,17 @@ import { MemoEmbed } from '@memos-embed/react'
   base-url="https://demo.usememos.com/api/v1"
   memo-id="1"
   theme="midnight"
+  link-target="_blank"
   show-tags="true"
   show-attachments="true"
   show-reactions="true"
 ></memos-embed>
+```
+
+```css
+memos-embed::part(container) {
+  border-radius: 24px;
+}
 ```
 
 ### Iframe
@@ -113,6 +178,12 @@ const iframe = renderIframeHtml({
   autoResize: true,
 })
 ```
+
+## Blog integration examples
+- `examples/next-mdx`: Next.js App Router + server-fetched memo data
+- `examples/mdx-components`: reusable MDX component pattern for React-based blogs
+- `examples/astro-blog`: Astro + MDX blog usage
+- `examples/static-html`: iframe and Web Component copy-paste examples for static sites and CMS pages
 
 ## Development Notes
 - The site uses source aliases so local changes in `packages/*` show up immediately in `apps/site`

@@ -16,6 +16,7 @@ describe("playground helpers", () => {
 			memoId: "42",
 			theme: "midnight",
 			density: "compact",
+			linkTarget: "_self",
 			showTags: "false",
 			showAttachments: "true",
 			showReactions: "false",
@@ -27,6 +28,7 @@ describe("playground helpers", () => {
 			memoId: "42",
 			theme: "midnight",
 			density: "compact",
+			linkTarget: "_self",
 			showTags: false,
 			showAttachments: true,
 			showReactions: false,
@@ -34,9 +36,10 @@ describe("playground helpers", () => {
 		});
 	});
 
-	it("builds preview and share urls with visibility flags", () => {
+	it("builds preview and share urls with visibility flags and link behavior", () => {
 		const state = {
 			...defaultPlaygroundState,
+			linkTarget: "_self" as const,
 			showAttachments: false,
 			showReactions: false,
 		};
@@ -45,15 +48,18 @@ describe("playground helpers", () => {
 		const shareUrl = buildShareUrl("https://embed.example.com", state);
 
 		expect(previewUrl).toContain("/embed/1");
+		expect(previewUrl).toContain("linkTarget=_self");
 		expect(previewUrl).toContain("showAttachments=false");
 		expect(previewUrl).toContain("showReactions=false");
 		expect(shareUrl).toContain("/playground?");
+		expect(shareUrl).toContain("linkTarget=_self");
 		expect(shareUrl).toContain("showAttachments=false");
 	});
 
 	it("generates iframe, React, and Web Component snippets with current options", () => {
 		const state = {
 			...defaultPlaygroundState,
+			linkTarget: "_self" as const,
 			showTags: false,
 			showMeta: false,
 		};
@@ -64,9 +70,12 @@ describe("playground helpers", () => {
 
 		expect(iframeCode).toContain("<iframe");
 		expect(iframeCode).toContain("frameId=");
+		expect(iframeCode).toContain("linkTarget=_self");
 		expect(iframeCode).toContain("memos-embed:resize");
+		expect(reactCode).toContain('linkTarget="_self"');
 		expect(reactCode).toContain("showTags={false}");
 		expect(reactCode).toContain("showMeta={false}");
+		expect(wcCode).toContain('link-target="_self"');
 		expect(wcCode).toContain('show-tags="false"');
 		expect(wcCode).toContain('show-meta="false"');
 	});

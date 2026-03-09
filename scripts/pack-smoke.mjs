@@ -82,6 +82,13 @@ try {
 			"@types/react": `file:${localPackageDirs["@types/react"]}`,
 			"@types/react-dom": `file:${localPackageDirs["@types/react-dom"]}`,
 		},
+		pnpm: {
+			overrides: {
+				"memos-embed": `file:${coreTarball}`,
+				"@memos-embed/react": `file:${reactTarball}`,
+				"@memos-embed/wc": `file:${wcTarball}`,
+			},
+		},
 	};
 
 	await writeFile(
@@ -110,7 +117,7 @@ try {
 	);
 	await writeFile(
 		join(consumerDir, "consumer.tsx"),
-		`import { MemoEmbed } from "@memos-embed/react";
+		`import { MemoEmbed, MemoEmbedList } from "@memos-embed/react";
 import { MemosEmbedElement, defineMemosEmbedElement } from "@memos-embed/wc";
 import { renderIframeHtml, type ThemePresetName } from "memos-embed";
 
@@ -130,9 +137,17 @@ const component = (
     showReactions
   />
 );
+const list = (
+  <MemoEmbedList
+    baseUrl="https://demo.usememos.com/api/v1"
+    memoIds={["1", "2"]}
+    layout="stack"
+  />
+);
 
 void iframe;
 void component;
+void list;
 void defineMemosEmbedElement;
 void MemosEmbedElement;
 `,
@@ -172,6 +187,9 @@ if (!iframe.includes("memos-embed:resize")) {
 if (typeof react.MemoEmbed !== "function") {
   throw new Error("Expected React wrapper export from ESM consumer");
 }
+if (typeof react.MemoEmbedList !== "function") {
+  throw new Error("Expected React list wrapper export from ESM consumer");
+}
 if (typeof wc.defineMemosEmbedElement !== "function") {
   throw new Error("Expected WC wrapper export from ESM consumer");
 }
@@ -207,6 +225,9 @@ if (!core.renderMemoStateHtmlSnippet("ok").includes("ok")) {
 }
 if (typeof react.MemoEmbed !== "function") {
   throw new Error("Expected React CJS exports");
+}
+if (typeof react.MemoEmbedList !== "function") {
+  throw new Error("Expected React list CJS exports");
 }
 if (typeof wc.defineMemosEmbedElement !== "function") {
   throw new Error("Expected WC CJS exports");

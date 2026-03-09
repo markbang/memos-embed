@@ -1,7 +1,13 @@
 import { escapeHtml, sanitizeUrl } from "./html";
 import { renderMarkdown } from "./markdown";
 import { resolveTheme } from "./theme";
-import type { EmbedHtmlOptions, EmbedRenderOptions, Memo, MemoAttachment } from "./types";
+import type {
+	EmbedHtmlOptions,
+	EmbedRenderOptions,
+	Memo,
+	MemoAttachment,
+	MemoListRenderOptions,
+} from "./types";
 
 const formatTime = (value?: string, locale?: string) => {
 	if (!value) {
@@ -59,7 +65,23 @@ const buildThemeStyle = (options: EmbedRenderOptions) => {
 	].join(";");
 };
 
+const buildMemoListStyle = (options: MemoListRenderOptions) =>
+	`--me-list-gap:${options.gap ?? "16px"}`;
+
 export const buildEmbedCss = () => `
+.memos-embed-list {
+  display: grid;
+  gap: var(--me-list-gap, 16px);
+}
+
+.memos-embed-list--stack {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.memos-embed-list--grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+}
+
 .memos-embed {
   position: relative;
   background-color: var(--me-background, #ffffff);
@@ -628,6 +650,17 @@ export const renderMemoHtml = (
   `.trim();
 };
 
+export const renderMemoListHtml = (
+	memos: readonly Memo[],
+	options: MemoListRenderOptions = {},
+) => {
+	const layout = options.layout ?? "stack";
+	const listStyle = escapeHtml(buildMemoListStyle(options));
+	const items = memos.map((memo) => renderMemoHtml(memo, options)).join("");
+
+	return `<div class="memos-embed-list memos-embed-list--${layout}" style="${listStyle}">${items}</div>`;
+};
+
 const wrapHtmlSnippet = (content: string, includeStyles = true) => {
 	if (!includeStyles) {
 		return content;
@@ -640,6 +673,11 @@ export const renderMemoHtmlSnippet = (
 	memo: Memo,
 	options: EmbedHtmlOptions = {},
 ) => wrapHtmlSnippet(renderMemoHtml(memo, options), options.includeStyles);
+
+export const renderMemoListHtmlSnippet = (
+	memos: readonly Memo[],
+	options: MemoListRenderOptions = {},
+) => wrapHtmlSnippet(renderMemoListHtml(memos, options), options.includeStyles);
 
 export const renderMemoStateHtmlSnippet = (
 	message: string,
