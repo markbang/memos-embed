@@ -1,6 +1,6 @@
 {
   "name": "memos-embed",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Core HTML renderer and iframe helpers for embedding Memos memo cards.",
   "type": "module",
   "homepage": "https://github.com/markbang/memos-embed/tree/main/packages/memos-embed#readme",

@@ -1,5 +1,13 @@
 # @memos-embed/wc
 
+## 0.4.2
+
+### Patch Changes
+
+- a9309c5: Patch release to verify the restored changelogithub-based GitHub Release flow after 0.4.1.
+- Updated dependencies [a9309c5]
+  - memos-embed@0.4.2
+
 ## 0.4.1
 
 ### Patch Changes
