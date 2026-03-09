@@ -24,6 +24,19 @@ import { MemoEmbed } from '@memos-embed/react'
 />
 ```
 
+## Roundup usage
+```tsx
+import { MemoEmbedList } from '@memos-embed/react'
+
+<MemoEmbedList
+  baseUrl="https://demo.usememos.com/api/v1"
+  memoIds={["1", "2", "3"]}
+  layout="stack"
+  gap="20px"
+  theme="paper"
+/>
+```
+
 ## Pre-fetched usage
 ```tsx
 import { fetchMemo } from 'memos-embed'
@@ -62,7 +75,8 @@ If you want to bring all styles yourself, pass `includeStyles={false}` and rende
 
 ## Notes
 - Pass `memo` to render already-fetched data and avoid a client-side request waterfall
-- `fetcher` and `includeCreator` are forwarded to the shared `fetchMemo()` helper when the component fetches its own data
+- Use `MemoEmbedList` when you want multiple memo cards with one shared style block in React
+- `fetcher` and `includeCreator` are forwarded to the shared `fetchMemo()` / `fetchMemos()` helpers when components fetch their own data
 - `linkTarget` keeps markdown and attachment links consistent with iframe and Web Component embeds
 - `includeStyles={false}` disables the built-in `<style>` block for bring-your-own styling setups
 - Fetch requests are cancelled when props change or the component unmounts

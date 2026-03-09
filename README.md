@@ -11,7 +11,7 @@ Embeddable memo cards for Memos, delivered as a website and npm packages.
 - Rich memo cards with themes, density presets, and extendable design tokens
 - Core HTML renderer for SSR and static-site workflows
 - Batch multi-memo fetching and shared-style list rendering for note digests and weekly roundups
-- React component wrapper with optional pre-fetched memo rendering
+- React components for single embeds and multi-memo roundups, with optional pre-fetched memo rendering
 - Web Component wrapper with exposed `::part(...)` hooks
 - Iframe embed route for no-build integrations
 - Lightweight markdown support for headings, lists, task lists, quotes, links, and fenced code blocks
@@ -131,6 +131,19 @@ const memo = await fetchMemo({
 })
 
 <MemoEmbed memo={memo} />
+```
+
+### React roundup component
+```tsx
+import { MemoEmbedList } from '@memos-embed/react'
+
+<MemoEmbedList
+  baseUrl="https://demo.usememos.com/api/v1"
+  memoIds={["1", "2", "3"]}
+  layout="stack"
+  gap="20px"
+  theme="paper"
+/>
 ```
 
 ### Web Component

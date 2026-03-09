@@ -1,19 +1,29 @@
 "use client";
 
-import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
+import {
+	type CSSProperties,
+	type RefObject,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import type {
 	EmbedHtmlOptions,
 	EmbedRenderOptions,
 	Memo,
+	MemoListRenderOptions,
 	ThemeInput,
 } from "memos-embed";
 import {
 	fetchMemo,
+	fetchMemos,
 	renderMemoHtmlSnippet,
+	renderMemoListHtmlSnippet,
 	renderMemoStateHtmlSnippet,
 } from "memos-embed";
 
-type SharedMemoEmbedProps = {
+type BaseEmbedProps = {
 	theme?: ThemeInput;
 	density?: EmbedRenderOptions["density"];
 	locale?: string;
@@ -26,10 +36,13 @@ type SharedMemoEmbedProps = {
 	className?: string;
 	style?: CSSProperties;
 	onError?: (error: Error) => void;
+};
+
+type MemoEmbedSharedProps = BaseEmbedProps & {
 	onLoad?: (memo: Memo) => void;
 };
 
-type MemoEmbedFetchProps = SharedMemoEmbedProps & {
+type MemoEmbedFetchProps = MemoEmbedSharedProps & {
 	memo?: undefined;
 	memoId: string;
 	baseUrl: string;
@@ -37,7 +50,7 @@ type MemoEmbedFetchProps = SharedMemoEmbedProps & {
 	fetcher?: typeof fetch;
 };
 
-type MemoEmbedProvidedProps = SharedMemoEmbedProps & {
+type MemoEmbedProvidedProps = MemoEmbedSharedProps & {
 	memo: Memo;
 	memoId?: string;
 	baseUrl?: string;
@@ -46,6 +59,32 @@ type MemoEmbedProvidedProps = SharedMemoEmbedProps & {
 };
 
 export type MemoEmbedProps = MemoEmbedFetchProps | MemoEmbedProvidedProps;
+
+type MemoEmbedListSharedProps = BaseEmbedProps & {
+	layout?: MemoListRenderOptions["layout"];
+	gap?: MemoListRenderOptions["gap"];
+	onLoad?: (memos: Memo[]) => void;
+};
+
+type MemoEmbedListFetchProps = MemoEmbedListSharedProps & {
+	memos?: undefined;
+	memoIds: readonly string[];
+	baseUrl: string;
+	includeCreator?: boolean;
+	fetcher?: typeof fetch;
+};
+
+type MemoEmbedListProvidedProps = MemoEmbedListSharedProps & {
+	memos: readonly Memo[];
+	memoIds?: readonly string[];
+	baseUrl?: string;
+	includeCreator?: boolean;
+	fetcher?: typeof fetch;
+};
+
+export type MemoEmbedListProps =
+	| MemoEmbedListFetchProps
+	| MemoEmbedListProvidedProps;
 
 const renderState = ({
 	message,
@@ -66,6 +105,122 @@ const renderState = ({
 		}}
 	/>
 );
+
+const useEmbedHtmlOptions = ({
+	theme,
+	density,
+	locale,
+	showTags,
+	showAttachments,
+	showReactions,
+	showMeta,
+	linkTarget,
+	includeStyles,
+}: {
+	theme?: ThemeInput;
+	density?: EmbedRenderOptions["density"];
+	locale?: string;
+	showTags?: boolean;
+	showAttachments?: boolean;
+	showReactions?: boolean;
+	showMeta?: boolean;
+	linkTarget?: EmbedRenderOptions["linkTarget"];
+	includeStyles: boolean;
+}) => {
+	const renderOptions: EmbedRenderOptions = useMemo(
+		() => ({
+			theme,
+			density,
+			locale,
+			showTags,
+			showAttachments,
+			showReactions,
+			showMeta,
+			linkTarget,
+		}),
+		[
+			theme,
+			density,
+			locale,
+			showTags,
+			showAttachments,
+			showReactions,
+			showMeta,
+			linkTarget,
+		],
+	);
+
+	return useMemo<EmbedHtmlOptions>(
+		() => ({
+			...renderOptions,
+			includeStyles,
+		}),
+		[renderOptions, includeStyles],
+	);
+};
+
+const useMemoListHtmlOptions = ({
+	theme,
+	density,
+	locale,
+	showTags,
+	showAttachments,
+	showReactions,
+	showMeta,
+	linkTarget,
+	includeStyles,
+	layout,
+	gap,
+}: {
+	theme?: ThemeInput;
+	density?: EmbedRenderOptions["density"];
+	locale?: string;
+	showTags?: boolean;
+	showAttachments?: boolean;
+	showReactions?: boolean;
+	showMeta?: boolean;
+	linkTarget?: EmbedRenderOptions["linkTarget"];
+	includeStyles: boolean;
+	layout?: MemoListRenderOptions["layout"];
+	gap?: MemoListRenderOptions["gap"];
+}) => {
+	const htmlOptions = useEmbedHtmlOptions({
+		theme,
+		density,
+		locale,
+		showTags,
+		showAttachments,
+		showReactions,
+		showMeta,
+		linkTarget,
+		includeStyles,
+	});
+
+	return useMemo<MemoListRenderOptions>(
+		() => ({
+			...htmlOptions,
+			layout,
+			gap,
+		}),
+		[htmlOptions, layout, gap],
+	);
+};
+
+const useInjectedHtml = ({
+	containerRef,
+	html,
+}: {
+	containerRef: RefObject<HTMLDivElement | null>;
+	html: string | null;
+}) => {
+	useEffect(() => {
+		if (!html || !containerRef.current) {
+			return;
+		}
+
+		containerRef.current.innerHTML = html;
+	}, [containerRef, html]);
+};
 
 export const MemoEmbed = ({
 	memo: providedMemo,
@@ -90,40 +245,23 @@ export const MemoEmbed = ({
 	const [fetchedMemo, setFetchedMemo] = useState<Memo | null>(null);
 	const [error, setError] = useState<Error | null>(null);
 	const containerRef = useRef<HTMLDivElement | null>(null);
-
-	const renderOptions: EmbedRenderOptions = useMemo(
-		() => ({
-			theme,
-			density,
-			locale,
-			showTags,
-			showAttachments,
-			showReactions,
-			showMeta,
-			linkTarget,
-		}),
-		[
-			theme,
-			density,
-			locale,
-			showTags,
-			showAttachments,
-			showReactions,
-			showMeta,
-			linkTarget,
-		],
-	);
-
-	const htmlOptions: EmbedHtmlOptions = useMemo(
-		() => ({
-			...renderOptions,
-			includeStyles,
-		}),
-		[renderOptions, includeStyles],
-	);
+	const htmlOptions = useEmbedHtmlOptions({
+		theme,
+		density,
+		locale,
+		showTags,
+		showAttachments,
+		showReactions,
+		showMeta,
+		linkTarget,
+		includeStyles,
+	});
 
 	const resolvedMemo = providedMemo ?? fetchedMemo;
 	const canFetch = !providedMemo && Boolean(baseUrl) && Boolean(memoId);
+	const html = resolvedMemo
+		? renderMemoHtmlSnippet(resolvedMemo, htmlOptions)
+		: null;
 
 	useEffect(() => {
 		if (!providedMemo) {
@@ -173,12 +311,7 @@ export const MemoEmbed = ({
 		};
 	}, [baseUrl, memoId, includeCreator, fetcher, onError, onLoad, canFetch]);
 
-	useEffect(() => {
-		if (!resolvedMemo || !containerRef.current) {
-			return;
-		}
-		containerRef.current.innerHTML = renderMemoHtmlSnippet(resolvedMemo, htmlOptions);
-	}, [resolvedMemo, htmlOptions]);
+	useInjectedHtml({ containerRef, html });
 
 	if (!providedMemo && (!baseUrl || !memoId)) {
 		return renderState({
@@ -205,6 +338,154 @@ export const MemoEmbed = ({
 			style,
 			includeStyles,
 		});
+	}
+
+	return <div className={className} style={style} ref={containerRef} />;
+};
+
+export const MemoEmbedList = ({
+	memos: providedMemos,
+	memoIds = [],
+	baseUrl,
+	theme,
+	density,
+	locale,
+	showTags,
+	showAttachments,
+	showReactions,
+	showMeta,
+	linkTarget,
+	includeStyles = true,
+	layout,
+	gap,
+	className,
+	style,
+	includeCreator = true,
+	fetcher,
+	onError,
+	onLoad,
+}: MemoEmbedListProps) => {
+	const [fetchedMemos, setFetchedMemos] = useState<Memo[] | null>(null);
+	const [error, setError] = useState<Error | null>(null);
+	const containerRef = useRef<HTMLDivElement | null>(null);
+	const htmlOptions = useMemoListHtmlOptions({
+		theme,
+		density,
+		locale,
+		showTags,
+		showAttachments,
+		showReactions,
+		showMeta,
+		linkTarget,
+		includeStyles,
+		layout,
+		gap,
+	});
+
+	const resolvedMemos = providedMemos
+		? Array.from(providedMemos)
+		: fetchedMemos;
+	const canFetch = !providedMemos && Boolean(baseUrl) && memoIds.length > 0;
+	const html = resolvedMemos
+		? renderMemoListHtmlSnippet(resolvedMemos, htmlOptions)
+		: null;
+
+	useEffect(() => {
+		if (!providedMemos) {
+			return;
+		}
+
+		setFetchedMemos(null);
+		setError(null);
+		onLoad?.(Array.from(providedMemos));
+	}, [providedMemos, onLoad]);
+
+	useEffect(() => {
+		if (!canFetch || !baseUrl) {
+			return;
+		}
+
+		const controller = new AbortController();
+		let isMounted = true;
+		setError(null);
+		setFetchedMemos(null);
+
+		fetchMemos({
+			baseUrl,
+			memoIds,
+			includeCreator,
+			fetcher,
+			signal: controller.signal,
+		})
+			.then((data: Memo[]) => {
+				if (!isMounted || controller.signal.aborted) {
+					return;
+				}
+				setFetchedMemos(data);
+				onLoad?.(data);
+			})
+			.catch((fetchError: Error) => {
+				if (!isMounted || controller.signal.aborted) {
+					return;
+				}
+				setError(fetchError);
+				onError?.(fetchError);
+			});
+
+		return () => {
+			isMounted = false;
+			controller.abort();
+		};
+	}, [
+		baseUrl,
+		memoIds,
+		includeCreator,
+		fetcher,
+		onError,
+		onLoad,
+		canFetch,
+	]);
+
+	useInjectedHtml({ containerRef, html });
+
+	if (!providedMemos && !baseUrl) {
+		return renderState({
+			message: "baseUrl is required when memos are not provided.",
+			className,
+			style,
+			includeStyles,
+		});
+	}
+
+	if (!providedMemos && memoIds.length === 0) {
+		return renderState({
+			message: "memoIds are required when memos are not provided.",
+			className,
+			style,
+			includeStyles,
+		});
+	}
+
+	if (error) {
+		return renderState({
+			message: error.message || "Failed to load memos.",
+			className,
+			style,
+			includeStyles,
+		});
+	}
+
+	if (!resolvedMemos) {
+		return renderState({
+			message: "Loading memos…",
+			className,
+			style,
+			includeStyles,
+		});
+	}
+
+	if (resolvedMemos.length === 0) {
+		return null;
 	}
 
 	return <div className={className} style={style} ref={containerRef} />;

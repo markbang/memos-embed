@@ -187,6 +187,18 @@ const memo = await fetchMemo({
 <MemoEmbed memo={memo} linkTarget="_blank" />`}
 						/>
 						<DocSection
+							title="React memo roundup"
+							code={`import { MemoEmbedList } from '@memos-embed/react'
+
+<MemoEmbedList
+  baseUrl="https://demo.usememos.com/api/v1"
+  memoIds={["1", "2", "3"]}
+  layout="stack"
+  gap="20px"
+  theme="paper"
+/>`}
+						/>
+						<DocSection
 							title="Web Component"
 							code={`pnpm add @memos-embed/wc
 
@@ -239,8 +251,9 @@ const iframe = renderIframeHtml({
 							</li>
 							<li>
 								• React and Web Component wrappers cancel stale fetches for
-								safer updates, and React can render pre-fetched memo data
-								without a client-side waterfall.
+								safer updates, React can render pre-fetched memo data without a
+								client-side waterfall, and `MemoEmbedList` helps roundup pages
+								share one style block.
 							</li>
 							<li>
 								• `extendTheme()` and bring-your-own-style controls make it
