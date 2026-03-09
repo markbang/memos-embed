@@ -15,6 +15,7 @@ pnpm add @memos-embed/wc
   memo-id="1"
   theme="minimal"
   density="comfortable"
+  link-target="_blank"
   show-tags="true"
   show-attachments="true"
   show-reactions="true"
@@ -35,6 +36,7 @@ defineMemosEmbedElement()
 - `theme`
 - `density`
 - `locale`
+- `link-target`
 - `show-tags`
 - `show-attachments`
 - `show-reactions`

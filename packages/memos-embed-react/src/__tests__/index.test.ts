@@ -12,16 +12,15 @@ describe("MemoEmbed", () => {
 	});
 
 	it("renders loaded content through core snippet helper", async () => {
-		const fetchMemoSpy = vi
-			.spyOn(memosEmbed, "fetchMemo")
-			.mockResolvedValue({
-				id: "1",
-				name: "memos/1",
-				content: "Hello",
-				tags: [],
-				attachments: [],
-				reactions: [],
-			});
+		const customFetcher = vi.fn<typeof fetch>();
+		const fetchMemoSpy = vi.spyOn(memosEmbed, "fetchMemo").mockResolvedValue({
+			id: "1",
+			name: "memos/1",
+			content: "Hello",
+			tags: [],
+			attachments: [],
+			reactions: [],
+		});
 		const renderSnippetSpy = vi.spyOn(memosEmbed, "renderMemoHtmlSnippet");
 		const container = document.createElement("div");
 		document.body.appendChild(container);
@@ -32,6 +31,10 @@ describe("MemoEmbed", () => {
 				createElement(MemoEmbed, {
 					baseUrl: "https://demo.usememos.com",
 					memoId: "1",
+					includeCreator: false,
+					fetcher: customFetcher,
+					linkTarget: "_blank",
+					className: "memo-wrapper",
 				}),
 			);
 			await Promise.resolve();
@@ -42,10 +45,21 @@ describe("MemoEmbed", () => {
 			expect.objectContaining({
 				baseUrl: "https://demo.usememos.com",
 				memoId: "1",
+				includeCreator: false,
+				fetcher: customFetcher,
 				signal: expect.any(AbortSignal),
 			}),
 		);
-		expect(renderSnippetSpy).toHaveBeenCalled();
+		expect(renderSnippetSpy).toHaveBeenCalledWith(
+			expect.objectContaining({
+				content: "Hello",
+			}),
+			expect.objectContaining({
+				includeStyles: true,
+				linkTarget: "_blank",
+			}),
+		);
+		expect(container.querySelector(".memo-wrapper")).toBeTruthy();
 		expect(container.innerHTML).toContain("Hello");
 		expect(container.textContent).not.toContain("Loading memo…");
 
@@ -55,5 +69,42 @@ describe("MemoEmbed", () => {
 		container.remove();
 		fetchMemoSpy.mockRestore();
 		renderSnippetSpy.mockRestore();
+	});
+
+	it("can render a provided memo without fetching", async () => {
+		const memo = {
+			id: "99",
+			name: "memos/99",
+			content: "Prefetched",
+			tags: [],
+			attachments: [],
+			reactions: [],
+		};
+		const fetchMemoSpy = vi.spyOn(memosEmbed, "fetchMemo");
+		const onLoad = vi.fn();
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		const root = createRoot(container);
+
+		await act(async () => {
+			root.render(
+				createElement(MemoEmbed, {
+					memo,
+					onLoad,
+				}),
+			);
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(fetchMemoSpy).not.toHaveBeenCalled();
+		expect(onLoad).toHaveBeenCalledWith(memo);
+		expect(container.innerHTML).toContain("Prefetched");
+
+		await act(async () => {
+			root.unmount();
+		});
+		container.remove();
+		fetchMemoSpy.mockRestore();
 	});
 });

@@ -93,6 +93,9 @@ describe("PlaygroundExperience", () => {
 		expect(previewFrame.getAttribute("src") ?? "").toContain(
 			"showAttachments=true",
 		);
+		expect(previewFrame.getAttribute("src") ?? "").toContain(
+			"linkTarget=_blank",
+		);
 
 		const baseUrlInput = screen.getByLabelText("Base URL") as HTMLInputElement;
 		fireEvent.change(baseUrlInput, {
@@ -108,6 +111,7 @@ describe("PlaygroundExperience", () => {
 				"baseUrl=https%3A%2F%2Fmemos.example.com%2Fapi%2Fv1",
 			);
 			expect(previewSrc).toContain("showAttachments=false");
+			expect(previewSrc).toContain("linkTarget=_blank");
 		});
 
 		const shareUrlInput = screen.getByLabelText(
@@ -117,11 +121,13 @@ describe("PlaygroundExperience", () => {
 			"baseUrl=https%3A%2F%2Fmemos.example.com%2Fapi%2Fv1",
 		);
 		expect(shareUrlInput.value).toContain("showAttachments=false");
+		expect(shareUrlInput.value).toContain("linkTarget=_blank");
 
 		const iframeCode = screen.getByLabelText(
 			"Iframe embed code",
 		) as HTMLTextAreaElement;
 		expect(iframeCode.value).toContain("showAttachments=false");
+		expect(iframeCode.value).toContain("linkTarget=_blank");
 		expect(iframeCode.value).toContain("memos-embed:resize");
 
 		fireEvent.click(screen.getByRole("button", { name: "Copy iframe code" }));
@@ -132,6 +138,7 @@ describe("PlaygroundExperience", () => {
 				expect.objectContaining({
 					baseUrl: "https://memos.example.com/api/v1",
 					showAttachments: false,
+					linkTarget: "_blank",
 				}),
 			);
 		});
@@ -157,7 +164,7 @@ describe("PlaygroundExperience", () => {
 		});
 	});
 
-	it("supports select and tabs interactions for theme, density, and code views", async () => {
+	it("supports select and tabs interactions for theme, density, link target, and code views", async () => {
 		const onStateChange = vi.fn();
 
 		const view = render(
@@ -177,11 +184,16 @@ describe("PlaygroundExperience", () => {
 		fireEvent.keyDown(densityTrigger, { key: "Enter" });
 		fireEvent.click(await screen.findByRole("option", { name: "Compact" }));
 
+		const linkTargetTrigger = scoped.getByLabelText("Link target");
+		fireEvent.keyDown(linkTargetTrigger, { key: "Enter" });
+		fireEvent.click(await screen.findByRole("option", { name: "Same tab" }));
+
 		await waitFor(() => {
 			expect(onStateChange).toHaveBeenLastCalledWith(
 				expect.objectContaining({
 					theme: "midnight",
 					density: "compact",
+					linkTarget: "_self",
 				}),
 			);
 		});
@@ -191,6 +203,7 @@ describe("PlaygroundExperience", () => {
 		) as HTMLInputElement;
 		expect(shareUrlInput.value).toContain("theme=midnight");
 		expect(shareUrlInput.value).toContain("density=compact");
+		expect(shareUrlInput.value).toContain("linkTarget=_self");
 
 		const codeCard = screen
 			.getByText("Code Snippets")
@@ -213,6 +226,7 @@ describe("PlaygroundExperience", () => {
 		) as HTMLTextAreaElement;
 		expect(reactCode.value).toContain('theme="midnight"');
 		expect(reactCode.value).toContain('density="compact"');
+		expect(reactCode.value).toContain('linkTarget="_self"');
 
 		const webComponentTab = codeScope.getByRole("tab", {
 			name: "Web Component",
@@ -229,5 +243,6 @@ describe("PlaygroundExperience", () => {
 		) as HTMLTextAreaElement;
 		expect(wcCode.value).toContain('theme="midnight"');
 		expect(wcCode.value).toContain('density="compact"');
+		expect(wcCode.value).toContain('link-target="_self"');
 	});
 });

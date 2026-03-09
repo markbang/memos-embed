@@ -86,9 +86,22 @@ import { MemoEmbed } from '@memos-embed/react'
   baseUrl="https://demo.usememos.com/api/v1"
   memoId="1"
   theme="glass"
+  linkTarget="_blank"
   showAttachments
   showReactions
 />`}
+						/>
+						<DocSection
+							title="Pre-fetched React data"
+							code={`import { fetchMemo } from 'memos-embed'
+import { MemoEmbed } from '@memos-embed/react'
+
+const memo = await fetchMemo({
+  baseUrl: 'https://demo.usememos.com/api/v1',
+  memoId: '1',
+})
+
+<MemoEmbed memo={memo} linkTarget="_blank" />`}
 						/>
 						<DocSection
 							title="Web Component"
@@ -96,7 +109,13 @@ import { MemoEmbed } from '@memos-embed/react'
 
 import { defineMemosEmbedElement } from '@memos-embed/wc'
 
-defineMemosEmbedElement()`}
+defineMemosEmbedElement()
+
+<memos-embed
+  base-url="https://demo.usememos.com/api/v1"
+  memo-id="1"
+  link-target="_blank"
+></memos-embed>`}
 						/>
 						<DocSection
 							title="Iframe"
@@ -131,12 +150,14 @@ const iframe = renderIframeHtml({
 							</li>
 							<li>• Reactions are grouped into compact count badges.</li>
 							<li>
-								• The playground now supports shareable URLs, copy-to-clipboard
-								snippets, and auto-resizing iframe code.
+								• The playground now supports shareable URLs, link-target
+								tuning, copy-to-clipboard snippets, and auto-resizing iframe
+								code.
 							</li>
 							<li>
 								• React and Web Component wrappers cancel stale fetches for
-								safer updates.
+								safer updates, and React can render pre-fetched memo data
+								without a client-side waterfall.
 							</li>
 							<li>
 								• Iframe embeds can now resize automatically through a

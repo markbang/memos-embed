@@ -10,22 +10,21 @@ describe("defineMemosEmbedElement", () => {
 
 	it("renders through core snippet helpers", async () => {
 		defineMemosEmbedElement();
-		const fetchMemoSpy = vi
-			.spyOn(memosEmbed, "fetchMemo")
-			.mockResolvedValue({
-				id: "1",
-				name: "memos/1",
-				content: "Hello",
-				tags: [],
-				attachments: [],
-				reactions: [],
-			});
+		const fetchMemoSpy = vi.spyOn(memosEmbed, "fetchMemo").mockResolvedValue({
+			id: "1",
+			name: "memos/1",
+			content: "Hello",
+			tags: [],
+			attachments: [],
+			reactions: [],
+		});
 		const renderStateSpy = vi.spyOn(memosEmbed, "renderMemoStateHtmlSnippet");
 		const renderSnippetSpy = vi.spyOn(memosEmbed, "renderMemoHtmlSnippet");
 
 		const element = document.createElement("memos-embed");
 		element.setAttribute("memo-id", "1");
 		element.setAttribute("base-url", "https://demo.usememos.com");
+		element.setAttribute("link-target", "_blank");
 		document.body.appendChild(element);
 
 		await Promise.resolve();
@@ -39,7 +38,14 @@ describe("defineMemosEmbedElement", () => {
 				signal: expect.any(AbortSignal),
 			}),
 		);
-		expect(renderSnippetSpy).toHaveBeenCalled();
+		expect(renderSnippetSpy).toHaveBeenCalledWith(
+			expect.objectContaining({
+				content: "Hello",
+			}),
+			expect.objectContaining({
+				linkTarget: "_blank",
+			}),
+		);
 		expect(element.shadowRoot?.innerHTML).toContain("Hello");
 
 		element.remove();

@@ -13,6 +13,9 @@ const attributeToBoolean = (value: string | null) => {
 	return value === "" || value === "true";
 };
 
+const attributeToLinkTarget = (value: string | null) =>
+	value === "_blank" || value === "_self" ? value : undefined;
+
 const HTMLElementBase =
 	(globalThis as { HTMLElement?: typeof HTMLElement }).HTMLElement ??
 	(class {} as typeof HTMLElement);
@@ -29,6 +32,7 @@ export class MemosEmbedElement extends HTMLElementBase {
 			"show-attachments",
 			"show-reactions",
 			"show-meta",
+			"link-target",
 		];
 	}
 
@@ -67,6 +71,7 @@ export class MemosEmbedElement extends HTMLElementBase {
 			),
 			showReactions: attributeToBoolean(this.getAttribute("show-reactions")),
 			showMeta: attributeToBoolean(this.getAttribute("show-meta")),
+			linkTarget: attributeToLinkTarget(this.getAttribute("link-target")),
 		};
 	}
 

@@ -50,6 +50,11 @@ const densityOptions = [
 	{ value: "compact", label: "Compact" },
 ] as const;
 
+const linkTargetOptions = [
+	{ value: "_blank", label: "New tab" },
+	{ value: "_self", label: "Same tab" },
+] as const;
+
 export function PlaygroundExperience({
 	initialState,
 	embedBaseUrl,
@@ -68,6 +73,7 @@ export function PlaygroundExperience({
 	const memoIdId = useId();
 	const themeId = useId();
 	const densityId = useId();
+	const linkTargetId = useId();
 	const showMetaId = useId();
 	const showTagsId = useId();
 	const showAttachmentsId = useId();
@@ -149,6 +155,7 @@ export function PlaygroundExperience({
 		"memo-id": state.memoId,
 		theme: state.theme,
 		density: state.density,
+		"link-target": state.linkTarget,
 		"show-tags": String(state.showTags),
 		"show-attachments": String(state.showAttachments),
 		"show-reactions": String(state.showReactions),
@@ -163,8 +170,8 @@ export function PlaygroundExperience({
 						<CardHeader>
 							<CardTitle>Configuration</CardTitle>
 							<CardDescription>
-								Customize the memo source, theme, density, and what metadata is
-								visible.
+								Customize the memo source, theme, density, link behavior, and
+								what metadata is visible.
 							</CardDescription>
 						</CardHeader>
 						<CardContent className="space-y-5">
@@ -196,7 +203,7 @@ export function PlaygroundExperience({
 									placeholder="1"
 								/>
 							</div>
-							<div className="grid gap-4 sm:grid-cols-2">
+							<div className="grid gap-4 sm:grid-cols-3">
 								<div className="space-y-2">
 									<Label htmlFor={themeId}>Theme</Label>
 									<Select
@@ -236,6 +243,29 @@ export function PlaygroundExperience({
 										</SelectTrigger>
 										<SelectContent>
 											{densityOptions.map((option) => (
+												<SelectItem key={option.value} value={option.value}>
+													{option.label}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</div>
+								<div className="space-y-2">
+									<Label htmlFor={linkTargetId}>Link target</Label>
+									<Select
+										value={state.linkTarget}
+										onValueChange={(value) =>
+											setState((current) => ({
+												...current,
+												linkTarget: value as "_blank" | "_self",
+											}))
+										}
+									>
+										<SelectTrigger id={linkTargetId}>
+											<SelectValue placeholder="Select a link target" />
+										</SelectTrigger>
+										<SelectContent>
+											{linkTargetOptions.map((option) => (
 												<SelectItem key={option.value} value={option.value}>
 													{option.label}
 												</SelectItem>
@@ -426,6 +456,7 @@ export function PlaygroundExperience({
 										memoId={state.memoId}
 										theme={state.theme}
 										density={state.density}
+										linkTarget={state.linkTarget}
 										showTags={state.showTags}
 										showAttachments={state.showAttachments}
 										showReactions={state.showReactions}

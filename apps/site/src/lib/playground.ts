@@ -11,6 +11,7 @@ export type PlaygroundState = {
 	memoId: string;
 	theme: ThemePresetName;
 	density: NonNullable<EmbedRenderOptions["density"]>;
+	linkTarget: NonNullable<EmbedRenderOptions["linkTarget"]>;
 	showTags: boolean;
 	showAttachments: boolean;
 	showReactions: boolean;
@@ -22,6 +23,7 @@ export const defaultPlaygroundState: PlaygroundState = {
 	memoId: "1",
 	theme: "minimal",
 	density: "comfortable",
+	linkTarget: "_blank",
 	showTags: true,
 	showAttachments: true,
 	showReactions: true,
@@ -69,6 +71,10 @@ export const normalizePlaygroundSearch = (
 		search.density === "compact" || search.density === "comfortable"
 			? search.density
 			: defaultPlaygroundState.density,
+	linkTarget:
+		search.linkTarget === "_self" || search.linkTarget === "_blank"
+			? search.linkTarget
+			: defaultPlaygroundState.linkTarget,
 	showTags: normalizeBooleanSearchValue(
 		search.showTags,
 		defaultPlaygroundState.showTags,
@@ -92,6 +98,7 @@ export const serializePlaygroundState = (state: PlaygroundState) => ({
 	memoId: state.memoId,
 	theme: state.theme,
 	density: state.density,
+	linkTarget: state.linkTarget,
 	showTags: String(state.showTags),
 	showAttachments: String(state.showAttachments),
 	showReactions: String(state.showReactions),
@@ -108,6 +115,7 @@ export const buildEmbedPreviewUrl = (
 		memoId: state.memoId,
 		theme: state.theme,
 		density: state.density,
+		linkTarget: state.linkTarget,
 		showTags: state.showTags,
 		showAttachments: state.showAttachments,
 		showReactions: state.showReactions,
@@ -121,6 +129,7 @@ export const buildIframeCode = (embedBaseUrl: string, state: PlaygroundState) =>
 		memoId: state.memoId,
 		theme: state.theme,
 		density: state.density,
+		linkTarget: state.linkTarget,
 		showTags: state.showTags,
 		showAttachments: state.showAttachments,
 		showReactions: state.showReactions,
@@ -138,6 +147,7 @@ export const buildWebComponentCode = (
   memo-id="${state.memoId}"
   theme="${state.theme}"
   density="${state.density}"
+  link-target="${state.linkTarget}"
   show-tags="${String(state.showTags)}"
   show-attachments="${String(state.showAttachments)}"
   show-reactions="${String(state.showReactions)}"
@@ -153,6 +163,7 @@ export const buildReactCode = (
   memoId="${state.memoId}"
   theme="${state.theme}"
   density="${state.density}"
+  linkTarget="${state.linkTarget}"
   showTags={${String(state.showTags)}}
   showAttachments={${String(state.showAttachments)}}
   showReactions={${String(state.showReactions)}}

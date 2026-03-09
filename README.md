@@ -10,7 +10,7 @@ Embeddable memo cards for Memos, delivered as a website and npm packages.
 ## Features
 - Rich memo cards with themes and density presets
 - Core HTML renderer for SSR and static-site workflows
-- React component wrapper
+- React component wrapper with optional pre-fetched memo rendering
 - Web Component wrapper
 - Iframe embed route for no-build integrations
 - Lightweight markdown support for headings, lists, task lists, quotes, links, and fenced code blocks
@@ -83,9 +83,23 @@ import { MemoEmbed } from '@memos-embed/react'
   memoId="1"
   theme="glass"
   density="compact"
+  linkTarget="_blank"
   showAttachments
   showReactions
 />
+```
+
+### React with pre-fetched data
+```tsx
+import { fetchMemo } from 'memos-embed'
+import { MemoEmbed } from '@memos-embed/react'
+
+const memo = await fetchMemo({
+  baseUrl: 'https://demo.usememos.com/api/v1',
+  memoId: '1',
+})
+
+<MemoEmbed memo={memo} />
 ```
 
 ### Web Component
@@ -95,6 +109,7 @@ import { MemoEmbed } from '@memos-embed/react'
   base-url="https://demo.usememos.com/api/v1"
   memo-id="1"
   theme="midnight"
+  link-target="_blank"
   show-tags="true"
   show-attachments="true"
   show-reactions="true"

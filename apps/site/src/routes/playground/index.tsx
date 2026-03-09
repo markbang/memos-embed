@@ -19,7 +19,7 @@ export const Route = createFileRoute("/playground/")({
 		buildPageHead({
 			title: "Playground",
 			description:
-				"Preview Memos embeds, tweak themes and visibility, and copy iframe, Web Component, or React snippets.",
+				"Preview Memos embeds, tweak themes, link behavior, and visibility, then copy iframe, Web Component, or React snippets.",
 		}),
 });
 
@@ -54,6 +54,7 @@ function PlaygroundComponent() {
 		url.searchParams.set("memoId", state.memoId);
 		url.searchParams.set("theme", state.theme);
 		url.searchParams.set("density", state.density);
+		url.searchParams.set("linkTarget", state.linkTarget);
 		url.searchParams.set("showTags", String(state.showTags));
 		url.searchParams.set("showAttachments", String(state.showAttachments));
 		url.searchParams.set("showReactions", String(state.showReactions));

@@ -6,6 +6,8 @@ declare global {
 				"memo-id"?: string;
 				theme?: string;
 				density?: string;
+				locale?: string;
+				"link-target"?: string;
 				"show-tags"?: string;
 				"show-attachments"?: string;
 				"show-reactions"?: string;

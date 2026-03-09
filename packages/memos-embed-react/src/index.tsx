@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import type {
 	EmbedHtmlOptions,
 	EmbedRenderOptions,
@@ -11,9 +11,7 @@ import {
 	renderMemoStateHtmlSnippet,
 } from "memos-embed";
 
-export type MemoEmbedProps = {
-	memoId: string;
-	baseUrl: string;
+type SharedMemoEmbedProps = {
 	theme?: ThemeInput;
 	density?: EmbedRenderOptions["density"];
 	locale?: string;
@@ -21,11 +19,51 @@ export type MemoEmbedProps = {
 	showAttachments?: boolean;
 	showReactions?: boolean;
 	showMeta?: boolean;
+	linkTarget?: EmbedRenderOptions["linkTarget"];
+	className?: string;
+	style?: CSSProperties;
 	onError?: (error: Error) => void;
 	onLoad?: (memo: Memo) => void;
 };
 
+type MemoEmbedFetchProps = SharedMemoEmbedProps & {
+	memo?: undefined;
+	memoId: string;
+	baseUrl: string;
+	includeCreator?: boolean;
+	fetcher?: typeof fetch;
+};
+
+type MemoEmbedProvidedProps = SharedMemoEmbedProps & {
+	memo: Memo;
+	memoId?: string;
+	baseUrl?: string;
+	includeCreator?: boolean;
+	fetcher?: typeof fetch;
+};
+
+export type MemoEmbedProps = MemoEmbedFetchProps | MemoEmbedProvidedProps;
+
+const renderState = ({
+	message,
+	className,
+	style,
+}: {
+	message: string;
+	className?: string;
+	style?: CSSProperties;
+}) => (
+	<div
+		className={className}
+		style={style}
+		dangerouslySetInnerHTML={{
+			__html: renderMemoStateHtmlSnippet(message),
+		}}
+	/>
+);
+
 export const MemoEmbed = ({
+	memo: providedMemo,
 	memoId,
 	baseUrl,
 	theme,
@@ -35,10 +73,15 @@ export const MemoEmbed = ({
 	showAttachments,
 	showReactions,
 	showMeta,
+	linkTarget,
+	className,
+	style,
+	includeCreator = true,
+	fetcher,
 	onError,
 	onLoad,
 }: MemoEmbedProps) => {
-	const [memo, setMemo] = useState<Memo | null>(null);
+	const [fetchedMemo, setFetchedMemo] = useState<Memo | null>(null);
 	const [error, setError] = useState<Error | null>(null);
 	const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -51,6 +94,7 @@ export const MemoEmbed = ({
 			showAttachments,
 			showReactions,
 			showMeta,
+			linkTarget,
 		}),
 		[
 			theme,
@@ -60,6 +104,7 @@ export const MemoEmbed = ({
 			showAttachments,
 			showReactions,
 			showMeta,
+			linkTarget,
 		],
 	);
 
@@ -71,18 +116,41 @@ export const MemoEmbed = ({
 		[renderOptions],
 	);
 
+	const resolvedMemo = providedMemo ?? fetchedMemo;
+	const canFetch = !providedMemo && Boolean(baseUrl) && Boolean(memoId);
+
 	useEffect(() => {
+		if (!providedMemo) {
+			return;
+		}
+
+		setFetchedMemo(null);
+		setError(null);
+		onLoad?.(providedMemo);
+	}, [providedMemo, onLoad]);
+
+	useEffect(() => {
+		if (!canFetch || !baseUrl || !memoId) {
+			return;
+		}
+
 		const controller = new AbortController();
 		let isMounted = true;
 		setError(null);
-		setMemo(null);
+		setFetchedMemo(null);
 
-		fetchMemo({ baseUrl, memoId, signal: controller.signal })
+		fetchMemo({
+			baseUrl,
+			memoId,
+			includeCreator,
+			fetcher,
+			signal: controller.signal,
+		})
 			.then((data: Memo) => {
 				if (!isMounted || controller.signal.aborted) {
 					return;
 				}
-				setMemo(data);
+				setFetchedMemo(data);
 				onLoad?.(data);
 			})
 			.catch((fetchError: Error) => {
@@ -97,34 +165,38 @@ export const MemoEmbed = ({
 			isMounted = false;
 			controller.abort();
 		};
-	}, [baseUrl, memoId, onError, onLoad]);
+	}, [baseUrl, memoId, includeCreator, fetcher, onError, onLoad, canFetch]);
 
 	useEffect(() => {
-		if (!memo || !containerRef.current) {
+		if (!resolvedMemo || !containerRef.current) {
 			return;
 		}
-		containerRef.current.innerHTML = renderMemoHtmlSnippet(memo, htmlOptions);
-	}, [memo, htmlOptions]);
+		containerRef.current.innerHTML = renderMemoHtmlSnippet(resolvedMemo, htmlOptions);
+	}, [resolvedMemo, htmlOptions]);
+
+	if (!providedMemo && (!baseUrl || !memoId)) {
+		return renderState({
+			message: "baseUrl and memoId are required when memo is not provided.",
+			className,
+			style,
+		});
+	}
 
 	if (error) {
-		return (
-			<div
-				dangerouslySetInnerHTML={{
-					__html: renderMemoStateHtmlSnippet("Failed to load memo."),
-				}}
-			/>
-		);
+		return renderState({
+			message: error.message || "Failed to load memo.",
+			className,
+			style,
+		});
 	}
 
-	if (!memo) {
-		return (
-			<div
-				dangerouslySetInnerHTML={{
-					__html: renderMemoStateHtmlSnippet("Loading memo…"),
-				}}
-			/>
-		);
+	if (!resolvedMemo) {
+		return renderState({
+			message: "Loading memo…",
+			className,
+			style,
+		});
 	}
 
-	return <div className="memos-embed__container" ref={containerRef} />;
+	return <div className={className} style={style} ref={containerRef} />;
 };
