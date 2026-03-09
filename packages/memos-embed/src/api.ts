@@ -7,6 +7,10 @@ import type {
 	Memo,
 	MemoApiResponse,
 	MemoAttachment,
+	MemoClient,
+	MemoClientConfig,
+	PrimeMemoOptions,
+	PrimeMemosOptions,
 	User,
 	UserApiResponse,
 } from "./types";
@@ -67,6 +71,21 @@ const getIdFromName = (name: string) => {
 const normalizeMemoId = (memoId: string) =>
 	memoId.includes("/") ? getIdFromName(memoId) : memoId;
 
+const getMemoId = (memo: Memo) => memo.id || (memo.name ? getIdFromName(memo.name) : "");
+
+const createMemoCacheKey = ({
+	baseUrl,
+	memoId,
+	includeCreator = true,
+}: {
+	baseUrl: string;
+	memoId: string;
+	includeCreator?: boolean;
+}) =>
+	`${normalizeBaseUrl(baseUrl)}::${normalizeMemoId(memoId)}::${
+		includeCreator ? "creator" : "plain"
+	}`;
+
 const normalizeUser = (user: UserApiResponse): User => {
 	const id = user.name ? getIdFromName(user.name) : "";
 	return {
@@ -114,37 +133,38 @@ const normalizeMemo = (
 	};
 };
 
-type FetchContext = {
-	baseUrl: string;
-	normalizedBaseUrl: string;
-	fetchImpl: typeof fetch;
-	signal?: AbortSignal;
-	includeCreator: boolean;
-	userCache: Map<string, Promise<User | undefined>>;
-};
+type UserCache = Map<string, Promise<User | undefined>>;
+type MemoCache = Map<string, Promise<Memo>>;
 
 const fetchUserWithCache = async ({
-	context,
+	baseUrl,
 	userId,
+	fetcher,
+	signal,
+	userCache,
 }: {
-	context: FetchContext;
+	baseUrl: string;
 	userId: string;
+	fetcher: typeof fetch;
+	signal?: AbortSignal;
+	userCache: UserCache;
 }): Promise<User | undefined> => {
 	if (!userId) {
 		return undefined;
 	}
 
+	const normalizedBaseUrl = normalizeBaseUrl(baseUrl);
 	const id = userId.includes("/") ? getIdFromName(userId) : userId;
-	const cached = context.userCache.get(id);
+	const cached = userCache.get(id);
 	if (cached) {
 		return cached;
 	}
 
 	const request = (async () => {
-		const endpoint = `${context.normalizedBaseUrl}/users/${id}`;
-		const response = await context.fetchImpl(endpoint, {
+		const endpoint = `${normalizedBaseUrl}/users/${id}`;
+		const response = await fetcher(endpoint, {
 			method: "GET",
-			signal: context.signal,
+			signal,
 		});
 
 		if (!response.ok) {
@@ -159,26 +179,40 @@ const fetchUserWithCache = async ({
 		return normalizeUser(data);
 	})();
 
-	context.userCache.set(id, request);
-	return request;
+	userCache.set(id, request);
+
+	try {
+		return await request;
+	} catch (error) {
+		userCache.delete(id);
+		throw error;
+	}
 };
 
-const fetchMemoWithContext = async ({
+const fetchMemoOnce = async ({
+	baseUrl,
 	memoId,
-	context,
-}: {
-	memoId: string;
-	context: FetchContext;
+	includeCreator = true,
+	fetcher,
+	signal,
+	userCache,
+}: FetchMemoOptions & {
+	fetcher: typeof fetch;
+	userCache: UserCache;
 }): Promise<Memo> => {
+	if (!baseUrl) {
+		throw new Error("baseUrl is required");
+	}
 	if (!memoId) {
 		throw new Error("memoId is required");
 	}
 
+	const normalizedBaseUrl = normalizeBaseUrl(baseUrl);
 	const id = normalizeMemoId(memoId);
-	const endpoint = `${context.normalizedBaseUrl}/memos/${id}`;
-	const response = await context.fetchImpl(endpoint, {
+	const endpoint = `${normalizedBaseUrl}/memos/${id}`;
+	const response = await fetcher(endpoint, {
 		method: "GET",
-		signal: context.signal,
+		signal,
 	});
 
 	if (!response.ok) {
@@ -191,33 +225,144 @@ const fetchMemoWithContext = async ({
 	}
 
 	let user: User | undefined;
-	if (context.includeCreator && data.creator) {
+	if (includeCreator && data.creator) {
 		user = await fetchUserWithCache({
-			context,
+			baseUrl,
 			userId: data.creator,
+			fetcher,
+			signal,
+			userCache,
 		});
 	}
 
-	return normalizeMemo(data, context.baseUrl, user);
+	return normalizeMemo(data, baseUrl, user);
 };
 
-const createFetchContext = ({
+const fetchMemoWithCache = async ({
 	baseUrl,
+	memoId,
 	includeCreator = true,
 	fetcher,
 	signal,
-}: Omit<FetchMemoOptions, "memoId">): FetchContext => {
-	if (!baseUrl) {
-		throw new Error("baseUrl is required");
+	userCache,
+	memoCache,
+}: FetchMemoOptions & {
+	fetcher: typeof fetch;
+	userCache: UserCache;
+	memoCache: MemoCache;
+}): Promise<Memo> => {
+	const cacheKey = createMemoCacheKey({
+		baseUrl,
+		memoId,
+		includeCreator,
+	});
+	const cached = memoCache.get(cacheKey);
+	if (cached) {
+		return cached;
 	}
 
-	return {
+	const request = fetchMemoOnce({
 		baseUrl,
-		normalizedBaseUrl: normalizeBaseUrl(baseUrl),
-		fetchImpl: fetcher ?? fetch,
-		signal,
+		memoId,
 		includeCreator,
-		userCache: new Map<string, Promise<User | undefined>>(),
+		fetcher,
+		signal,
+		userCache,
+	});
+	memoCache.set(cacheKey, request);
+
+	try {
+		return await request;
+	} catch (error) {
+		memoCache.delete(cacheKey);
+		throw error;
+	}
+};
+
+const primeMemoInCache = ({
+	memoCache,
+	baseUrl,
+	memo,
+	includeCreator = true,
+}: PrimeMemoOptions & {
+	memoCache: MemoCache;
+}) => {
+	if (!baseUrl) {
+		return;
+	}
+
+	const memoId = getMemoId(memo);
+	if (!memoId) {
+		return;
+	}
+
+	memoCache.set(
+		createMemoCacheKey({
+			baseUrl,
+			memoId,
+			includeCreator,
+		}),
+		Promise.resolve(memo),
+	);
+};
+
+export const createMemoClient = (
+	config: MemoClientConfig = {},
+): MemoClient => {
+	const memoCache: MemoCache = new Map();
+	const userCache: UserCache = new Map();
+
+	const clientFetchMemo: MemoClient["fetchMemo"] = async ({
+		baseUrl,
+		memoId,
+		includeCreator = true,
+		fetcher,
+	}) =>
+		fetchMemoWithCache({
+			baseUrl,
+			memoId,
+			includeCreator,
+			fetcher: fetcher ?? config.fetcher ?? fetch,
+			userCache,
+			memoCache,
+		});
+
+	const clientFetchMemos: MemoClient["fetchMemos"] = async ({
+		memoIds,
+		...options
+	}) => Promise.all(memoIds.map((memoId) => clientFetchMemo({ ...options, memoId })));
+
+	const primeMemo: MemoClient["primeMemo"] = (options) => {
+		primeMemoInCache({
+			memoCache,
+			...options,
+		});
+	};
+
+	const primeMemos: MemoClient["primeMemos"] = ({
+		baseUrl,
+		memos,
+		includeCreator = true,
+	}) => {
+		for (const memo of memos) {
+			primeMemoInCache({
+				memoCache,
+				baseUrl,
+				memo,
+				includeCreator,
+			});
+		}
+	};
+
+	return {
+		fetchMemo: clientFetchMemo,
+		fetchMemos: clientFetchMemos,
+		primeMemo,
+		primeMemos,
+		clear: () => {
+			memoCache.clear();
+			userCache.clear();
+		},
 	};
 };
 
@@ -227,19 +372,15 @@ export const fetchMemo = async ({
 	includeCreator = true,
 	fetcher,
 	signal,
-}: FetchMemoOptions): Promise<Memo> => {
-	const context = createFetchContext({
+}: FetchMemoOptions): Promise<Memo> =>
+	fetchMemoOnce({
 		baseUrl,
-		includeCreator,
-		fetcher,
-		signal,
-	});
-
-	return fetchMemoWithContext({
 		memoId,
-		context,
+		includeCreator,
+		fetcher: fetcher ?? fetch,
+		signal,
+		userCache: new Map(),
 	});
-};
 
 export const fetchMemos = async ({
 	baseUrl,
@@ -248,29 +389,22 @@ export const fetchMemos = async ({
 	fetcher,
 	signal,
 }: FetchMemosOptions): Promise<Memo[]> => {
-	const context = createFetchContext({
-		baseUrl,
-		includeCreator,
-		fetcher,
-		signal,
-	});
-	const memoCache = new Map<string, Promise<Memo>>();
+	const memoCache: MemoCache = new Map();
+	const userCache: UserCache = new Map();
+	const fetchImpl = fetcher ?? fetch;
 
 	return Promise.all(
-		memoIds.map((memoId) => {
-			const id = normalizeMemoId(memoId);
-			const cached = memoCache.get(id);
-			if (cached) {
-				return cached;
-			}
-
-			const request = fetchMemoWithContext({
+		memoIds.map((memoId) =>
+			fetchMemoWithCache({
+				baseUrl,
 				memoId,
-				context,
-			});
-			memoCache.set(id, request);
-			return request;
-		}),
+				includeCreator,
+				fetcher: fetchImpl,
+				signal,
+				userCache,
+				memoCache,
+			}),
+		),
 	);
 };
 

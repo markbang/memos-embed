@@ -73,6 +73,20 @@ const html = renderMemoListHtmlSnippet(memos, {
 })
 ```
 
+### `createMemoClient`
+```ts
+import { createMemoClient } from 'memos-embed'
+
+const client = createMemoClient()
+
+await Promise.all([
+  client.fetchMemo({ baseUrl: 'https://demo.usememos.com/api/v1', memoId: '1' }),
+  client.fetchMemos({ baseUrl: 'https://demo.usememos.com/api/v1', memoIds: ['1', '2'] }),
+])
+```
+
+Use a shared client when multiple embeds on one page should reuse memo and creator fetches.
+
 ## Custom blog theming
 ```ts
 import { extendTheme, renderMemoHtmlSnippet } from 'memos-embed'

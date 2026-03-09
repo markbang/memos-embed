@@ -11,9 +11,13 @@ export type {
 	Memo,
 	MemoApiResponse,
 	MemoAttachment,
+	MemoClient,
+	MemoClientConfig,
 	MemoListLayout,
 	MemoListRenderOptions,
 	MemoReaction,
+	PrimeMemoOptions,
+	PrimeMemosOptions,
 	ThemeInput,
 	ThemeOverrides,
 	ThemePresetName,
@@ -22,6 +26,7 @@ export type {
 } from "./types";
 
 export {
+	createMemoClient,
 	fetchMemo,
 	fetchMemoHtmlSnippet,
 	fetchMemoListHtmlSnippet,
