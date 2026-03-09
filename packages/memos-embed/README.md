@@ -14,8 +14,8 @@ pnpm add memos-embed
 - `buildEmbedCss` for extracting the shared styles
 - `buildEmbedUrl` / `renderIframeHtml` for iframe-based embeds, including optional auto-resize support
 
-## API
-### `fetchMemo`
+## Usage
+### Fetch a memo
 ```ts
 import { fetchMemo } from 'memos-embed'
 
@@ -25,9 +25,14 @@ const memo = await fetchMemo({
 })
 ```
 
-### `renderMemoHtmlSnippet`
+### Render a complete HTML snippet
 ```ts
-import { renderMemoHtmlSnippet } from 'memos-embed'
+import { fetchMemo, renderMemoHtmlSnippet } from 'memos-embed'
+
+const memo = await fetchMemo({
+  baseUrl: 'https://demo.usememos.com/api/v1',
+  memoId: '1',
+})
 
 const html = renderMemoHtmlSnippet(memo, {
   includeStyles: true,
@@ -41,9 +46,31 @@ const html = renderMemoHtmlSnippet(memo, {
 })
 ```
 
-### `renderIframeHtml`
+### Render HTML only and inject your own styles
 ```ts
-import { renderIframeHtml } from 'memos-embed'
+import { buildEmbedCss, fetchMemo, renderMemoHtml } from 'memos-embed'
+
+const memo = await fetchMemo({
+  baseUrl: 'https://demo.usememos.com/api/v1',
+  memoId: '1',
+})
+
+const css = buildEmbedCss()
+const html = renderMemoHtml(memo, {
+  theme: 'light',
+  locale: 'en',
+})
+```
+
+### Build an iframe URL or HTML wrapper
+```ts
+import { buildEmbedUrl, renderIframeHtml } from 'memos-embed'
+
+const src = buildEmbedUrl({
+  embedBaseUrl: 'https://your-site.com',
+  baseUrl: 'https://demo.usememos.com/api/v1',
+  memoId: '1',
+})
 
 const iframe = renderIframeHtml({
   embedBaseUrl: 'https://your-site.com',
@@ -57,7 +84,7 @@ const iframe = renderIframeHtml({
 })
 ```
 
-### `fetchMemos` + `renderMemoListHtmlSnippet`
+### Fetch a roundup and render a memo list
 ```ts
 import { fetchMemos, renderMemoListHtmlSnippet } from 'memos-embed'
 
@@ -73,7 +100,7 @@ const html = renderMemoListHtmlSnippet(memos, {
 })
 ```
 
-### `createMemoClient`
+### Create a shared client
 ```ts
 import { createMemoClient } from 'memos-embed'
 

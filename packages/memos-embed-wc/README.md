@@ -7,7 +7,7 @@ Web Component wrapper for Memos embed cards.
 pnpm add @memos-embed/wc
 ```
 
-## Usage
+## Browser usage
 ```html
 <script type="module" src="https://unpkg.com/@memos-embed/wc@latest/dist/register.js"></script>
 <memos-embed
@@ -16,14 +16,14 @@ pnpm add @memos-embed/wc
   theme="minimal"
   density="comfortable"
   link-target="_blank"
-  show-tags="true"
-  show-attachments="true"
-  show-reactions="true"
-  show-meta="true"
+  show-tags
+  show-attachments
+  show-reactions
+  show-meta
 ></memos-embed>
 ```
 
-## JS Usage
+## Module usage
 ```ts
 import { defineMemosEmbedElement } from '@memos-embed/wc'
 
@@ -42,6 +42,8 @@ defineMemosEmbedElement()
 - `show-attachments`
 - `show-reactions`
 - `show-meta`
+
+Boolean attributes can be passed either as empty attributes (for example `show-tags`) or as `"true"`.
 
 ## Styling from your site
 Keep the built-in styles and tweak the exposed parts:
