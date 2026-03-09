@@ -37,9 +37,33 @@ const memo = await fetchMemo({
 <MemoEmbed memo={memo} className="my-8" />
 ```
 
+## Styling with your blog theme
+```tsx
+import { extendTheme } from 'memos-embed'
+
+const blogTheme = extendTheme('minimal', {
+  fontFamily: 'inherit',
+  radius: 'var(--radius)',
+  tokens: {
+    background: 'var(--card)',
+    foreground: 'var(--card-foreground)',
+    mutedForeground: 'var(--muted-foreground)',
+    border: 'var(--border)',
+    accent: 'var(--primary)',
+    accentForeground: 'var(--primary-foreground)',
+    codeBackground: 'var(--muted)',
+  },
+})
+
+<MemoEmbed memo={memo} theme={blogTheme} />
+```
+
+If you want to bring all styles yourself, pass `includeStyles={false}` and render your own CSS around the generated markup.
+
 ## Notes
 - Pass `memo` to render already-fetched data and avoid a client-side request waterfall
 - `fetcher` and `includeCreator` are forwarded to the shared `fetchMemo()` helper when the component fetches its own data
 - `linkTarget` keeps markdown and attachment links consistent with iframe and Web Component embeds
+- `includeStyles={false}` disables the built-in `<style>` block for bring-your-own styling setups
 - Fetch requests are cancelled when props change or the component unmounts
 - Rendering is powered by the shared `memos-embed` core package, so output stays consistent with the iframe and Web Component versions

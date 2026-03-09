@@ -56,6 +56,31 @@ const iframe = renderIframeHtml({
 })
 ```
 
+## Custom blog theming
+```ts
+import { extendTheme, renderMemoHtmlSnippet } from 'memos-embed'
+
+const blogTheme = extendTheme('minimal', {
+  fontFamily: 'inherit',
+  radius: 'var(--radius)',
+  tokens: {
+    background: 'var(--card)',
+    foreground: 'var(--card-foreground)',
+    mutedForeground: 'var(--muted-foreground)',
+    border: 'var(--border)',
+    accent: 'var(--primary)',
+    accentForeground: 'var(--primary-foreground)',
+    codeBackground: 'var(--muted)',
+  },
+})
+
+const html = renderMemoHtmlSnippet(memo, {
+  theme: blogTheme,
+})
+```
+
+Use `includeStyles: false` when you want to provide all CSS yourself.
+
 ## Render behavior
 The renderer supports:
 - headings, lists, task lists, quotes, inline code, links, and fenced code blocks
@@ -63,3 +88,4 @@ The renderer supports:
 - grouped reaction counts
 - optional postMessage-based iframe auto-resize
 - theme presets: `minimal`, `glass`, `paper`, `midnight`, `terminal`
+- `extendTheme()` for blog-aligned design tokens and CSS variable-based theming

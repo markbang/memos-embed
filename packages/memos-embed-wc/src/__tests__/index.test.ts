@@ -8,7 +8,7 @@ describe("defineMemosEmbedElement", () => {
 		expect(customElements.get("memos-embed")).toBeTruthy();
 	});
 
-	it("renders through core snippet helpers", async () => {
+	it("renders through core snippet helpers and supports include-styles=false", async () => {
 		defineMemosEmbedElement();
 		const fetchMemoSpy = vi.spyOn(memosEmbed, "fetchMemo").mockResolvedValue({
 			id: "1",
@@ -25,12 +25,15 @@ describe("defineMemosEmbedElement", () => {
 		element.setAttribute("memo-id", "1");
 		element.setAttribute("base-url", "https://demo.usememos.com");
 		element.setAttribute("link-target", "_blank");
+		element.setAttribute("include-styles", "false");
 		document.body.appendChild(element);
 
 		await Promise.resolve();
 		await Promise.resolve();
 
-		expect(renderStateSpy).toHaveBeenCalledWith("Loading memo…");
+		expect(renderStateSpy).toHaveBeenCalledWith("Loading memo…", {
+			includeStyles: false,
+		});
 		expect(fetchMemoSpy).toHaveBeenCalledWith(
 			expect.objectContaining({
 				baseUrl: "https://demo.usememos.com",
@@ -43,10 +46,12 @@ describe("defineMemosEmbedElement", () => {
 				content: "Hello",
 			}),
 			expect.objectContaining({
+				includeStyles: false,
 				linkTarget: "_blank",
 			}),
 		);
 		expect(element.shadowRoot?.innerHTML).toContain("Hello");
+		expect(element.shadowRoot?.innerHTML).not.toContain("<style>");
 
 		element.remove();
 		fetchMemoSpy.mockRestore();

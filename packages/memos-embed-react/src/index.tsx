@@ -1,3 +1,5 @@
+"use client";
+
 import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import type {
 	EmbedHtmlOptions,
@@ -20,6 +22,7 @@ type SharedMemoEmbedProps = {
 	showReactions?: boolean;
 	showMeta?: boolean;
 	linkTarget?: EmbedRenderOptions["linkTarget"];
+	includeStyles?: boolean;
 	className?: string;
 	style?: CSSProperties;
 	onError?: (error: Error) => void;
@@ -48,16 +51,18 @@ const renderState = ({
 	message,
 	className,
 	style,
+	includeStyles,
 }: {
 	message: string;
 	className?: string;
 	style?: CSSProperties;
+	includeStyles?: boolean;
 }) => (
 	<div
 		className={className}
 		style={style}
 		dangerouslySetInnerHTML={{
-			__html: renderMemoStateHtmlSnippet(message),
+			__html: renderMemoStateHtmlSnippet(message, { includeStyles }),
 		}}
 	/>
 );
@@ -74,6 +79,7 @@ export const MemoEmbed = ({
 	showReactions,
 	showMeta,
 	linkTarget,
+	includeStyles = true,
 	className,
 	style,
 	includeCreator = true,
@@ -111,9 +117,9 @@ export const MemoEmbed = ({
 	const htmlOptions: EmbedHtmlOptions = useMemo(
 		() => ({
 			...renderOptions,
-			includeStyles: true,
+			includeStyles,
 		}),
-		[renderOptions],
+		[renderOptions, includeStyles],
 	);
 
 	const resolvedMemo = providedMemo ?? fetchedMemo;
@@ -179,6 +185,7 @@ export const MemoEmbed = ({
 			message: "baseUrl and memoId are required when memo is not provided.",
 			className,
 			style,
+			includeStyles,
 		});
 	}
 
@@ -187,6 +194,7 @@ export const MemoEmbed = ({
 			message: error.message || "Failed to load memo.",
 			className,
 			style,
+			includeStyles,
 		});
 	}
 
@@ -195,6 +203,7 @@ export const MemoEmbed = ({
 			message: "Loading memo…",
 			className,
 			style,
+			includeStyles,
 		});
 	}
 

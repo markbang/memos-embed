@@ -11,6 +11,7 @@ export type {
 	MemoAttachment,
 	MemoReaction,
 	ThemeInput,
+	ThemeOverrides,
 	ThemePresetName,
 	User,
 	UserApiResponse,
@@ -30,4 +31,4 @@ export {
 	MEMOS_EMBED_RESIZE_MESSAGE_TYPE,
 	renderIframeHtml,
 } from "./iframe";
-export { themePresets, defaultTheme, resolveTheme } from "./theme";
+export { themePresets, defaultTheme, resolveTheme, extendTheme } from "./theme";

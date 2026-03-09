@@ -111,6 +111,10 @@ export type EmbedTheme = {
 	monoFontFamily: string;
 };
 
+export type ThemeOverrides = Partial<Omit<EmbedTheme, "tokens">> & {
+	tokens?: Partial<ThemeTokens>;
+};
+
 export type ThemeInput = ThemePresetName | Partial<EmbedTheme>;
 
 export type FetchMemoOptions = {

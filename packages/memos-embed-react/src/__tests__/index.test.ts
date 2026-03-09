@@ -71,7 +71,7 @@ describe("MemoEmbed", () => {
 		renderSnippetSpy.mockRestore();
 	});
 
-	it("can render a provided memo without fetching", async () => {
+	it("can render a provided memo without fetching and without built-in styles", async () => {
 		const memo = {
 			id: "99",
 			name: "memos/99",
@@ -81,6 +81,7 @@ describe("MemoEmbed", () => {
 			reactions: [],
 		};
 		const fetchMemoSpy = vi.spyOn(memosEmbed, "fetchMemo");
+		const renderSnippetSpy = vi.spyOn(memosEmbed, "renderMemoHtmlSnippet");
 		const onLoad = vi.fn();
 		const container = document.createElement("div");
 		document.body.appendChild(container);
@@ -90,6 +91,7 @@ describe("MemoEmbed", () => {
 			root.render(
 				createElement(MemoEmbed, {
 					memo,
+					includeStyles: false,
 					onLoad,
 				}),
 			);
@@ -98,13 +100,23 @@ describe("MemoEmbed", () => {
 		});
 
 		expect(fetchMemoSpy).not.toHaveBeenCalled();
+		expect(renderSnippetSpy).toHaveBeenCalledWith(
+			expect.objectContaining({
+				content: "Prefetched",
+			}),
+			expect.objectContaining({
+				includeStyles: false,
+			}),
+		);
 		expect(onLoad).toHaveBeenCalledWith(memo);
 		expect(container.innerHTML).toContain("Prefetched");
+		expect(container.innerHTML).not.toContain("<style>");
 
 		await act(async () => {
 			root.unmount();
 		});
 		container.remove();
 		fetchMemoSpy.mockRestore();
+		renderSnippetSpy.mockRestore();
 	});
 });

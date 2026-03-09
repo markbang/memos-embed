@@ -23,6 +23,74 @@ const themeOptions = (Object.keys(themePresets) as ThemePresetName[]).map(
 	(name) => themePresets[name],
 );
 
+const repoExampleBaseUrl =
+	"https://github.com/markbang/memos-embed/tree/main/examples";
+
+const integrationGuides = [
+	{
+		title: "Next.js App Router",
+		description:
+			"Fetch memo data on the server, pass serialized memo props into the React wrapper, and avoid client-side waterfalls.",
+		href: `${repoExampleBaseUrl}/next-mdx`,
+		label: "Open Next.js example",
+	},
+	{
+		title: "MDX component pattern",
+		description:
+			"Create a reusable MemoCard component for long-form posts so authors can embed notes with a single tag.",
+		href: `${repoExampleBaseUrl}/mdx-components`,
+		label: "Open MDX example",
+	},
+	{
+		title: "Astro blog",
+		description:
+			"Render memo cards inside Astro pages and MDX content while keeping styling aligned with your site tokens.",
+		href: `${repoExampleBaseUrl}/astro-blog`,
+		label: "Open Astro example",
+	},
+	{
+		title: "Static HTML / CMS",
+		description:
+			"Drop in an iframe or Web Component when you do not control a React build pipeline.",
+		href: `${repoExampleBaseUrl}/static-html`,
+		label: "Open static example",
+	},
+] as const;
+
+const customThemeSnippet = `import { extendTheme } from 'memos-embed'
+
+const blogTheme = extendTheme('minimal', {
+  fontFamily: 'inherit',
+  radius: 'var(--radius)',
+  tokens: {
+    background: 'var(--card)',
+    foreground: 'var(--card-foreground)',
+    mutedForeground: 'var(--muted-foreground)',
+    border: 'var(--border)',
+    accent: 'var(--primary)',
+    accentForeground: 'var(--primary-foreground)',
+    codeBackground: 'var(--muted)',
+  },
+})`;
+
+const webComponentStylingSnippet = `<memos-embed
+  base-url="https://demo.usememos.com/api/v1"
+  memo-id="1"
+  include-styles="false"
+></memos-embed>
+
+<style>
+  memos-embed::part(container) {
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: var(--card);
+  }
+
+  memos-embed::part(user-name) {
+    color: var(--card-foreground);
+  }
+</style>`;
+
 export function DocsPageContent() {
 	return (
 		<div className="container mx-auto space-y-8 px-4 py-10">
@@ -160,6 +228,10 @@ const iframe = renderIframeHtml({
 								without a client-side waterfall.
 							</li>
 							<li>
+								• `extendTheme()` and bring-your-own-style controls make it
+								easier to match personal blogs and docs sites.
+							</li>
+							<li>
 								• Iframe embeds can now resize automatically through a
 								postMessage handshake.
 							</li>
@@ -190,13 +262,18 @@ const iframe = renderIframeHtml({
 								<tbody className="align-top text-muted-foreground">
 									<TableRow
 										name="theme"
-										type="minimal | glass | paper | midnight | terminal"
-										description="Switch card tone without rewriting CSS."
+										type="minimal | glass | paper | midnight | terminal | custom"
+										description="Switch card tone or extend a preset with blog-specific design tokens."
 									/>
 									<TableRow
 										name="density"
 										type="comfortable | compact"
 										description="Adjust padding, spacing, and avatar size."
+									/>
+									<TableRow
+										name="includeStyles"
+										type="boolean"
+										description="Disable the built-in style block for bring-your-own CSS setups in core, React, and Web Component flows."
 									/>
 									<TableRow
 										name="showMeta"
@@ -272,6 +349,97 @@ const iframe = renderIframeHtml({
 					</CardContent>
 				</Card>
 			</div>
+
+			<div className="grid gap-6 lg:grid-cols-2">
+				<Card>
+					<CardHeader>
+						<CardTitle>Match your blog theme</CardTitle>
+						<CardDescription>
+							Use CSS variables or design tokens from your site to keep embeds
+							visually consistent.
+						</CardDescription>
+					</CardHeader>
+					<CardContent className="space-y-4">
+						<pre className="overflow-auto rounded-lg border bg-muted/40 p-4 text-sm">
+							<code>{customThemeSnippet}</code>
+						</pre>
+						<ul className="space-y-2 text-sm text-muted-foreground">
+							<li>
+								• Use `extendTheme()` when you want blog colors, radius, and
+								font choices without rewriting the renderer.
+							</li>
+							<li>
+								• Pass `includeStyles={false}` in React when you want to own the
+								entire CSS layer yourself.
+							</li>
+							<li>
+								• Pre-fetched `memo` props are ideal for server-rendered blogs,
+								MDX pages, and content collections.
+							</li>
+						</ul>
+					</CardContent>
+				</Card>
+
+				<Card>
+					<CardHeader>
+						<CardTitle>Style the Web Component from your site</CardTitle>
+						<CardDescription>
+							Lean on shadow DOM isolation by default, then opt into
+							`::part(...)` when you want finer control.
+						</CardDescription>
+					</CardHeader>
+					<CardContent className="space-y-4">
+						<pre className="overflow-auto rounded-lg border bg-muted/40 p-4 text-sm">
+							<code>{webComponentStylingSnippet}</code>
+						</pre>
+						<ul className="space-y-2 text-sm text-muted-foreground">
+							<li>
+								• Keep built-in styles when you just need a few targeted tweaks.
+							</li>
+							<li>
+								• Set `include-styles="false"` for fully custom component
+								shells.
+							</li>
+							<li>
+								• Use `link-target` when blog links should stay in-page or open
+								in a new tab.
+							</li>
+						</ul>
+					</CardContent>
+				</Card>
+			</div>
+
+			<section className="space-y-4">
+				<div className="max-w-2xl space-y-2">
+					<h2 className="text-3xl font-semibold tracking-tight">
+						Blog Integration Guides
+					</h2>
+					<p className="text-muted-foreground">
+						Start from a copy-paste example that matches your publishing stack,
+						then adapt the theme and rendering options to your blog.
+					</p>
+				</div>
+				<div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+					{integrationGuides.map((guide) => (
+						<Card key={guide.title} className="h-full">
+							<CardHeader>
+								<CardTitle>{guide.title}</CardTitle>
+								<CardDescription>{guide.description}</CardDescription>
+							</CardHeader>
+							<CardContent>
+								<a
+									href={guide.href}
+									target="_blank"
+									rel="noreferrer"
+									className="inline-flex rounded-md border border-border/70 px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+								>
+									{guide.label}
+								</a>
+							</CardContent>
+						</Card>
+					))}
+				</div>
+			</section>
 		</div>
 	);
 }

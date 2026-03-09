@@ -8,6 +8,7 @@ declare global {
 				density?: string;
 				locale?: string;
 				"link-target"?: string;
+				"include-styles"?: string;
 				"show-tags"?: string;
 				"show-attachments"?: string;
 				"show-reactions"?: string;

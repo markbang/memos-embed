@@ -2,6 +2,7 @@ import {
 	fetchMemo,
 	renderMemoHtmlSnippet,
 	renderMemoStateHtmlSnippet,
+	type EmbedHtmlOptions,
 	type EmbedRenderOptions,
 	type ThemeInput,
 } from "memos-embed";
@@ -33,6 +34,7 @@ export class MemosEmbedElement extends HTMLElementBase {
 			"show-reactions",
 			"show-meta",
 			"link-target",
+			"include-styles",
 		];
 	}
 
@@ -75,6 +77,13 @@ export class MemosEmbedElement extends HTMLElementBase {
 		};
 	}
 
+	private getHtmlOptions(): EmbedHtmlOptions {
+		return {
+			...this.getRenderOptions(),
+			includeStyles: attributeToBoolean(this.getAttribute("include-styles")),
+		};
+	}
+
 	private async render() {
 		const memoId = this.getAttribute("memo-id");
 		const baseUrl = this.getAttribute("base-url");
@@ -82,6 +91,7 @@ export class MemosEmbedElement extends HTMLElementBase {
 		if (!memoId || !baseUrl) {
 			this.shadowRootRef.innerHTML = renderMemoStateHtmlSnippet(
 				"Missing memo-id or base-url.",
+				{ includeStyles: attributeToBoolean(this.getAttribute("include-styles")) },
 			);
 			return;
 		}
@@ -91,7 +101,9 @@ export class MemosEmbedElement extends HTMLElementBase {
 		this.abortController = controller;
 		const currentToken = ++this.renderToken;
 
-		this.shadowRootRef.innerHTML = renderMemoStateHtmlSnippet("Loading memo…");
+		this.shadowRootRef.innerHTML = renderMemoStateHtmlSnippet("Loading memo…", {
+			includeStyles: attributeToBoolean(this.getAttribute("include-styles")),
+		});
 
 		try {
 			const memo = await fetchMemo({
@@ -104,7 +116,7 @@ export class MemosEmbedElement extends HTMLElementBase {
 			}
 			this.shadowRootRef.innerHTML = renderMemoHtmlSnippet(
 				memo,
-				this.getRenderOptions(),
+				this.getHtmlOptions(),
 			);
 		} catch (error) {
 			if (controller.signal.aborted || currentToken !== this.renderToken) {
@@ -112,7 +124,9 @@ export class MemosEmbedElement extends HTMLElementBase {
 			}
 			const message =
 				error instanceof Error ? error.message : "Failed to load memo.";
-			this.shadowRootRef.innerHTML = renderMemoStateHtmlSnippet(message);
+			this.shadowRootRef.innerHTML = renderMemoStateHtmlSnippet(message, {
+				includeStyles: attributeToBoolean(this.getAttribute("include-styles")),
+			});
 		}
 	}
 }

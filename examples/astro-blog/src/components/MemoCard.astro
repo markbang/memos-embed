@@ -1,0 +1,31 @@
+---
+import { extendTheme, fetchMemo, renderMemoHtmlSnippet } from "memos-embed";
+
+const { memoId } = Astro.props;
+
+const memo = await fetchMemo({
+	baseUrl: "https://demo.usememos.com/api/v1",
+	memoId,
+});
+
+const theme = extendTheme("paper", {
+	fontFamily: "inherit",
+	radius: "var(--radius, 20px)",
+	tokens: {
+		background: "var(--card)",
+		foreground: "var(--card-foreground)",
+		mutedForeground: "var(--muted-foreground)",
+		border: "var(--border)",
+		accent: "var(--primary)",
+		accentForeground: "var(--primary-foreground)",
+		codeBackground: "var(--muted)",
+	},
+});
+
+const html = renderMemoHtmlSnippet(memo, {
+	theme,
+	linkTarget: "_blank",
+});
+---
+
+<div set:html={html} />

@@ -8,10 +8,10 @@
 Embeddable memo cards for Memos, delivered as a website and npm packages.
 
 ## Features
-- Rich memo cards with themes and density presets
+- Rich memo cards with themes, density presets, and extendable design tokens
 - Core HTML renderer for SSR and static-site workflows
 - React component wrapper with optional pre-fetched memo rendering
-- Web Component wrapper
+- Web Component wrapper with exposed `::part(...)` hooks
 - Iframe embed route for no-build integrations
 - Lightweight markdown support for headings, lists, task lists, quotes, links, and fenced code blocks
 - Attachment previews for images and grouped reaction badges
@@ -57,16 +57,30 @@ pnpm validate
 ## Usage
 ### Core package
 ```ts
-import { fetchMemo, renderMemoHtmlSnippet } from 'memos-embed'
+import { extendTheme, fetchMemo, renderMemoHtmlSnippet } from 'memos-embed'
 
 const memo = await fetchMemo({
   baseUrl: 'https://demo.usememos.com/api/v1',
   memoId: '1',
 })
 
+const blogTheme = extendTheme('paper', {
+  radius: 'var(--radius)',
+  fontFamily: 'inherit',
+  tokens: {
+    background: 'var(--card)',
+    foreground: 'var(--card-foreground)',
+    border: 'var(--border)',
+    accent: 'var(--primary)',
+    accentForeground: 'var(--primary-foreground)',
+    mutedForeground: 'var(--muted-foreground)',
+    codeBackground: 'var(--muted)',
+  },
+})
+
 const html = renderMemoHtmlSnippet(memo, {
   includeStyles: true,
-  theme: 'paper',
+  theme: blogTheme,
   density: 'comfortable',
   showAttachments: true,
   showReactions: true,
@@ -116,6 +130,12 @@ const memo = await fetchMemo({
 ></memos-embed>
 ```
 
+```css
+memos-embed::part(container) {
+  border-radius: 24px;
+}
+```
+
 ### Iframe
 ```ts
 import { renderIframeHtml } from 'memos-embed'
@@ -128,6 +148,12 @@ const iframe = renderIframeHtml({
   autoResize: true,
 })
 ```
+
+## Blog integration examples
+- `examples/next-mdx`: Next.js App Router + server-fetched memo data
+- `examples/mdx-components`: reusable MDX component pattern for React-based blogs
+- `examples/astro-blog`: Astro + MDX blog usage
+- `examples/static-html`: iframe and Web Component copy-paste examples for static sites and CMS pages
 
 ## Development Notes
 - The site uses source aliases so local changes in `packages/*` show up immediately in `apps/site`
