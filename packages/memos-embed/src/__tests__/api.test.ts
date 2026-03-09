@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+	createMemoClient,
 	fetchMemo,
 	fetchMemoHtmlSnippet,
 	fetchMemoListHtmlSnippet,
@@ -193,6 +194,63 @@ describe("fetchMemos", () => {
 		expect(memos[0]?.id).toBe("1");
 		expect(memos[1]?.id).toBe("1");
 		expect(fetcher).toHaveBeenCalledTimes(1);
+	});
+});
+
+describe("createMemoClient", () => {
+	it("reuses cached memo requests across repeated fetches", async () => {
+		const fetcher = vi.fn(async (url: RequestInfo | URL) => ({
+			ok: true,
+			json: async () => ({
+				name: "memos/1",
+				content: `Fetched ${String(url)}`,
+				tags: [],
+			}),
+		} as Response));
+		const client = createMemoClient({ fetcher });
+
+		const [first, second] = await Promise.all([
+			client.fetchMemo({
+				baseUrl: "https://demo.usememos.com/api/v1",
+				memoId: "1",
+				includeCreator: false,
+			}),
+			client.fetchMemo({
+				baseUrl: "https://demo.usememos.com/api/v1",
+				memoId: "1",
+				includeCreator: false,
+			}),
+		]);
+
+		expect(first.id).toBe("1");
+		expect(second.id).toBe("1");
+		expect(fetcher).toHaveBeenCalledTimes(1);
+	});
+
+	it("can be primed with prefetched memos", async () => {
+		const fetcher = vi.fn<typeof fetch>();
+		const client = createMemoClient({ fetcher });
+		client.primeMemo({
+			baseUrl: "https://demo.usememos.com/api/v1",
+			memo: {
+				id: "1",
+				name: "memos/1",
+				content: "Prefetched",
+				tags: [],
+				attachments: [],
+				reactions: [],
+			},
+			includeCreator: false,
+		});
+
+		const memo = await client.fetchMemo({
+			baseUrl: "https://demo.usememos.com/api/v1",
+			memoId: "1",
+			includeCreator: false,
+		});
+
+		expect(memo.content).toBe("Prefetched");
+		expect(fetcher).not.toHaveBeenCalled();
 	});
 });
 

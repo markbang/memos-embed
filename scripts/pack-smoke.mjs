@@ -117,11 +117,12 @@ try {
 	);
 	await writeFile(
 		join(consumerDir, "consumer.tsx"),
-		`import { MemoEmbed, MemoEmbedList } from "@memos-embed/react";
+		`import { MemoClientProvider, MemoEmbed, MemoEmbedList } from "@memos-embed/react";
 import { MemosEmbedElement, defineMemosEmbedElement } from "@memos-embed/wc";
-import { renderIframeHtml, type ThemePresetName } from "memos-embed";
+import { createMemoClient, renderIframeHtml, type ThemePresetName } from "memos-embed";
 
 const theme: ThemePresetName = "midnight";
+const client = createMemoClient();
 const iframe = renderIframeHtml({
   embedBaseUrl: "https://embed.example.com",
   baseUrl: "https://demo.usememos.com/api/v1",
@@ -144,10 +145,15 @@ const list = (
     layout="stack"
   />
 );
+const provider = (
+  <MemoClientProvider client={client}>
+    {component}
+    {list}
+  </MemoClientProvider>
+);
 
 void iframe;
-void component;
-void list;
+void provider;
 void defineMemosEmbedElement;
 void MemosEmbedElement;
 `,
@@ -190,6 +196,12 @@ if (typeof react.MemoEmbed !== "function") {
 if (typeof react.MemoEmbedList !== "function") {
   throw new Error("Expected React list wrapper export from ESM consumer");
 }
+if (typeof react.MemoClientProvider !== "function") {
+  throw new Error("Expected React provider export from ESM consumer");
+}
+if (typeof core.createMemoClient !== "function") {
+  throw new Error("Expected shared memo client export from ESM consumer");
+}
 if (typeof wc.defineMemosEmbedElement !== "function") {
   throw new Error("Expected WC wrapper export from ESM consumer");
 }
@@ -228,6 +240,12 @@ if (typeof react.MemoEmbed !== "function") {
 }
 if (typeof react.MemoEmbedList !== "function") {
   throw new Error("Expected React list CJS exports");
+}
+if (typeof react.MemoClientProvider !== "function") {
+  throw new Error("Expected React provider CJS exports");
+}
+if (typeof core.createMemoClient !== "function") {
+  throw new Error("Expected shared memo client CJS exports");
 }
 if (typeof wc.defineMemosEmbedElement !== "function") {
   throw new Error("Expected WC CJS exports");

@@ -1,8 +1,11 @@
 "use client";
 
 import {
+	createContext,
 	type CSSProperties,
+	type ReactNode,
 	type RefObject,
+	useContext,
 	useEffect,
 	useMemo,
 	useRef,
@@ -12,6 +15,7 @@ import type {
 	EmbedHtmlOptions,
 	EmbedRenderOptions,
 	Memo,
+	MemoClient,
 	MemoListRenderOptions,
 	ThemeInput,
 } from "memos-embed";
@@ -24,6 +28,7 @@ import {
 } from "memos-embed";
 
 type BaseEmbedProps = {
+	client?: MemoClient;
 	theme?: ThemeInput;
 	density?: EmbedRenderOptions["density"];
 	locale?: string;
@@ -85,6 +90,23 @@ type MemoEmbedListProvidedProps = MemoEmbedListSharedProps & {
 export type MemoEmbedListProps =
 	| MemoEmbedListFetchProps
 	| MemoEmbedListProvidedProps;
+
+const MemoClientContext = createContext<MemoClient | null>(null);
+
+export const MemoClientProvider = ({
+	client,
+	children,
+}: {
+	client: MemoClient;
+	children: ReactNode;
+}) => (
+	<MemoClientContext.Provider value={client}>
+		{children}
+	</MemoClientContext.Provider>
+);
+
+export const useMemoClient = (client?: MemoClient) =>
+	client ?? useContext(MemoClientContext);
 
 const renderState = ({
 	message,
@@ -226,6 +248,7 @@ export const MemoEmbed = ({
 	memo: providedMemo,
 	memoId,
 	baseUrl,
+	client,
 	theme,
 	density,
 	locale,
@@ -245,6 +268,7 @@ export const MemoEmbed = ({
 	const [fetchedMemo, setFetchedMemo] = useState<Memo | null>(null);
 	const [error, setError] = useState<Error | null>(null);
 	const containerRef = useRef<HTMLDivElement | null>(null);
+	const memoClient = useMemoClient(client);
 	const htmlOptions = useEmbedHtmlOptions({
 		theme,
 		density,
@@ -270,18 +294,54 @@ export const MemoEmbed = ({
 
 		setFetchedMemo(null);
 		setError(null);
+		if (memoClient && baseUrl) {
+			memoClient.primeMemo({
+				baseUrl,
+				memo: providedMemo,
+				includeCreator,
+			});
+		}
 		onLoad?.(providedMemo);
-	}, [providedMemo, onLoad]);
+	}, [providedMemo, memoClient, baseUrl, includeCreator, onLoad]);
 
 	useEffect(() => {
 		if (!canFetch || !baseUrl || !memoId) {
 			return;
 		}
 
-		const controller = new AbortController();
 		let isMounted = true;
 		setError(null);
 		setFetchedMemo(null);
+
+		if (memoClient) {
+			memoClient
+				.fetchMemo({
+					baseUrl,
+					memoId,
+					includeCreator,
+					fetcher,
+				})
+				.then((data: Memo) => {
+					if (!isMounted) {
+						return;
+					}
+					setFetchedMemo(data);
+					onLoad?.(data);
+				})
+				.catch((fetchError: Error) => {
+					if (!isMounted) {
+						return;
+					}
+					setError(fetchError);
+					onError?.(fetchError);
+				});
+
+			return () => {
+				isMounted = false;
+			};
+		}
+
+		const controller = new AbortController();
 
 		fetchMemo({
 			baseUrl,
@@ -309,7 +369,16 @@ export const MemoEmbed = ({
 			isMounted = false;
 			controller.abort();
 		};
-	}, [baseUrl, memoId, includeCreator, fetcher, onError, onLoad, canFetch]);
+	}, [
+		baseUrl,
+		memoId,
+		includeCreator,
+		fetcher,
+		onError,
+		onLoad,
+		canFetch,
+		memoClient,
+	]);
 
 	useInjectedHtml({ containerRef, html });
 
@@ -347,6 +416,7 @@ export const MemoEmbedList = ({
 	memos: providedMemos,
 	memoIds = [],
 	baseUrl,
+	client,
 	theme,
 	density,
 	locale,
@@ -368,6 +438,9 @@ export const MemoEmbedList = ({
 	const [fetchedMemos, setFetchedMemos] = useState<Memo[] | null>(null);
 	const [error, setError] = useState<Error | null>(null);
 	const containerRef = useRef<HTMLDivElement | null>(null);
+	const memoClient = useMemoClient(client);
+	const memoIdsKey = memoIds.join("\u001f");
+	const stableMemoIds = useMemo(() => Array.from(memoIds), [memoIdsKey]);
 	const htmlOptions = useMemoListHtmlOptions({
 		theme,
 		density,
@@ -385,7 +458,7 @@ export const MemoEmbedList = ({
 	const resolvedMemos = providedMemos
 		? Array.from(providedMemos)
 		: fetchedMemos;
-	const canFetch = !providedMemos && Boolean(baseUrl) && memoIds.length > 0;
+	const canFetch = !providedMemos && Boolean(baseUrl) && stableMemoIds.length > 0;
 	const html = resolvedMemos
 		? renderMemoListHtmlSnippet(resolvedMemos, htmlOptions)
 		: null;
@@ -397,22 +470,58 @@ export const MemoEmbedList = ({
 
 		setFetchedMemos(null);
 		setError(null);
+		if (memoClient && baseUrl) {
+			memoClient.primeMemos({
+				baseUrl,
+				memos: providedMemos,
+				includeCreator,
+			});
+		}
 		onLoad?.(Array.from(providedMemos));
-	}, [providedMemos, onLoad]);
+	}, [providedMemos, memoClient, baseUrl, includeCreator, onLoad]);
 
 	useEffect(() => {
 		if (!canFetch || !baseUrl) {
 			return;
 		}
 
-		const controller = new AbortController();
 		let isMounted = true;
 		setError(null);
 		setFetchedMemos(null);
 
+		if (memoClient) {
+			memoClient
+				.fetchMemos({
+					baseUrl,
+					memoIds: stableMemoIds,
+					includeCreator,
+					fetcher,
+				})
+				.then((data: Memo[]) => {
+					if (!isMounted) {
+						return;
+					}
+					setFetchedMemos(data);
+					onLoad?.(data);
+				})
+				.catch((fetchError: Error) => {
+					if (!isMounted) {
+						return;
+					}
+					setError(fetchError);
+					onError?.(fetchError);
+				});
+
+			return () => {
+				isMounted = false;
+			};
+		}
+
+		const controller = new AbortController();
+
 		fetchMemos({
 			baseUrl,
-			memoIds,
+			memoIds: stableMemoIds,
 			includeCreator,
 			fetcher,
 			signal: controller.signal,
@@ -438,12 +547,13 @@ export const MemoEmbedList = ({
 		};
 	}, [
 		baseUrl,
-		memoIds,
+		stableMemoIds,
 		includeCreator,
 		fetcher,
 		onError,
 		onLoad,
 		canFetch,
+		memoClient,
 	]);
 
 	useInjectedHtml({ containerRef, html });
@@ -457,7 +567,7 @@ export const MemoEmbedList = ({
 		});
 	}
 
-	if (!providedMemos && memoIds.length === 0) {
+	if (!providedMemos && stableMemoIds.length === 0) {
 		return renderState({
 			message: "memoIds are required when memos are not provided.",
 			className,

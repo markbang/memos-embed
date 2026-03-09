@@ -11,6 +11,7 @@ Embeddable memo cards for Memos, delivered as a website and npm packages.
 - Rich memo cards with themes, density presets, and extendable design tokens
 - Core HTML renderer for SSR and static-site workflows
 - Batch multi-memo fetching and shared-style list rendering for note digests and weekly roundups
+- Shared memo client for cross-embed request deduping on React and MDX pages
 - React components for single embeds and multi-memo roundups, with optional pre-fetched memo rendering
 - Web Component wrapper with exposed `::part(...)` hooks
 - Iframe embed route for no-build integrations
@@ -105,6 +106,13 @@ const html = renderMemoListHtmlSnippet(memos, {
 })
 ```
 
+### Shared memo client
+```ts
+import { createMemoClient } from 'memos-embed'
+
+const memoClient = createMemoClient()
+```
+
 ### React
 ```tsx
 import { MemoEmbed } from '@memos-embed/react'
@@ -144,6 +152,19 @@ import { MemoEmbedList } from '@memos-embed/react'
   gap="20px"
   theme="paper"
 />
+```
+
+### React shared client
+```tsx
+import { createMemoClient } from 'memos-embed'
+import { MemoClientProvider, MemoEmbed, MemoEmbedList } from '@memos-embed/react'
+
+const client = createMemoClient()
+
+<MemoClientProvider client={client}>
+  <MemoEmbed baseUrl="https://demo.usememos.com/api/v1" memoId="1" />
+  <MemoEmbedList baseUrl="https://demo.usememos.com/api/v1" memoIds={["2", "3"]} />
+</MemoClientProvider>
 ```
 
 ### Web Component
