@@ -117,9 +117,9 @@ try {
 	);
 	await writeFile(
 		join(consumerDir, "consumer.tsx"),
-		`import { MemoClientProvider, MemoEmbed, MemoEmbedList } from "@memos-embed/react";
+		`import { MemoClientProvider, MemoEmbed, MemoEmbedList, useMemoClient } from "@memos-embed/react";
 import { MemosEmbedElement, defineMemosEmbedElement } from "@memos-embed/wc";
-import { createMemoClient, renderIframeHtml, type ThemePresetName } from "memos-embed";
+import { createMemoClient, fetchMemo, fetchMemos, renderIframeHtml, type Memo, type ThemePresetName } from "memos-embed";
 
 const theme: ThemePresetName = "midnight";
 const client = createMemoClient();
@@ -129,7 +129,7 @@ const iframe = renderIframeHtml({
   memoId: "1",
   autoResize: true,
 });
-const prefetchedMemo = {
+const prefetchedMemo: Memo = {
   id: "1",
   name: "memos/1",
   content: "Prefetched memo",
@@ -137,7 +137,7 @@ const prefetchedMemo = {
   attachments: [],
   reactions: [],
 };
-const prefetchedMemos = [
+const prefetchedMemos: Memo[] = [
   prefetchedMemo,
   {
     id: "2",
@@ -178,10 +178,17 @@ const provider = (
   </MemoClientProvider>
 );
 
+const reuseClient = useMemoClient(client);
+const memoFetcher: typeof fetchMemo = fetchMemo;
+const memosFetcher: typeof fetchMemos = fetchMemos;
+
 void iframe;
 void provider;
 void defineMemosEmbedElement;
 void MemosEmbedElement;
+void reuseClient;
+void memoFetcher;
+void memosFetcher;
 `,
 	);
 	await writeFile(
