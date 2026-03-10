@@ -129,6 +129,25 @@ const iframe = renderIframeHtml({
   memoId: "1",
   autoResize: true,
 });
+const prefetchedMemo = {
+  id: "1",
+  name: "memos/1",
+  content: "Prefetched memo",
+  tags: [],
+  attachments: [],
+  reactions: [],
+};
+const prefetchedMemos = [
+  prefetchedMemo,
+  {
+    id: "2",
+    name: "memos/2",
+    content: "Prefetched list item",
+    tags: [],
+    attachments: [],
+    reactions: [],
+  },
+];
 const component = (
   <MemoEmbed
     baseUrl="https://demo.usememos.com/api/v1"
@@ -145,10 +164,17 @@ const list = (
     layout="stack"
   />
 );
+const prefetchedProvider = (
+  <MemoClientProvider client={client}>
+    <MemoEmbed baseUrl="https://demo.usememos.com/api/v1" memo={prefetchedMemo} />
+    <MemoEmbedList baseUrl="https://demo.usememos.com/api/v1" memos={prefetchedMemos} />
+  </MemoClientProvider>
+);
 const provider = (
   <MemoClientProvider client={client}>
     {component}
     {list}
+    {prefetchedProvider}
   </MemoClientProvider>
 );
 
