@@ -13,7 +13,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlaygroundIndexRouteImport } from './routes/playground/index'
 import { Route as DocsIndexRouteImport } from './routes/docs/index'
 import { Route as EmbedMemoIdRouteImport } from './routes/embed/$memoId'
-import { Route as DemoI18nRouteImport } from './routes/demo.i18n'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -35,22 +34,15 @@ const EmbedMemoIdRoute = EmbedMemoIdRouteImport.update({
   path: '/embed/$memoId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoI18nRoute = DemoI18nRouteImport.update({
-  id: '/demo/i18n',
-  path: '/demo/i18n',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/demo/i18n': typeof DemoI18nRoute
   '/embed/$memoId': typeof EmbedMemoIdRoute
   '/docs/': typeof DocsIndexRoute
   '/playground/': typeof PlaygroundIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/demo/i18n': typeof DemoI18nRoute
   '/embed/$memoId': typeof EmbedMemoIdRoute
   '/docs': typeof DocsIndexRoute
   '/playground': typeof PlaygroundIndexRoute
@@ -58,28 +50,20 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/demo/i18n': typeof DemoI18nRoute
   '/embed/$memoId': typeof EmbedMemoIdRoute
   '/docs/': typeof DocsIndexRoute
   '/playground/': typeof PlaygroundIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/demo/i18n' | '/embed/$memoId' | '/docs/' | '/playground/'
+  fullPaths: '/' | '/embed/$memoId' | '/docs/' | '/playground/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/demo/i18n' | '/embed/$memoId' | '/docs' | '/playground'
-  id:
-    | '__root__'
-    | '/'
-    | '/demo/i18n'
-    | '/embed/$memoId'
-    | '/docs/'
-    | '/playground/'
+  to: '/' | '/embed/$memoId' | '/docs' | '/playground'
+  id: '__root__' | '/' | '/embed/$memoId' | '/docs/' | '/playground/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DemoI18nRoute: typeof DemoI18nRoute
   EmbedMemoIdRoute: typeof EmbedMemoIdRoute
   DocsIndexRoute: typeof DocsIndexRoute
   PlaygroundIndexRoute: typeof PlaygroundIndexRoute
@@ -115,19 +99,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmbedMemoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/i18n': {
-      id: '/demo/i18n'
-      path: '/demo/i18n'
-      fullPath: '/demo/i18n'
-      preLoaderRoute: typeof DemoI18nRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DemoI18nRoute: DemoI18nRoute,
   EmbedMemoIdRoute: EmbedMemoIdRoute,
   DocsIndexRoute: DocsIndexRoute,
   PlaygroundIndexRoute: PlaygroundIndexRoute,
