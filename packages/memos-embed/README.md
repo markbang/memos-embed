@@ -14,13 +14,21 @@ pnpm add memos-embed
 - `buildEmbedCss` for extracting the shared styles
 - `buildEmbedUrl` / `renderIframeHtml` for iframe-based embeds, including optional auto-resize support
 
+## Base URL handling
+`baseUrl` accepts any of these forms and normalizes them internally:
+- `https://demo.usememos.com`
+- `https://demo.usememos.com/api`
+- `https://demo.usememos.com/api/v1`
+
+Use whichever shape you already have. The client will resolve memo and user requests against `/api/v1` automatically.
+
 ## Usage
 ### Fetch a memo
 ```ts
 import { fetchMemo } from 'memos-embed'
 
 const memo = await fetchMemo({
-  baseUrl: 'https://demo.usememos.com/api/v1',
+  baseUrl: 'https://demo.usememos.com',
   memoId: '1',
 })
 ```

@@ -14,7 +14,7 @@ import { MemoEmbed } from '@memos-embed/react'
 export function App() {
   return (
     <MemoEmbed
-      baseUrl="https://demo.usememos.com/api/v1"
+      baseUrl="https://demo.usememos.com"
       memoId="1"
       theme="glass"
       density="comfortable"
@@ -29,6 +29,8 @@ export function App() {
   )
 }
 ```
++
++`baseUrl` can be your Memos instance root, `/api`, or `/api/v1`. The shared core normalizes all three forms before requesting memo data.
 
 ## Roundup usage
 ```tsx

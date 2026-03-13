@@ -109,7 +109,10 @@ describe("fetchMemo", () => {
 		);
 	});
 
-	it("uses api/v1 when baseUrl is instance root", async () => {
+	it.each([
+		"https://demo.usememos.com",
+		"https://demo.usememos.com/api",
+	])("normalizes %s to the api/v1 memo endpoint", async (baseUrl) => {
 		const response = {
 			ok: true,
 			json: async () => ({
@@ -121,7 +124,7 @@ describe("fetchMemo", () => {
 		const fetcher = vi.fn(async () => response);
 
 		await fetchMemo({
-			baseUrl: "https://demo.usememos.com",
+			baseUrl,
 			memoId: "123",
 			fetcher,
 		});

@@ -11,7 +11,7 @@ pnpm add @memos-embed/wc
 ```html
 <script type="module" src="https://unpkg.com/@memos-embed/wc@latest/dist/register.js"></script>
 <memos-embed
-  base-url="https://demo.usememos.com/api/v1"
+  base-url="https://demo.usememos.com"
   memo-id="1"
   theme="minimal"
   density="comfortable"
@@ -22,6 +22,8 @@ pnpm add @memos-embed/wc
   show-meta
 ></memos-embed>
 ```
++
++`base-url` accepts the instance root, `/api`, or `/api/v1`. The element normalizes all three forms before fetching memo data.
 
 ## Module usage
 ```ts
