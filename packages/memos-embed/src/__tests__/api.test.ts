@@ -227,6 +227,39 @@ describe("createMemoClient", () => {
 		expect(fetcher).toHaveBeenCalledTimes(1);
 	});
 
+	it("reuses cached batch memo requests across repeated list fetches", async () => {
+		const fetcher = vi.fn(async (url: RequestInfo | URL) => {
+			const href = String(url);
+			const memoId = href.endsWith("/memos/2") ? "2" : "1";
+			return {
+				ok: true,
+				json: async () => ({
+					name: `memos/${memoId}`,
+					content: `Memo ${memoId}`,
+					tags: [],
+				}),
+			} as Response;
+		});
+		const client = createMemoClient({ fetcher });
+
+		const [first, second] = await Promise.all([
+			client.fetchMemos({
+				baseUrl: "https://demo.usememos.com/api/v1",
+				memoIds: ["1", "2"],
+				includeCreator: false,
+			}),
+			client.fetchMemos({
+				baseUrl: "https://demo.usememos.com/api/v1",
+				memoIds: ["1", "2"],
+				includeCreator: false,
+			}),
+		]);
+
+		expect(first.map((memo) => memo.id)).toEqual(["1", "2"]);
+		expect(second.map((memo) => memo.id)).toEqual(["1", "2"]);
+		expect(fetcher).toHaveBeenCalledTimes(2);
+	});
+
 	it("can be primed with prefetched memos", async () => {
 		const fetcher = vi.fn<typeof fetch>();
 		const client = createMemoClient({ fetcher });
