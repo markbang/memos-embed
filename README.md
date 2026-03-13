@@ -57,6 +57,14 @@ pnpm validate
 - If your `main` branch blocks workflow pushes or release creation, add a `CHANGESETS_GITHUB_TOKEN` secret with repo write access
 - Set `NPM_TOKEN` so package publishing can authenticate with npm
 
+## Base URL handling
+`baseUrl` accepts any of these forms and normalizes them internally:
+- `https://demo.usememos.com`
+- `https://demo.usememos.com/api`
+- `https://demo.usememos.com/api/v1`
+
+Use whichever shape you already have. The client resolves memo and user requests against `/api/v1` automatically.
+
 ## Usage
 ### Core package
 ```ts

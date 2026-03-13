@@ -29,8 +29,8 @@ export function App() {
   )
 }
 ```
-+
-+`baseUrl` can be your Memos instance root, `/api`, or `/api/v1`. The shared core normalizes all three forms before requesting memo data.
+
+`baseUrl` can be your Memos instance root, `/api`, or `/api/v1`. The shared core normalizes all three forms before requesting memo data.
 
 ## Roundup usage
 ```tsx

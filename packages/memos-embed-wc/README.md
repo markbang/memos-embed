@@ -22,8 +22,8 @@ pnpm add @memos-embed/wc
   show-meta
 ></memos-embed>
 ```
-+
-+`base-url` accepts the instance root, `/api`, or `/api/v1`. The element normalizes all three forms before fetching memo data.
+
+`base-url` accepts the instance root, `/api`, or `/api/v1`. The element normalizes all three forms before fetching memo data.
 
 ## Module usage
 ```ts
