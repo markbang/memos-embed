@@ -34,8 +34,8 @@ export default defineConfig({
 				),
 			},
 			{
-				find: "@",
-				replacement: resolve(__dirname, "src"),
+				find: /^@\//,
+				replacement: `${resolve(__dirname, "src")}/`,
 			},
 		],
 	},
