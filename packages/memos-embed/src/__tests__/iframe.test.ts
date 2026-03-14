@@ -90,4 +90,18 @@ describe("renderIframeHtml", () => {
 		expect(html).toContain("<script>");
 		expect(html).toContain("memos-embed:resize");
 	});
+
+	it("sanitizes frame ids before wiring auto-resize", () => {
+		const html = renderIframeHtml({
+			embedBaseUrl: "https://embed.example.com",
+			baseUrl: "https://demo.usememos.com/api/v1",
+			memoId: "1",
+			frameId: " memo frame #1 ",
+			autoResize: true,
+		});
+
+		expect(html).toContain('id="memo-frame--1"');
+		expect(html).toContain("frameId=memo-frame--1");
+		expect(html).not.toContain("frameId=%20memo%20frame%20%231%20");
+	});
 });
