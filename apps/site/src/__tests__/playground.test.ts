@@ -12,8 +12,8 @@ import {
 describe("playground helpers", () => {
 	it("normalizes search params into a complete state object", () => {
 		const state = normalizePlaygroundSearch({
-			baseUrl: "https://demo.usememos.com/api/v1",
-			memoId: "42",
+			baseUrl: " https://demo.usememos.com/api/v1 ",
+			memoId: " 42 ",
 			theme: "midnight",
 			density: "compact",
 			linkTarget: "_self",

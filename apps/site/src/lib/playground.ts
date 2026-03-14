@@ -58,11 +58,11 @@ export const normalizePlaygroundSearch = (
 ): PlaygroundState => ({
 	baseUrl:
 		typeof search.baseUrl === "string" && search.baseUrl.trim()
-			? search.baseUrl
+			? search.baseUrl.trim()
 			: defaultPlaygroundState.baseUrl,
 	memoId:
 		typeof search.memoId === "string" && search.memoId.trim()
-			? search.memoId
+			? search.memoId.trim()
 			: defaultPlaygroundState.memoId,
 	theme: isThemePresetName(search.theme)
 		? search.theme
