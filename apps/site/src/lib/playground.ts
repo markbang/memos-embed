@@ -93,82 +93,104 @@ export const normalizePlaygroundSearch = (
 	),
 });
 
-export const serializePlaygroundState = (state: PlaygroundState) => ({
-	baseUrl: state.baseUrl,
-	memoId: state.memoId,
-	theme: state.theme,
-	density: state.density,
-	linkTarget: state.linkTarget,
-	showTags: String(state.showTags),
-	showAttachments: String(state.showAttachments),
-	showReactions: String(state.showReactions),
-	showMeta: String(state.showMeta),
+const normalizePlaygroundStateForOutput = (
+	state: PlaygroundState,
+): PlaygroundState => ({
+	...state,
+	baseUrl: state.baseUrl.trim(),
+	memoId: state.memoId.trim(),
 });
+
+export const serializePlaygroundState = (state: PlaygroundState) => {
+	const normalizedState = normalizePlaygroundStateForOutput(state);
+
+	return {
+		baseUrl: normalizedState.baseUrl,
+		memoId: normalizedState.memoId,
+		theme: normalizedState.theme,
+		density: normalizedState.density,
+		linkTarget: normalizedState.linkTarget,
+		showTags: String(normalizedState.showTags),
+		showAttachments: String(normalizedState.showAttachments),
+		showReactions: String(normalizedState.showReactions),
+		showMeta: String(normalizedState.showMeta),
+	};
+};
 
 export const buildEmbedPreviewUrl = (
 	embedBaseUrl: string,
 	state: PlaygroundState,
-) =>
-	buildEmbedUrl({
-		embedBaseUrl,
-		baseUrl: state.baseUrl,
-		memoId: state.memoId,
-		theme: state.theme,
-		density: state.density,
-		linkTarget: state.linkTarget,
-		showTags: state.showTags,
-		showAttachments: state.showAttachments,
-		showReactions: state.showReactions,
-		showMeta: state.showMeta,
-	});
+) => {
+	const normalizedState = normalizePlaygroundStateForOutput(state);
 
-export const buildIframeCode = (embedBaseUrl: string, state: PlaygroundState) =>
-	renderIframeHtml({
+	return buildEmbedUrl({
 		embedBaseUrl,
-		baseUrl: state.baseUrl,
-		memoId: state.memoId,
-		theme: state.theme,
-		density: state.density,
-		linkTarget: state.linkTarget,
-		showTags: state.showTags,
-		showAttachments: state.showAttachments,
-		showReactions: state.showReactions,
-		showMeta: state.showMeta,
+		baseUrl: normalizedState.baseUrl,
+		memoId: normalizedState.memoId,
+		theme: normalizedState.theme,
+		density: normalizedState.density,
+		linkTarget: normalizedState.linkTarget,
+		showTags: normalizedState.showTags,
+		showAttachments: normalizedState.showAttachments,
+		showReactions: normalizedState.showReactions,
+		showMeta: normalizedState.showMeta,
+	});
+};
+
+export const buildIframeCode = (embedBaseUrl: string, state: PlaygroundState) => {
+	const normalizedState = normalizePlaygroundStateForOutput(state);
+
+	return renderIframeHtml({
+		embedBaseUrl,
+		baseUrl: normalizedState.baseUrl,
+		memoId: normalizedState.memoId,
+		theme: normalizedState.theme,
+		density: normalizedState.density,
+		linkTarget: normalizedState.linkTarget,
+		showTags: normalizedState.showTags,
+		showAttachments: normalizedState.showAttachments,
+		showReactions: normalizedState.showReactions,
+		showMeta: normalizedState.showMeta,
 		height: 240,
 		title: "memos-embed",
 		autoResize: true,
 	});
+};
 
-export const buildWebComponentCode = (
-	state: PlaygroundState,
-) => `<script type="module" src="https://unpkg.com/@memos-embed/wc@latest/dist/register.js"></script>
+export const buildWebComponentCode = (state: PlaygroundState) => {
+	const normalizedState = normalizePlaygroundStateForOutput(state);
+
+	return `<script type="module" src="https://unpkg.com/@memos-embed/wc@latest/dist/register.js"></script>
 <memos-embed
-  base-url="${state.baseUrl}"
-  memo-id="${state.memoId}"
-  theme="${state.theme}"
-  density="${state.density}"
-  link-target="${state.linkTarget}"
-  show-tags="${String(state.showTags)}"
-  show-attachments="${String(state.showAttachments)}"
-  show-reactions="${String(state.showReactions)}"
-  show-meta="${String(state.showMeta)}"
+  base-url="${normalizedState.baseUrl}"
+  memo-id="${normalizedState.memoId}"
+  theme="${normalizedState.theme}"
+  density="${normalizedState.density}"
+  link-target="${normalizedState.linkTarget}"
+  show-tags="${String(normalizedState.showTags)}"
+  show-attachments="${String(normalizedState.showAttachments)}"
+  show-reactions="${String(normalizedState.showReactions)}"
+  show-meta="${String(normalizedState.showMeta)}"
 ></memos-embed>`;
+};
 
-export const buildReactCode = (
-	state: PlaygroundState,
-) => `import { MemoEmbed } from '@memos-embed/react'
+export const buildReactCode = (state: PlaygroundState) => {
+	const normalizedState = normalizePlaygroundStateForOutput(state);
+
+	return `import { MemoEmbed } from '@memos-embed/react'
 
 <MemoEmbed
-  baseUrl="${state.baseUrl}"
-  memoId="${state.memoId}"
-  theme="${state.theme}"
-  density="${state.density}"
-  linkTarget="${state.linkTarget}"
-  showTags={${String(state.showTags)}}
-  showAttachments={${String(state.showAttachments)}}
-  showReactions={${String(state.showReactions)}}
-  showMeta={${String(state.showMeta)}}
+  baseUrl="${normalizedState.baseUrl}"
+  memoId="${normalizedState.memoId}"
+  theme="${normalizedState.theme}"
+  density="${normalizedState.density}"
+  linkTarget="${normalizedState.linkTarget}"
+  showTags={${String(normalizedState.showTags)}}
+  showAttachments={${String(normalizedState.showAttachments)}}
+  showReactions={${String(normalizedState.showReactions)}}
+  showMeta={${String(normalizedState.showMeta)}}
 />`;
+};
 
 export const buildShareUrl = (origin: string, state: PlaygroundState) => {
 	const url = new URL(`${origin}/playground`);

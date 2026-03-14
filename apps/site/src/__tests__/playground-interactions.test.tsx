@@ -99,7 +99,12 @@ describe("PlaygroundExperience", () => {
 
 		const baseUrlInput = screen.getByLabelText("Base URL") as HTMLInputElement;
 		fireEvent.change(baseUrlInput, {
-			target: { value: "https://memos.example.com/api/v1" },
+			target: { value: " https://memos.example.com/api/v1 " },
+		});
+
+		const memoIdInput = screen.getByLabelText("Memo ID") as HTMLInputElement;
+		fireEvent.change(memoIdInput, {
+			target: { value: " 1 " },
 		});
 
 		const attachmentsSwitch = screen.getByLabelText("Attachments");
@@ -110,6 +115,8 @@ describe("PlaygroundExperience", () => {
 			expect(previewSrc).toContain(
 				"baseUrl=https%3A%2F%2Fmemos.example.com%2Fapi%2Fv1",
 			);
+			expect(previewSrc).toContain("/embed/1");
+			expect(previewSrc).not.toContain("%20");
 			expect(previewSrc).toContain("showAttachments=false");
 			expect(previewSrc).toContain("linkTarget=_blank");
 		});
@@ -133,10 +140,16 @@ describe("PlaygroundExperience", () => {
 		fireEvent.click(screen.getByRole("button", { name: "Copy iframe code" }));
 
 		await waitFor(() => {
-			expect(writeText).toHaveBeenCalledWith(iframeCode.value);
+			expect(writeText).toHaveBeenCalledTimes(1);
+			expect(writeText.mock.calls[0]?.[0]).toContain(
+				"baseUrl=https%3A%2F%2Fmemos.example.com%2Fapi%2Fv1",
+			);
+			expect(writeText.mock.calls[0]?.[0]).toContain("/embed/1?");
+			expect(writeText.mock.calls[0]?.[0]).not.toContain("%20");
 			expect(onStateChange).toHaveBeenLastCalledWith(
 				expect.objectContaining({
-					baseUrl: "https://memos.example.com/api/v1",
+					baseUrl: " https://memos.example.com/api/v1 ",
+					memoId: " 1 ",
 					showAttachments: false,
 					linkTarget: "_blank",
 				}),
