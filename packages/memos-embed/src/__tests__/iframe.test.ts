@@ -32,6 +32,18 @@ describe("buildEmbedUrl", () => {
 		expect(url).toContain("linkTarget=_self");
 		expect(url).toContain("frameId=memo-frame-1");
 	});
+
+	it("normalizes trailing slashes in the forwarded baseUrl", () => {
+		const url = buildEmbedUrl({
+			embedBaseUrl: "https://embed.example.com/",
+			baseUrl: "https://demo.usememos.com/api/v1/",
+			memoId: "1",
+		});
+
+		expect(url).toBe(
+			"https://embed.example.com/embed/1?baseUrl=https%3A%2F%2Fdemo.usememos.com%2Fapi%2Fv1",
+		);
+	});
 });
 
 describe("buildIframeResizeScript", () => {

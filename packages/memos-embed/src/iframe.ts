@@ -76,7 +76,7 @@ export const buildEmbedUrl = ({
 	}
 
 	const url = new URL(`${normalizeBaseUrl(embedBaseUrl)}/embed/${memoId}`);
-	url.searchParams.set("baseUrl", baseUrl);
+	url.searchParams.set("baseUrl", normalizeBaseUrl(baseUrl));
 	if (density) {
 		url.searchParams.set("density", density);
 	}
