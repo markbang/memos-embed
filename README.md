@@ -243,6 +243,10 @@ const iframe = renderIframeHtml({
 })
 ```
 
+`autoResize` works through a `postMessage` handshake keyed by `frameId`. `renderIframeHtml()` keeps that wiring aligned for you. If you hand-roll the iframe markup, make sure the iframe element `id` matches the `frameId` query param you send to `/embed/:memoId`.
+
+For pages with multiple embeds, give each iframe a distinct `frameId` to keep resize events scoped correctly.
+
 ## Blog integration examples
 - `examples/next-mdx`: Next.js App Router + server-fetched memo data
 - `examples/mdx-components`: reusable MDX component pattern for React-based blogs

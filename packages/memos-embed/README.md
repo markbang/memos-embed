@@ -92,6 +92,20 @@ const iframe = renderIframeHtml({
 })
 ```
 
+When `autoResize` is enabled, `renderIframeHtml()` also makes sure the iframe `id` and the forwarded `frameId` query param stay in sync. If you build the iframe markup yourself with `buildEmbedUrl()`, make sure those values match on both sides of the handshake or the resize listener will ignore the message.
+
+In multi-embed pages, prefer giving each iframe its own stable `frameId`.
+
+```ts
+const iframe = renderIframeHtml({
+  embedBaseUrl: 'https://your-site.com',
+  baseUrl: 'https://demo.usememos.com/api/v1',
+  memoId: '1',
+  frameId: 'weekly-note-hero',
+  autoResize: true,
+})
+```
+
 ### Fetch a roundup and render a memo list
 ```ts
 import { fetchMemos, renderMemoListHtmlSnippet } from 'memos-embed'
