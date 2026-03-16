@@ -65,8 +65,23 @@ const buildThemeStyle = (options: EmbedRenderOptions) => {
 	].join(";");
 };
 
+const sanitizeCssLength = (value: string | undefined, fallback: string) => {
+	if (!value) {
+		return fallback;
+	}
+
+	const trimmed = value.trim();
+	if (!trimmed) {
+		return fallback;
+	}
+
+	return /^[0-9]+(?:\.[0-9]+)?(?:px|rem|em|%|vw|vh)$/.test(trimmed)
+		? trimmed
+		: fallback;
+};
+
 const buildMemoListStyle = (options: MemoListRenderOptions) =>
-	`--me-list-gap:${options.gap ?? "16px"}`;
+	`--me-list-gap:${sanitizeCssLength(options.gap, "16px")}`;
 
 export const buildEmbedCss = () => `
 .memos-embed-list {

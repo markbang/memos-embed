@@ -90,6 +90,15 @@ describe("renderMemoListHtmlSnippet", () => {
 		expect(html).toContain("--me-list-gap:24px");
 		expect(html.match(/class=\"memos-embed\"/g)?.length).toBe(2);
 	});
+
+	it("falls back when list gap is not a safe css length", () => {
+		const html = renderMemoListHtmlSnippet([memo], {
+			gap: "16px;background:red",
+		});
+
+		expect(html).toContain("--me-list-gap:16px");
+		expect(html).not.toContain("background:red");
+	});
 });
 
 describe("renderMemoStateHtmlSnippet", () => {
