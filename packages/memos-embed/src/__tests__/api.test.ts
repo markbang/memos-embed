@@ -135,6 +135,29 @@ describe("fetchMemo", () => {
 		const url = firstCall ? String(firstCall[0]) : "";
 		expect(url).toContain("https://demo.usememos.com/api/v1/memos/123");
 	});
+
+	it("normalizes repeated trailing slashes in baseUrl", async () => {
+		const response = {
+			ok: true,
+			json: async () => ({
+				name: "memos/123",
+				content: "Hello",
+				tags: [],
+			}),
+		} as Response;
+		const fetcher = vi.fn(async () => response);
+
+		await fetchMemo({
+			baseUrl: "https://demo.usememos.com///",
+			memoId: "123",
+			fetcher,
+		});
+
+		const calls = fetcher.mock.calls as Array<unknown[]>;
+		const firstCall = calls[0];
+		const url = firstCall ? String(firstCall[0]) : "";
+		expect(url).toBe("https://demo.usememos.com/api/v1/memos/123");
+	});
 });
 
 describe("fetchMemos", () => {

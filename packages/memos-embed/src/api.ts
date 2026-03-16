@@ -16,7 +16,7 @@ import type {
 } from "./types";
 
 const normalizeBaseUrl = (value: string) => {
-	const trimmed = value.replace(/\/$/, "");
+	const trimmed = value.replace(/\/+$/, "");
 	if (trimmed.endsWith("/api/v1")) {
 		return trimmed;
 	}
