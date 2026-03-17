@@ -1,4 +1,4 @@
-export const locales = ["en", "de"] as const;
+export const locales = ["en", "de", "zh"] as const;
 
 export const getLocale = () => "en";
 
