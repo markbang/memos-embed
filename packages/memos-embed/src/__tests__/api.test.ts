@@ -311,6 +311,45 @@ describe("createMemoClient", () => {
 		expect(memo.content).toBe("Prefetched");
 		expect(fetcher).not.toHaveBeenCalled();
 	});
+
+	it("can be primed with prefetched memo lists", async () => {
+		const fetcher = vi.fn<typeof fetch>();
+		const client = createMemoClient({ fetcher });
+		client.primeMemos({
+			baseUrl: "https://demo.usememos.com/api/v1",
+			memos: [
+				{
+					id: "1",
+					name: "memos/1",
+					content: "Prefetched 1",
+					tags: [],
+					attachments: [],
+					reactions: [],
+				},
+				{
+					id: "2",
+					name: "memos/2",
+					content: "Prefetched 2",
+					tags: [],
+					attachments: [],
+					reactions: [],
+				},
+			],
+			includeCreator: false,
+		});
+
+		const memos = await client.fetchMemos({
+			baseUrl: "https://demo.usememos.com/api/v1",
+			memoIds: ["1", "2"],
+			includeCreator: false,
+		});
+
+		expect(memos.map((memo) => memo.content)).toEqual([
+			"Prefetched 1",
+			"Prefetched 2",
+		]);
+		expect(fetcher).not.toHaveBeenCalled();
+	});
 });
 
 describe("fetchMemoHtmlSnippet", () => {
