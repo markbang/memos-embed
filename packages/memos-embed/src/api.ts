@@ -281,11 +281,13 @@ const fetchMemoWithCache = async ({
 
 const primeMemoInCache = ({
 	memoCache,
+	userCache,
 	baseUrl,
 	memo,
 	includeCreator = true,
 }: PrimeMemoOptions & {
 	memoCache: MemoCache;
+	userCache: UserCache;
 }) => {
 	if (!baseUrl) {
 		return;
@@ -303,6 +305,21 @@ const primeMemoInCache = ({
 			includeCreator,
 		}),
 		Promise.resolve(memo),
+	);
+
+	if (!includeCreator || !memo.creatorUsername) {
+		return;
+	}
+
+	userCache.set(
+		memo.creatorUsername,
+		Promise.resolve({
+			id: memo.creatorUsername,
+			name: memo.creatorUsername,
+			username: memo.creatorUsername,
+			displayName: memo.creatorDisplayName,
+			avatarUrl: memo.creatorAvatarUrl,
+		}),
 	);
 };
 
@@ -335,6 +352,7 @@ export const createMemoClient = (
 	const primeMemo: MemoClient["primeMemo"] = (options) => {
 		primeMemoInCache({
 			memoCache,
+			userCache,
 			...options,
 		});
 	};
@@ -347,6 +365,7 @@ export const createMemoClient = (
 		for (const memo of memos) {
 			primeMemoInCache({
 				memoCache,
+				userCache,
 				baseUrl,
 				memo,
 				includeCreator,
