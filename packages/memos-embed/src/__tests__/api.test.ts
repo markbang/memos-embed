@@ -419,6 +419,57 @@ describe("createMemoClient", () => {
 		]);
 		expect(fetcher).not.toHaveBeenCalled();
 	});
+
+	it("reuses creator cache when prefetched memo only carries a creator id path", async () => {
+		const fetcher = vi.fn(async (url: RequestInfo | URL) => {
+			const href = String(url);
+			if (href.includes("/users/1")) {
+				return {
+					ok: true,
+					json: async () => ({
+						name: "users/1",
+						username: "bangwu",
+						displayName: "棒无",
+						avatarUrl: "/api/v1/users/1/avatar",
+					}),
+				} as Response;
+			}
+
+			return {
+				ok: true,
+				json: async () => ({
+					name: "memos/1",
+					creator: "users/1",
+					content: "Fetched 1",
+					tags: [],
+				}),
+			} as Response;
+		});
+		const client = createMemoClient({ fetcher });
+
+		client.primeMemo({
+			baseUrl: "https://demo.usememos.com/api/v1",
+			memo: {
+				id: "1",
+				name: "memos/1",
+				creator: "users/1",
+				creatorDisplayName: "棒无",
+				creatorAvatarUrl: "https://demo.usememos.com/api/v1/users/1/avatar",
+				content: "Prefetched 1",
+				tags: [],
+				attachments: [],
+				reactions: [],
+			},
+		});
+
+		const memo = await client.fetchMemo({
+			baseUrl: "https://demo.usememos.com/api/v1",
+			memoId: "1",
+		});
+
+		expect(memo.creatorDisplayName).toBe("棒无");
+		expect(fetcher).not.toHaveBeenCalled();
+	});
 });
 
 describe("fetchMemoHtmlSnippet", () => {
