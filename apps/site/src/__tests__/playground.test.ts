@@ -40,7 +40,7 @@ describe("playground helpers", () => {
 		const state = {
 			...defaultPlaygroundState,
 			baseUrl: " https://demo.usememos.com/api/v1 ",
-			memoId: " 1 ",
+			memoId: " memos/1 ",
 			linkTarget: "_self" as const,
 			showAttachments: false,
 			showReactions: false,

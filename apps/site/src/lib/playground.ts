@@ -93,12 +93,22 @@ export const normalizePlaygroundSearch = (
 	),
 });
 
+const normalizePlaygroundMemoId = (value: string) => {
+	const trimmed = value.trim();
+	if (!trimmed) {
+		return trimmed;
+	}
+
+	const parts = trimmed.split("/").filter(Boolean);
+	return parts[parts.length - 1] ?? trimmed;
+};
+
 const normalizePlaygroundStateForOutput = (
 	state: PlaygroundState,
 ): PlaygroundState => ({
 	...state,
 	baseUrl: state.baseUrl.trim(),
-	memoId: state.memoId.trim(),
+	memoId: normalizePlaygroundMemoId(state.memoId),
 });
 
 export const serializePlaygroundState = (state: PlaygroundState) => {

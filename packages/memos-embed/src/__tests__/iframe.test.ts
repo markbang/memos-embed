@@ -44,6 +44,17 @@ describe("buildEmbedUrl", () => {
 			"https://embed.example.com/embed/1?baseUrl=https%3A%2F%2Fdemo.usememos.com%2Fapi%2Fv1",
 		);
 	});
+
+	it("normalizes memos-style memo ids before building the embed route", () => {
+		const url = buildEmbedUrl({
+			embedBaseUrl: "https://embed.example.com",
+			baseUrl: "https://demo.usememos.com/api/v1",
+			memoId: "memos/123",
+		});
+
+		expect(url).toContain("https://embed.example.com/embed/123");
+		expect(url).not.toContain("/embed/memos/123");
+	});
 });
 
 describe("buildIframeResizeScript", () => {

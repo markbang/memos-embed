@@ -3,6 +3,15 @@ import { resolveTheme } from "./theme";
 import type { IframeEmbedOptions } from "./types";
 
 const normalizeBaseUrl = (value: string) => value.replace(/\/$/, "");
+const normalizeMemoId = (value: string) => {
+	const trimmed = value.trim();
+	if (!trimmed) {
+		return trimmed;
+	}
+
+	const parts = trimmed.split("/").filter(Boolean);
+	return parts[parts.length - 1] ?? trimmed;
+};
 const frameIdPrefix = "memos-embed-frame";
 
 export const MEMOS_EMBED_MEASURE_MESSAGE_TYPE = "memos-embed:measure";
@@ -102,7 +111,8 @@ export const buildEmbedUrl = ({
 		throw new Error("memoId is required");
 	}
 
-	const url = new URL(`${normalizeBaseUrl(embedBaseUrl)}/embed/${memoId}`);
+	const normalizedMemoId = normalizeMemoId(memoId);
+	const url = new URL(`${normalizeBaseUrl(embedBaseUrl)}/embed/${normalizedMemoId}`);
 	url.searchParams.set("baseUrl", normalizeBaseUrl(baseUrl));
 	if (density) {
 		url.searchParams.set("density", density);
