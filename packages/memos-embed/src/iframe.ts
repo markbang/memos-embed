@@ -20,21 +20,48 @@ const encodeTheme = (theme?: IframeEmbedOptions["theme"]) => {
 	return resolved.name;
 };
 
-const formatDimension = (value: number | string | undefined, fallback: string) => {
-	if (value === undefined || value === null || value === "") {
-		return fallback;
-	}
-	return typeof value === "number" ? `${value}px` : value;
-};
-
-const formatAttributeDimension = (
+const sanitizeCssDimension = (
 	value: number | string | undefined,
 	fallback: string,
 ) => {
 	if (value === undefined || value === null || value === "") {
 		return fallback;
 	}
-	return typeof value === "number" ? String(value) : value;
+
+	if (typeof value === "number") {
+		return Number.isFinite(value) && value > 0 ? `${value}px` : fallback;
+	}
+
+	const trimmed = value.trim();
+	if (!trimmed) {
+		return fallback;
+	}
+
+	return /^[0-9]+(?:\.[0-9]+)?(?:px|rem|em|%|vw|vh)$/.test(trimmed)
+		? trimmed
+		: fallback;
+};
+
+const sanitizeHtmlDimension = (
+	value: number | string | undefined,
+	fallback: string,
+) => {
+	if (value === undefined || value === null || value === "") {
+		return fallback;
+	}
+
+	if (typeof value === "number") {
+		return Number.isFinite(value) && value > 0 ? String(value) : fallback;
+	}
+
+	const trimmed = value.trim();
+	if (!trimmed) {
+		return fallback;
+	}
+
+	return /^[0-9]+(?:\.[0-9]+)?(?:px|rem|em|%|vw|vh)$/.test(trimmed)
+		? trimmed
+		: fallback;
 };
 
 const createFrameId = () =>
@@ -129,10 +156,10 @@ export const renderIframeHtml = (options: IframeEmbedOptions) => {
 		...options,
 		frameId,
 	});
-	const width = formatDimension(options.width, "100%");
-	const height = formatDimension(options.height, "280px");
-	const widthAttr = formatAttributeDimension(options.width, "100%");
-	const heightAttr = formatAttributeDimension(options.height, "280");
+	const width = sanitizeCssDimension(options.width, "100%");
+	const height = sanitizeCssDimension(options.height, "280px");
+	const widthAttr = sanitizeHtmlDimension(options.width, "100%");
+	const heightAttr = sanitizeHtmlDimension(options.height, "280");
 	const title = options.title ?? "Memos Embed";
 	const loading = options.loading ?? "lazy";
 	const id = frameId ? ` id="${escapeHtml(frameId)}"` : "";

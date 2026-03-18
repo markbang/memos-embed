@@ -103,6 +103,24 @@ describe("renderIframeHtml", () => {
 		expect(html).toContain("memos-embed:resize");
 	});
 
+	it("falls back when iframe dimensions are not safe css values", () => {
+		const html = renderIframeHtml({
+			embedBaseUrl: "https://embed.example.com",
+			baseUrl: "https://demo.usememos.com/api/v1",
+			memoId: "1",
+			width: "100%;position:fixed",
+			height: "320px;transform:scale(2)",
+		});
+
+		expect(html).toContain('width="100%"');
+		expect(html).toContain('height="280"');
+		expect(html).toContain(
+			'style="border:none;border-radius:16px;width:100%;height:280px"',
+		);
+		expect(html).not.toContain("position:fixed");
+		expect(html).not.toContain("transform:scale(2)");
+	});
+
 	it("sanitizes frame ids before wiring auto-resize", () => {
 		const html = renderIframeHtml({
 			embedBaseUrl: "https://embed.example.com",
