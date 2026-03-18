@@ -45,6 +45,24 @@ describe("buildEmbedUrl", () => {
 		);
 	});
 
+	it("normalizes forwarded baseUrl variants to the api v1 endpoint", () => {
+		expect(
+			buildEmbedUrl({
+				embedBaseUrl: "https://embed.example.com",
+				baseUrl: "https://demo.usememos.com",
+				memoId: "1",
+			}),
+		).toContain("baseUrl=https%3A%2F%2Fdemo.usememos.com%2Fapi%2Fv1");
+
+		expect(
+			buildEmbedUrl({
+				embedBaseUrl: "https://embed.example.com",
+				baseUrl: "https://demo.usememos.com/api",
+				memoId: "1",
+			}),
+		).toContain("baseUrl=https%3A%2F%2Fdemo.usememos.com%2Fapi%2Fv1");
+	});
+
 	it("normalizes memos-style memo ids before building the embed route", () => {
 		const url = buildEmbedUrl({
 			embedBaseUrl: "https://embed.example.com",

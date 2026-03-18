@@ -63,7 +63,7 @@ pnpm validate
 - `https://demo.usememos.com/api`
 - `https://demo.usememos.com/api/v1`
 
-Use whichever shape you already have. The client resolves memo and user requests against `/api/v1` automatically.
+Use whichever shape you already have. The client and iframe helpers both resolve memo requests against `/api/v1` automatically.
 
 ## Usage
 ### Core package

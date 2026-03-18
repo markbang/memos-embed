@@ -2,7 +2,19 @@ import { escapeHtml } from "./html";
 import { resolveTheme } from "./theme";
 import type { IframeEmbedOptions } from "./types";
 
-const normalizeBaseUrl = (value: string) => value.replace(/\/$/, "");
+const normalizeEmbedBaseUrl = (value: string) => value.replace(/\/$/, "");
+
+const normalizeApiBaseUrl = (value: string) => {
+	const trimmed = value.replace(/\/+$/, "");
+	if (trimmed.endsWith("/api/v1")) {
+		return trimmed;
+	}
+	if (trimmed.endsWith("/api")) {
+		return `${trimmed}/v1`;
+	}
+	return `${trimmed}/api/v1`;
+};
+
 const normalizeMemoId = (value: string) => {
 	const trimmed = value.trim();
 	if (!trimmed) {
@@ -112,8 +124,8 @@ export const buildEmbedUrl = ({
 	}
 
 	const normalizedMemoId = normalizeMemoId(memoId);
-	const url = new URL(`${normalizeBaseUrl(embedBaseUrl)}/embed/${normalizedMemoId}`);
-	url.searchParams.set("baseUrl", normalizeBaseUrl(baseUrl));
+	const url = new URL(`${normalizeEmbedBaseUrl(embedBaseUrl)}/embed/${normalizedMemoId}`);
+	url.searchParams.set("baseUrl", normalizeApiBaseUrl(baseUrl));
 	if (density) {
 		url.searchParams.set("density", density);
 	}
