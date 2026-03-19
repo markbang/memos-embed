@@ -50,14 +50,18 @@ describe("playground helpers", () => {
 		const shareUrl = buildShareUrl("https://embed.example.com", state);
 
 		expect(previewUrl).toContain("/embed/1");
-		expect(previewUrl).toContain("baseUrl=https%3A%2F%2Fdemo.usememos.com%2Fapi%2Fv1");
+		expect(previewUrl).toContain(
+			"baseUrl=https%3A%2F%2Fdemo.usememos.com%2Fapi%2Fv1",
+		);
 		expect(previewUrl).not.toContain("%20");
 		expect(previewUrl).toContain("linkTarget=_self");
 		expect(previewUrl).toContain("showAttachments=false");
 		expect(previewUrl).toContain("showReactions=false");
 		expect(shareUrl).toContain("/playground?");
 		expect(shareUrl).toContain("memoId=1");
-		expect(shareUrl).toContain("baseUrl=https%3A%2F%2Fdemo.usememos.com%2Fapi%2Fv1");
+		expect(shareUrl).toContain(
+			"baseUrl=https%3A%2F%2Fdemo.usememos.com%2Fapi%2Fv1",
+		);
 		expect(shareUrl).not.toContain("%20");
 		expect(shareUrl).toContain("linkTarget=_self");
 		expect(shareUrl).toContain("showAttachments=false");

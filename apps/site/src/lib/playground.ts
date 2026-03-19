@@ -137,7 +137,10 @@ export const buildEmbedPreviewUrl = (
 	});
 };
 
-export const buildIframeCode = (embedBaseUrl: string, state: PlaygroundState) => {
+export const buildIframeCode = (
+	embedBaseUrl: string,
+	state: PlaygroundState,
+) => {
 	const normalizedState = normalizePlaygroundStateForOutput(state);
 
 	return renderIframeHtml({
