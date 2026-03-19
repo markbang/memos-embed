@@ -40,12 +40,15 @@ defineMemosEmbedElement()
 - `locale`
 - `link-target`
 - `include-styles`
+- `include-creator`
 - `show-tags`
 - `show-attachments`
 - `show-reactions`
 - `show-meta`
 
 Boolean attributes can be passed either as empty attributes (for example `show-tags`) or as `"true"`.
+
+Set `include-creator="false"` when you want to skip the extra creator lookup request and render only memo content.
 
 ## Styling from your site
 Keep the built-in styles and tweak the exposed parts:

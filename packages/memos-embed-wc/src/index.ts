@@ -35,6 +35,7 @@ export class MemosEmbedElement extends HTMLElementBase {
 			"show-meta",
 			"link-target",
 			"include-styles",
+			"include-creator",
 		];
 	}
 
@@ -109,6 +110,7 @@ export class MemosEmbedElement extends HTMLElementBase {
 			const memo = await fetchMemo({
 				baseUrl,
 				memoId,
+				includeCreator: attributeToBoolean(this.getAttribute("include-creator")),
 				signal: controller.signal,
 			});
 			if (controller.signal.aborted || currentToken !== this.renderToken) {

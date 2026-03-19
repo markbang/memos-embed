@@ -26,6 +26,7 @@ describe("defineMemosEmbedElement", () => {
 		element.setAttribute("base-url", "https://demo.usememos.com");
 		element.setAttribute("link-target", "_blank");
 		element.setAttribute("include-styles", "false");
+		element.setAttribute("include-creator", "false");
 		document.body.appendChild(element);
 
 		await Promise.resolve();
@@ -38,6 +39,7 @@ describe("defineMemosEmbedElement", () => {
 			expect.objectContaining({
 				baseUrl: "https://demo.usememos.com",
 				memoId: "1",
+				includeCreator: false,
 				signal: expect.any(AbortSignal),
 			}),
 		);
