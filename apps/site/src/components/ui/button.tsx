@@ -1,6 +1,5 @@
-import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-import type * as React from "react";
+import { cloneElement, isValidElement, type ReactElement } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -36,26 +35,51 @@ const buttonVariants = cva(
 	},
 );
 
+const mergeChildClassName = (
+	buttonClassName: string,
+	childProps: { className?: string },
+) => cn(buttonClassName, childProps.className);
+
 function Button({
 	className,
 	variant = "default",
 	size = "default",
 	asChild = false,
+	children,
 	...props
 }: React.ComponentProps<"button"> &
 	VariantProps<typeof buttonVariants> & {
 		asChild?: boolean;
 	}) {
-	const Comp = asChild ? Slot : "button";
+	const buttonClassName = cn(buttonVariants({ variant, size, className }));
+
+	if (asChild) {
+		if (!isValidElement(children)) {
+			throw new Error(
+				"Button with asChild expects a single React element child.",
+			);
+		}
+
+		const child = children as ReactElement<{ className?: string }>;
+		return cloneElement(child, {
+			...props,
+			className: mergeChildClassName(buttonClassName, child.props),
+			"data-slot": "button",
+			"data-variant": variant,
+			"data-size": size,
+		});
+	}
 
 	return (
-		<Comp
+		<button
 			data-slot="button"
 			data-variant={variant}
 			data-size={size}
-			className={cn(buttonVariants({ variant, size, className }))}
+			className={buttonClassName}
 			{...props}
-		/>
+		>
+			{children}
+		</button>
 	);
 }
 
