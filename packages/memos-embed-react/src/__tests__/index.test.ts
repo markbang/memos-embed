@@ -1,5 +1,6 @@
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import * as memosEmbed from "memos-embed";
 import {
@@ -136,6 +137,27 @@ describe("@memos-embed/react", () => {
 		container.remove();
 		fetchMemoSpy.mockRestore();
 		renderSnippetSpy.mockRestore();
+	});
+
+	it("server-renders a provided memo immediately for prefetched data", () => {
+		const html = renderToStaticMarkup(
+			createElement(MemoEmbed, {
+				memo: {
+					id: "ssr-1",
+					name: "memos/ssr-1",
+					content: "SSR memo",
+					tags: [],
+					attachments: [],
+					reactions: [],
+				},
+				className: "memo-ssr",
+				includeStyles: false,
+			}),
+		);
+
+		expect(html).toContain('class="memo-ssr"');
+		expect(html).toContain("SSR memo");
+		expect(html).not.toContain("Loading memo");
 	});
 
 	it("renders memo roundups through shared list helpers", async () => {
@@ -292,6 +314,40 @@ describe("@memos-embed/react", () => {
 		container.remove();
 		coreFetchMemoSpy.mockRestore();
 		coreFetchMemosSpy.mockRestore();
+	});
+
+	it("server-renders provided memo lists immediately for prefetched data", () => {
+		const html = renderToStaticMarkup(
+			createElement(MemoEmbedList, {
+				memos: [
+					{
+						id: "ssr-1",
+						name: "memos/ssr-1",
+						content: "SSR one",
+						tags: [],
+						attachments: [],
+						reactions: [],
+					},
+					{
+						id: "ssr-2",
+						name: "memos/ssr-2",
+						content: "SSR two",
+						tags: [],
+						attachments: [],
+						reactions: [],
+					},
+				],
+				className: "memo-list-ssr",
+				includeStyles: false,
+				layout: "grid",
+			}),
+		);
+
+		expect(html).toContain('class="memo-list-ssr"');
+		expect(html).toContain("SSR one");
+		expect(html).toContain("SSR two");
+		expect(html).toContain("memos-embed-list--grid");
+		expect(html).not.toContain("Loading memos");
 	});
 
 	it("primes both single and list caches when provider receives prefetched data", async () => {
