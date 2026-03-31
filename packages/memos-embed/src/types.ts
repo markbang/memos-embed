@@ -68,6 +68,7 @@ export type Memo = {
 	id: string;
 	name: string;
 	creator?: string;
+	creatorId?: string;
 	creatorDisplayName?: string;
 	creatorUsername?: string;
 	creatorAvatarUrl?: string;

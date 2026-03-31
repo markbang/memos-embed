@@ -102,6 +102,7 @@ describe("fetchMemo", () => {
 		});
 
 		expect(memo.creator).toBe("bangwu");
+		expect(memo.creatorId).toBe("1");
 		expect(memo.creatorUsername).toBe("bangwu");
 		expect(memo.creatorDisplayName).toBe("棒无");
 		expect(memo.creatorAvatarUrl).toBe(
@@ -469,6 +470,61 @@ describe("createMemoClient", () => {
 
 		expect(memo.creatorDisplayName).toBe("棒无");
 		expect(fetcher).not.toHaveBeenCalled();
+	});
+
+	it("reuses primed creator details across different memos from the same creator", async () => {
+		const fetcher = vi.fn(async (url: RequestInfo | URL) => {
+			const href = String(url);
+			if (href.endsWith("/memos/2")) {
+				return {
+					ok: true,
+					json: async () => ({
+						name: "memos/2",
+						creator: "users/1",
+						content: "Fetched 2",
+						tags: [],
+					}),
+				} as Response;
+			}
+
+			return {
+				ok: true,
+				json: async () => ({
+					name: "users/1",
+					username: "bangwu",
+					displayName: "棒无",
+					avatarUrl: "/api/v1/users/1/avatar",
+				}),
+			} as Response;
+		});
+		const client = createMemoClient({ fetcher });
+
+		client.primeMemo({
+			baseUrl: "https://demo.usememos.com/api/v1",
+			memo: {
+				id: "1",
+				name: "memos/1",
+				creator: "bangwu",
+				creatorId: "1",
+				creatorUsername: "bangwu",
+				creatorDisplayName: "棒无",
+				creatorAvatarUrl: "https://demo.usememos.com/api/v1/users/1/avatar",
+				content: "Prefetched 1",
+				tags: [],
+				attachments: [],
+				reactions: [],
+			},
+		});
+
+		const memo = await client.fetchMemo({
+			baseUrl: "https://demo.usememos.com/api/v1",
+			memoId: "2",
+		});
+
+		expect(memo.creator).toBe("bangwu");
+		expect(memo.creatorId).toBe("1");
+		expect(memo.creatorDisplayName).toBe("棒无");
+		expect(fetcher).toHaveBeenCalledTimes(1);
 	});
 });
 
