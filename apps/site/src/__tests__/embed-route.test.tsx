@@ -1,6 +1,6 @@
 import { render, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { EmbedPreview } from "@/routes/embed/$memoId";
+import { EmbedPreview } from "@/components/EmbedPreview";
 
 const createDomRect = (height: number): DOMRect =>
 	({
