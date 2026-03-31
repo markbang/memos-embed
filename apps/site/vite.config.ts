@@ -8,6 +8,13 @@ import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 import viteTsConfigPaths from "vite-tsconfig-paths";
 
+const radixPlaygroundPackages = [
+	"/node_modules/@radix-ui/react-label/",
+	"/node_modules/@radix-ui/react-select/",
+	"/node_modules/@radix-ui/react-switch/",
+	"/node_modules/@radix-ui/react-tabs/",
+];
+
 const createManualChunk = (id: string) => {
 	if (!id.includes("node_modules")) {
 		return undefined;
@@ -25,7 +32,9 @@ const createManualChunk = (id: string) => {
 	}
 
 	if (id.includes("/node_modules/@radix-ui/")) {
-		return "radix-vendor";
+		return radixPlaygroundPackages.some((pkg) => id.includes(pkg))
+			? "radix-playground"
+			: "radix-shell";
 	}
 
 	if (id.includes("/node_modules/lucide-react/")) {
