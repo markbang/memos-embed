@@ -1,6 +1,6 @@
 {
   "name": "@memos-embed/wc",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Web Component wrapper for embedding Memos memo cards.",
   "type": "module",
   "homepage": "https://github.com/markbang/memos-embed/tree/main/packages/memos-embed-wc#readme",

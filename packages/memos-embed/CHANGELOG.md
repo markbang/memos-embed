@@ -1,5 +1,11 @@
 # memos-embed
 
+## 0.4.3
+
+### Patch Changes
+
+- 2a4cbe0: Reuse primed creator metadata across different memo fetches in `createMemoClient`, reducing duplicate user lookups after server-prefetching memo data.
+
 ## 0.4.2
 
 ### Patch Changes

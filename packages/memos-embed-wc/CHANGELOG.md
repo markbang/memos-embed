@@ -1,5 +1,12 @@
 # @memos-embed/wc
 
+## 0.4.3
+
+### Patch Changes
+
+- Updated dependencies [2a4cbe0]
+  - memos-embed@0.4.3
+
 ## 0.4.2
 
 ### Patch Changes
