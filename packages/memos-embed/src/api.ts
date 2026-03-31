@@ -86,6 +86,20 @@ const createMemoCacheKey = ({
 		includeCreator ? "creator" : "plain"
 	}`;
 
+const getCreatorCacheKeys = (memo: Memo) => {
+	const keys = new Set<string>();
+	if (memo.creatorId) {
+		keys.add(memo.creatorId);
+	}
+	if (memo.creatorUsername) {
+		keys.add(memo.creatorUsername);
+	}
+	if (memo.creator) {
+		keys.add(memo.creator.includes("/") ? getIdFromName(memo.creator) : memo.creator);
+	}
+	return Array.from(keys).filter(Boolean);
+};
+
 const normalizeUser = (user: UserApiResponse): User => {
 	const id = user.name ? getIdFromName(user.name) : "";
 	return {
@@ -109,14 +123,14 @@ const normalizeMemo = (
 	);
 	const reactions = memo.reactions ?? [];
 	const id = memo.name ? getIdFromName(memo.name) : "";
-	const creatorFallback = memo.creator
-		? getIdFromName(memo.creator)
-		: memo.creator;
+	const creatorId = memo.creator ? getIdFromName(memo.creator) : undefined;
+	const creatorFallback = creatorId ?? memo.creator;
 
 	return {
 		id,
 		name: memo.name,
 		creator: user?.username ?? creatorFallback,
+		creatorId,
 		creatorDisplayName: user?.displayName,
 		creatorUsername: user?.username,
 		creatorAvatarUrl: normalizeResourceUrl(user?.avatarUrl, baseUrl),
@@ -307,20 +321,30 @@ const primeMemoInCache = ({
 		Promise.resolve(memo),
 	);
 
-	if (!includeCreator || !memo.creatorUsername) {
+	if (!includeCreator) {
 		return;
 	}
 
-	userCache.set(
-		memo.creatorUsername,
-		Promise.resolve({
-			id: memo.creatorUsername,
-			name: memo.creatorUsername,
-			username: memo.creatorUsername,
-			displayName: memo.creatorDisplayName,
-			avatarUrl: memo.creatorAvatarUrl,
-		}),
-	);
+	const creatorCacheKeys = getCreatorCacheKeys(memo);
+	if (creatorCacheKeys.length === 0) {
+		return;
+	}
+
+	const cachedUser = Promise.resolve({
+		id: memo.creatorId ?? creatorCacheKeys[0] ?? "",
+		name: memo.creatorId
+			? `users/${memo.creatorId}`
+			: memo.creator && memo.creator.includes("/")
+				? memo.creator
+				: memo.creatorUsername ?? memo.creator ?? creatorCacheKeys[0] ?? "",
+		username: memo.creatorUsername,
+		displayName: memo.creatorDisplayName,
+		avatarUrl: memo.creatorAvatarUrl,
+	});
+
+	for (const key of creatorCacheKeys) {
+		userCache.set(key, cachedUser);
+	}
 };
 
 export const createMemoClient = (
