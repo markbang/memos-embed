@@ -1,5 +1,5 @@
 import { MemoEmbed } from "@memos-embed/react";
-import { Check, Copy, Share2 } from "lucide-react";
+import { Check, ChevronDown, Copy, Share2 } from "lucide-react";
 import { type ThemePresetName, themePresets } from "memos-embed";
 import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,13 +12,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
@@ -38,22 +31,27 @@ export type PlaygroundExperienceProps = {
 	registerWebComponent?: () => Promise<void> | void;
 };
 
-const themeOptions = (Object.keys(themePresets) as ThemePresetName[]).map(
-	(value) => ({
-		value,
-		label: themePresets[value].name,
-	}),
-);
+type SelectOption<T extends string> = {
+	value: T;
+	label: string;
+};
 
-const densityOptions = [
+const themeOptions: SelectOption<ThemePresetName>[] = (
+	Object.keys(themePresets) as ThemePresetName[]
+).map((value) => ({
+	value,
+	label: themePresets[value].name,
+}));
+
+const densityOptions: SelectOption<"comfortable" | "compact">[] = [
 	{ value: "comfortable", label: "Comfortable" },
 	{ value: "compact", label: "Compact" },
-] as const;
+];
 
-const linkTargetOptions = [
+const linkTargetOptions: SelectOption<"_blank" | "_self">[] = [
 	{ value: "_blank", label: "New tab" },
 	{ value: "_self", label: "Same tab" },
-] as const;
+];
 
 export function PlaygroundExperience({
 	initialState,
@@ -206,72 +204,45 @@ export function PlaygroundExperience({
 							<div className="grid gap-4 sm:grid-cols-3">
 								<div className="space-y-2">
 									<Label htmlFor={themeId}>Theme</Label>
-									<Select
+									<SelectField
+										id={themeId}
 										value={state.theme}
+										options={themeOptions}
 										onValueChange={(value) =>
 											setState((current) => ({
 												...current,
-												theme: value as ThemePresetName,
+												theme: value,
 											}))
 										}
-									>
-										<SelectTrigger id={themeId}>
-											<SelectValue placeholder="Select a theme" />
-										</SelectTrigger>
-										<SelectContent>
-											{themeOptions.map((option) => (
-												<SelectItem key={option.value} value={option.value}>
-													{option.label}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
+									/>
 								</div>
 								<div className="space-y-2">
 									<Label htmlFor={densityId}>Density</Label>
-									<Select
+									<SelectField
+										id={densityId}
 										value={state.density}
+										options={densityOptions}
 										onValueChange={(value) =>
 											setState((current) => ({
 												...current,
-												density: value as "comfortable" | "compact",
+												density: value,
 											}))
 										}
-									>
-										<SelectTrigger id={densityId}>
-											<SelectValue placeholder="Select density" />
-										</SelectTrigger>
-										<SelectContent>
-											{densityOptions.map((option) => (
-												<SelectItem key={option.value} value={option.value}>
-													{option.label}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
+									/>
 								</div>
 								<div className="space-y-2">
 									<Label htmlFor={linkTargetId}>Link target</Label>
-									<Select
+									<SelectField
+										id={linkTargetId}
 										value={state.linkTarget}
+										options={linkTargetOptions}
 										onValueChange={(value) =>
 											setState((current) => ({
 												...current,
-												linkTarget: value as "_blank" | "_self",
+												linkTarget: value,
 											}))
 										}
-									>
-										<SelectTrigger id={linkTargetId}>
-											<SelectValue placeholder="Select a link target" />
-										</SelectTrigger>
-										<SelectContent>
-											{linkTargetOptions.map((option) => (
-												<SelectItem key={option.value} value={option.value}>
-													{option.label}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
+									/>
 								</div>
 							</div>
 
@@ -304,7 +275,7 @@ export function PlaygroundExperience({
 									<ToggleRow
 										id={showAttachmentsId}
 										label="Attachments"
-										description="Files and image previews"
+										description="Images and files"
 										checked={state.showAttachments}
 										onCheckedChange={(checked) =>
 											setState((current) => ({
@@ -316,7 +287,7 @@ export function PlaygroundExperience({
 									<ToggleRow
 										id={showReactionsId}
 										label="Reactions"
-										description="Emoji chips with grouped counts"
+										description="Emoji counts and engagement"
 										checked={state.showReactions}
 										onCheckedChange={(checked) =>
 											setState((current) => ({
@@ -486,12 +457,42 @@ function ToggleRow({
 	onCheckedChange: (checked: boolean) => void;
 }) {
 	return (
-		<div className="flex items-center justify-between rounded-lg border p-3">
-			<div className="space-y-1 pr-4">
+		<div className="flex items-center justify-between gap-4 rounded-xl border bg-muted/10 p-4">
+			<div className="space-y-1">
 				<Label htmlFor={id}>{label}</Label>
-				<p className="text-xs text-muted-foreground">{description}</p>
+				<p className="text-sm text-muted-foreground">{description}</p>
 			</div>
 			<Switch id={id} checked={checked} onCheckedChange={onCheckedChange} />
+		</div>
+	);
+}
+
+function SelectField<T extends string>({
+	id,
+	value,
+	options,
+	onValueChange,
+}: {
+	id: string;
+	value: T;
+	options: ReadonlyArray<SelectOption<T>>;
+	onValueChange: (value: T) => void;
+}) {
+	return (
+		<div className="relative">
+			<select
+				id={id}
+				value={value}
+				onChange={(event) => onValueChange(event.target.value as T)}
+				className="border-input focus-visible:border-ring focus-visible:ring-ring/50 dark:bg-input/30 flex h-9 w-full appearance-none rounded-md border bg-transparent px-3 pr-9 text-sm shadow-xs outline-none focus-visible:ring-[3px]"
+			>
+				{options.map((option) => (
+					<option key={option.value} value={option.value}>
+						{option.label}
+					</option>
+				))}
+			</select>
+			<ChevronDown className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground" />
 		</div>
 	);
 }

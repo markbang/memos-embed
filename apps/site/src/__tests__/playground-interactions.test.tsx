@@ -189,17 +189,14 @@ describe("PlaygroundExperience", () => {
 		);
 		const scoped = within(view.container);
 
-		const themeTrigger = scoped.getByLabelText("Theme");
-		fireEvent.keyDown(themeTrigger, { key: "Enter" });
-		fireEvent.click(await screen.findByRole("option", { name: "midnight" }));
+		const themeSelect = scoped.getByLabelText("Theme");
+		fireEvent.change(themeSelect, { target: { value: "midnight" } });
 
-		const densityTrigger = scoped.getByLabelText("Density");
-		fireEvent.keyDown(densityTrigger, { key: "Enter" });
-		fireEvent.click(await screen.findByRole("option", { name: "Compact" }));
+		const densitySelect = scoped.getByLabelText("Density");
+		fireEvent.change(densitySelect, { target: { value: "compact" } });
 
-		const linkTargetTrigger = scoped.getByLabelText("Link target");
-		fireEvent.keyDown(linkTargetTrigger, { key: "Enter" });
-		fireEvent.click(await screen.findByRole("option", { name: "Same tab" }));
+		const linkTargetSelect = scoped.getByLabelText("Link target");
+		fireEvent.change(linkTargetSelect, { target: { value: "_self" } });
 
 		await waitFor(() => {
 			expect(onStateChange).toHaveBeenLastCalledWith(
