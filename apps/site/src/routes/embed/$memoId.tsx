@@ -95,8 +95,9 @@ export function EmbedPreview({
 		if (!containerRef.current) {
 			return;
 		}
+
 		containerRef.current.innerHTML = html;
-		highlightCodeBlocks(containerRef.current);
+		void highlightCodeBlocks(containerRef.current).catch(() => {});
 	}, [html]);
 
 	useEffect(() => {
