@@ -1,10 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type { EmbedRenderOptions } from "memos-embed";
 import { renderMemoHtmlSnippet, renderMemoStateHtmlSnippet } from "memos-embed";
-import { useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef } from "react";
 import { getMemo } from "@/data/memos";
-import { bindEmbedAutoResize } from "@/lib/embed-resize";
-import { highlightCodeBlocks } from "@/lib/highlight";
 import { normalizeBooleanSearchValue } from "@/lib/playground";
 
 type SearchParams = {
@@ -18,6 +16,12 @@ type SearchParams = {
 	linkTarget?: "_blank" | "_self";
 	frameId?: string;
 };
+
+const EmbedPreview = lazy(() =>
+	import("@/components/EmbedPreview").then((mod) => ({
+		default: mod.EmbedPreview,
+	})),
+);
 
 export const Route = createFileRoute("/embed/$memoId")({
 	loader: async ({ params, location }) => {
@@ -82,13 +86,18 @@ export const Route = createFileRoute("/embed/$memoId")({
 	}),
 });
 
-export function EmbedPreview({
-	html,
-	frameId,
-}: {
-	html: string;
-	frameId?: string;
-}) {
+function EmbedComponent() {
+	const { html } = Route.useLoaderData();
+	const { frameId } = Route.useSearch();
+
+	return (
+		<Suspense fallback={<EmbedPreviewFallback html={html} />}>
+			<EmbedPreview html={html} frameId={frameId} />
+		</Suspense>
+	);
+}
+
+function EmbedPreviewFallback({ html }: { html: string }) {
 	const containerRef = useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
@@ -97,29 +106,7 @@ export function EmbedPreview({
 		}
 
 		containerRef.current.innerHTML = html;
-		void highlightCodeBlocks(containerRef.current).catch(() => {});
 	}, [html]);
 
-	useEffect(() => {
-		if (!containerRef.current || !frameId) {
-			return;
-		}
-		if (typeof window === "undefined" || window.parent === window) {
-			return;
-		}
-
-		return bindEmbedAutoResize({
-			frameId,
-			container: containerRef.current,
-		});
-	}, [frameId]);
-
 	return <div ref={containerRef} />;
-}
-
-function EmbedComponent() {
-	const { html } = Route.useLoaderData();
-	const { frameId } = Route.useSearch();
-
-	return <EmbedPreview html={html} frameId={frameId} />;
 }
