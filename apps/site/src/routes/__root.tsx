@@ -1,5 +1,4 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
-import type { QueryClient } from "@tanstack/react-query";
 import {
 	createRootRouteWithContext,
 	HeadContent,
@@ -14,14 +13,9 @@ import { buildThemeInitializationScript } from "@/lib/site-theme";
 import { m } from "@/paraglide/messages";
 import { getLocale } from "@/paraglide/runtime";
 import Header from "../components/Header";
-import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
 
-interface MyRouterContext {
-	queryClient: QueryClient;
-}
-
-export const Route = createRootRouteWithContext<MyRouterContext>()({
+export const Route = createRootRouteWithContext<object>()({
 	beforeLoad: async () => {
 		// Other redirect strategies are possible; see
 		// https://github.com/TanStack/router/tree/main/examples/react/i18n-paraglide#offline-redirect
@@ -101,7 +95,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 								name: "Tanstack Router",
 								render: <TanStackRouterDevtoolsPanel />,
 							},
-							TanStackQueryDevtools,
 						]}
 					/>
 				) : null}
