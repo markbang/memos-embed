@@ -1,8 +1,8 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { createElement } from "react";
 import { afterEach, describe, expect, it } from "vitest";
-import { DocsPageContent } from "@/routes/docs/index";
-import { HomePageContent } from "@/routes/index";
+import { DocsPageContent } from "@/components/DocsPage";
+import { HomePageContent } from "@/components/HomePage";
 
 afterEach(() => {
 	cleanup();
