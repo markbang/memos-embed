@@ -150,6 +150,8 @@ const memo = await fetchMemo({
 <MemoEmbed memo={memo} />
 ```
 
+When you pass a pre-fetched `memo`, the React component now renders the full embed HTML during SSR/SSG instead of waiting for hydration.
+
 ### React roundup component
 ```tsx
 import { MemoEmbedList } from '@memos-embed/react'
@@ -208,7 +210,7 @@ const [heroMemo, roundupMemos] = await Promise.all([
 </MemoClientProvider>
 ```
 
-Passing `memo` or `memos` while a `MemoClientProvider` is active primes the shared client cache, so later embeds for the same ids can reuse already-fetched data.
+Passing `memo` or `memos` while a `MemoClientProvider` is active primes the shared client cache, so later embeds for the same ids can reuse already-fetched data. Those pre-fetched props also render immediately in the initial HTML response for SSR/SSG pages.
 
 ### Web Component
 ```html

@@ -4,11 +4,9 @@ import {
 	createContext,
 	type CSSProperties,
 	type ReactNode,
-	type RefObject,
 	useContext,
 	useEffect,
 	useMemo,
-	useRef,
 	useState,
 } from "react";
 import type {
@@ -108,6 +106,22 @@ export const MemoClientProvider = ({
 export const useMemoClient = (client?: MemoClient) =>
 	client ?? useContext(MemoClientContext);
 
+const renderHtml = ({
+	html,
+	className,
+	style,
+}: {
+	html: string;
+	className?: string;
+	style?: CSSProperties;
+}) => (
+	<div
+		className={className}
+		style={style}
+		dangerouslySetInnerHTML={{ __html: html }}
+	/>
+);
+
 const renderState = ({
 	message,
 	className,
@@ -118,15 +132,12 @@ const renderState = ({
 	className?: string;
 	style?: CSSProperties;
 	includeStyles?: boolean;
-}) => (
-	<div
-		className={className}
-		style={style}
-		dangerouslySetInnerHTML={{
-			__html: renderMemoStateHtmlSnippet(message, { includeStyles }),
-		}}
-	/>
-);
+}) =>
+	renderHtml({
+		html: renderMemoStateHtmlSnippet(message, { includeStyles }),
+		className,
+		style,
+	});
 
 const useEmbedHtmlOptions = ({
 	theme,
@@ -228,22 +239,6 @@ const useMemoListHtmlOptions = ({
 	);
 };
 
-const useInjectedHtml = ({
-	containerRef,
-	html,
-}: {
-	containerRef: RefObject<HTMLDivElement | null>;
-	html: string | null;
-}) => {
-	useEffect(() => {
-		if (!html || !containerRef.current) {
-			return;
-		}
-
-		containerRef.current.innerHTML = html;
-	}, [containerRef, html]);
-};
-
 export const MemoEmbed = ({
 	memo: providedMemo,
 	memoId,
@@ -267,7 +262,6 @@ export const MemoEmbed = ({
 }: MemoEmbedProps) => {
 	const [fetchedMemo, setFetchedMemo] = useState<Memo | null>(null);
 	const [error, setError] = useState<Error | null>(null);
-	const containerRef = useRef<HTMLDivElement | null>(null);
 	const memoClient = useMemoClient(client);
 	const htmlOptions = useEmbedHtmlOptions({
 		theme,
@@ -283,9 +277,13 @@ export const MemoEmbed = ({
 
 	const resolvedMemo = providedMemo ?? fetchedMemo;
 	const canFetch = !providedMemo && Boolean(baseUrl) && Boolean(memoId);
-	const html = resolvedMemo
-		? renderMemoHtmlSnippet(resolvedMemo, htmlOptions)
-		: null;
+	const html = useMemo(
+		() =>
+			resolvedMemo
+				? renderMemoHtmlSnippet(resolvedMemo, htmlOptions)
+				: null,
+		[resolvedMemo, htmlOptions],
+	);
 
 	useEffect(() => {
 		if (!providedMemo) {
@@ -380,8 +378,6 @@ export const MemoEmbed = ({
 		memoClient,
 	]);
 
-	useInjectedHtml({ containerRef, html });
-
 	if (!providedMemo && (!baseUrl || !memoId)) {
 		return renderState({
 			message: "baseUrl and memoId are required when memo is not provided.",
@@ -400,7 +396,7 @@ export const MemoEmbed = ({
 		});
 	}
 
-	if (!resolvedMemo) {
+	if (!resolvedMemo || !html) {
 		return renderState({
 			message: "Loading memo…",
 			className,
@@ -409,7 +405,11 @@ export const MemoEmbed = ({
 		});
 	}
 
-	return <div className={className} style={style} ref={containerRef} />;
+	return renderHtml({
+		html,
+		className,
+		style,
+	});
 };
 
 export const MemoEmbedList = ({
@@ -437,7 +437,6 @@ export const MemoEmbedList = ({
 }: MemoEmbedListProps) => {
 	const [fetchedMemos, setFetchedMemos] = useState<Memo[] | null>(null);
 	const [error, setError] = useState<Error | null>(null);
-	const containerRef = useRef<HTMLDivElement | null>(null);
 	const memoClient = useMemoClient(client);
 	const memoIdsKey = memoIds.join("\u001f");
 	const stableMemoIds = useMemo(() => Array.from(memoIds), [memoIdsKey]);
@@ -455,13 +454,15 @@ export const MemoEmbedList = ({
 		gap,
 	});
 
-	const resolvedMemos = providedMemos
-		? Array.from(providedMemos)
-		: fetchedMemos;
+	const resolvedMemos = providedMemos ?? fetchedMemos;
 	const canFetch = !providedMemos && Boolean(baseUrl) && stableMemoIds.length > 0;
-	const html = resolvedMemos
-		? renderMemoListHtmlSnippet(resolvedMemos, htmlOptions)
-		: null;
+	const html = useMemo(
+		() =>
+			resolvedMemos
+				? renderMemoListHtmlSnippet(resolvedMemos, htmlOptions)
+				: null,
+		[resolvedMemos, htmlOptions],
+	);
 
 	useEffect(() => {
 		if (!providedMemos) {
@@ -556,8 +557,6 @@ export const MemoEmbedList = ({
 		memoClient,
 	]);
 
-	useInjectedHtml({ containerRef, html });
-
 	if (!providedMemos && !baseUrl) {
 		return renderState({
 			message: "baseUrl is required when memos are not provided.",
@@ -585,7 +584,7 @@ export const MemoEmbedList = ({
 		});
 	}
 
-	if (!resolvedMemos) {
+	if (!resolvedMemos || !html) {
 		return renderState({
 			message: "Loading memos…",
 			className,
@@ -598,5 +597,9 @@ export const MemoEmbedList = ({
 		return null;
 	}
 
-	return <div className={className} style={style} ref={containerRef} />;
+	return renderHtml({
+		html,
+		className,
+		style,
+	});
 };

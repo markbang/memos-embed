@@ -92,6 +92,8 @@ const [heroMemo, roundupMemos] = await Promise.all([
 
 Passing `memo` or `memos` while a `MemoClientProvider` is active primes the shared client cache, so later embeds for the same memo ids can reuse that data.
 
+When you pass pre-fetched `memo` or `memos`, the component now renders full embed markup during SSR/SSG instead of waiting for client-side hydration.
+
 ## Pre-fetched usage
 ```tsx
 import { fetchMemo } from 'memos-embed'
@@ -104,6 +106,8 @@ const memo = await fetchMemo({
 
 <MemoEmbed memo={memo} className="my-8" />
 ```
+
+This path is ideal for MDX, Next.js, Astro, and other SSR setups because the rendered memo HTML is included in the initial response.
 
 ## Styling with your blog theme
 ```tsx
