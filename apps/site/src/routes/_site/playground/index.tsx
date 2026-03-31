@@ -3,7 +3,7 @@ import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import {
 	normalizePlaygroundSearch,
 	type PlaygroundState,
-} from "@/lib/playground";
+} from "@/lib/playground-state";
 import { buildPageHead } from "@/lib/site-meta";
 
 const PlaygroundExperience = lazy(() =>

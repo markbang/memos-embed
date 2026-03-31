@@ -1,9 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type { EmbedRenderOptions } from "memos-embed";
-import { renderMemoHtmlSnippet, renderMemoStateHtmlSnippet } from "memos-embed";
 import { lazy, Suspense, useEffect, useRef } from "react";
-import { getMemo } from "@/data/memos";
-import { normalizeBooleanSearchValue } from "@/lib/playground";
+import { normalizeBooleanSearchValue } from "@/lib/playground-state";
 
 type SearchParams = {
 	baseUrl?: string;
@@ -35,6 +33,9 @@ export const Route = createFileRoute("/embed/$memoId")({
 			showMeta,
 			linkTarget,
 		} = location.search as SearchParams;
+		const { renderMemoHtmlSnippet, renderMemoStateHtmlSnippet } = await import(
+			"memos-embed"
+		);
 
 		if (!baseUrl) {
 			return {
@@ -43,6 +44,7 @@ export const Route = createFileRoute("/embed/$memoId")({
 		}
 
 		try {
+			const { getMemo } = await import("@/data/memos");
 			const memo = await getMemo({
 				data: {
 					baseUrl,
