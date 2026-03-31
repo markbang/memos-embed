@@ -9,88 +9,91 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as PlaygroundIndexRouteImport } from './routes/playground/index'
-import { Route as DocsIndexRouteImport } from './routes/docs/index'
+import { Route as SiteRouteRouteImport } from './routes/_site/route'
+import { Route as SiteIndexRouteImport } from './routes/_site/index'
 import { Route as EmbedMemoIdRouteImport } from './routes/embed/$memoId'
+import { Route as SitePlaygroundIndexRouteImport } from './routes/_site/playground/index'
+import { Route as SiteDocsIndexRouteImport } from './routes/_site/docs/index'
 
-const IndexRoute = IndexRouteImport.update({
+const SiteRouteRoute = SiteRouteRouteImport.update({
+  id: '/_site',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/_site/route.lazy').then((d) => d.Route))
+const SiteIndexRoute = SiteIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlaygroundIndexRoute = PlaygroundIndexRouteImport.update({
-  id: '/playground/',
-  path: '/playground/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DocsIndexRoute = DocsIndexRouteImport.update({
-  id: '/docs/',
-  path: '/docs/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => SiteRouteRoute,
 } as any)
 const EmbedMemoIdRoute = EmbedMemoIdRouteImport.update({
   id: '/embed/$memoId',
   path: '/embed/$memoId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitePlaygroundIndexRoute = SitePlaygroundIndexRouteImport.update({
+  id: '/playground/',
+  path: '/playground/',
+  getParentRoute: () => SiteRouteRoute,
+} as any)
+const SiteDocsIndexRoute = SiteDocsIndexRouteImport.update({
+  id: '/docs/',
+  path: '/docs/',
+  getParentRoute: () => SiteRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof SiteIndexRoute
   '/embed/$memoId': typeof EmbedMemoIdRoute
-  '/docs/': typeof DocsIndexRoute
-  '/playground/': typeof PlaygroundIndexRoute
+  '/docs/': typeof SiteDocsIndexRoute
+  '/playground/': typeof SitePlaygroundIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/embed/$memoId': typeof EmbedMemoIdRoute
-  '/docs': typeof DocsIndexRoute
-  '/playground': typeof PlaygroundIndexRoute
+  '/': typeof SiteIndexRoute
+  '/docs': typeof SiteDocsIndexRoute
+  '/playground': typeof SitePlaygroundIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_site': typeof SiteRouteRouteWithChildren
   '/embed/$memoId': typeof EmbedMemoIdRoute
-  '/docs/': typeof DocsIndexRoute
-  '/playground/': typeof PlaygroundIndexRoute
+  '/_site/': typeof SiteIndexRoute
+  '/_site/docs/': typeof SiteDocsIndexRoute
+  '/_site/playground/': typeof SitePlaygroundIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/embed/$memoId' | '/docs/' | '/playground/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/embed/$memoId' | '/docs' | '/playground'
-  id: '__root__' | '/' | '/embed/$memoId' | '/docs/' | '/playground/'
+  to: '/embed/$memoId' | '/' | '/docs' | '/playground'
+  id:
+    | '__root__'
+    | '/_site'
+    | '/embed/$memoId'
+    | '/_site/'
+    | '/_site/docs/'
+    | '/_site/playground/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  SiteRouteRoute: typeof SiteRouteRouteWithChildren
   EmbedMemoIdRoute: typeof EmbedMemoIdRoute
-  DocsIndexRoute: typeof DocsIndexRoute
-  PlaygroundIndexRoute: typeof PlaygroundIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_site': {
+      id: '/_site'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof SiteRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_site/': {
+      id: '/_site/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/playground/': {
-      id: '/playground/'
-      path: '/playground'
-      fullPath: '/playground/'
-      preLoaderRoute: typeof PlaygroundIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/docs/': {
-      id: '/docs/'
-      path: '/docs'
-      fullPath: '/docs/'
-      preLoaderRoute: typeof DocsIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof SiteIndexRouteImport
+      parentRoute: typeof SiteRouteRoute
     }
     '/embed/$memoId': {
       id: '/embed/$memoId'
@@ -99,14 +102,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmbedMemoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_site/playground/': {
+      id: '/_site/playground/'
+      path: '/playground'
+      fullPath: '/playground/'
+      preLoaderRoute: typeof SitePlaygroundIndexRouteImport
+      parentRoute: typeof SiteRouteRoute
+    }
+    '/_site/docs/': {
+      id: '/_site/docs/'
+      path: '/docs'
+      fullPath: '/docs/'
+      preLoaderRoute: typeof SiteDocsIndexRouteImport
+      parentRoute: typeof SiteRouteRoute
+    }
   }
 }
 
+interface SiteRouteRouteChildren {
+  SiteIndexRoute: typeof SiteIndexRoute
+  SiteDocsIndexRoute: typeof SiteDocsIndexRoute
+  SitePlaygroundIndexRoute: typeof SitePlaygroundIndexRoute
+}
+
+const SiteRouteRouteChildren: SiteRouteRouteChildren = {
+  SiteIndexRoute: SiteIndexRoute,
+  SiteDocsIndexRoute: SiteDocsIndexRoute,
+  SitePlaygroundIndexRoute: SitePlaygroundIndexRoute,
+}
+
+const SiteRouteRouteWithChildren = SiteRouteRoute._addFileChildren(
+  SiteRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  SiteRouteRoute: SiteRouteRouteWithChildren,
   EmbedMemoIdRoute: EmbedMemoIdRoute,
-  DocsIndexRoute: DocsIndexRoute,
-  PlaygroundIndexRoute: PlaygroundIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

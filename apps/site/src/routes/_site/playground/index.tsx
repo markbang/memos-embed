@@ -12,7 +12,7 @@ const PlaygroundExperience = lazy(() =>
 	})),
 );
 
-export const Route = createFileRoute("/playground/")({
+export const Route = createFileRoute("/_site/playground/")({
 	validateSearch: normalizePlaygroundSearch,
 	component: PlaygroundComponent,
 	head: () =>
