@@ -1,40 +1,114 @@
-import hljs from "highlight.js/lib/core";
-import css from "highlight.js/lib/languages/css";
-import go from "highlight.js/lib/languages/go";
-import javascript from "highlight.js/lib/languages/javascript";
-import json from "highlight.js/lib/languages/json";
-import markdown from "highlight.js/lib/languages/markdown";
-import python from "highlight.js/lib/languages/python";
-import shell from "highlight.js/lib/languages/shell";
-import sql from "highlight.js/lib/languages/sql";
-import typescript from "highlight.js/lib/languages/typescript";
-import xml from "highlight.js/lib/languages/xml";
-import yaml from "highlight.js/lib/languages/yaml";
+type HighlightJsModule = typeof import("highlight.js/lib/core");
+type HighlightLanguageModule = {
+	default: Parameters<HighlightJsModule["default"]["registerLanguage"]>[1];
+};
 
-hljs.registerLanguage("javascript", javascript);
-hljs.registerLanguage("js", javascript);
-hljs.registerLanguage("typescript", typescript);
-hljs.registerLanguage("ts", typescript);
-hljs.registerLanguage("python", python);
-hljs.registerLanguage("py", python);
-hljs.registerLanguage("go", go);
-hljs.registerLanguage("css", css);
-hljs.registerLanguage("html", xml);
-hljs.registerLanguage("xml", xml);
-hljs.registerLanguage("json", json);
-hljs.registerLanguage("yaml", yaml);
-hljs.registerLanguage("yml", yaml);
-hljs.registerLanguage("sql", sql);
-hljs.registerLanguage("shell", shell);
-hljs.registerLanguage("bash", shell);
-hljs.registerLanguage("sh", shell);
-hljs.registerLanguage("markdown", markdown);
-hljs.registerLanguage("md", markdown);
+type HighlightInstance = HighlightJsModule["default"];
 
-export function highlightCodeBlocks(container: HTMLElement) {
+const languageAliases = [
+	["javascript", "javascript"],
+	["js", "javascript"],
+	["typescript", "typescript"],
+	["ts", "typescript"],
+	["python", "python"],
+	["py", "python"],
+	["go", "go"],
+	["css", "css"],
+	["html", "xml"],
+	["xml", "xml"],
+	["json", "json"],
+	["yaml", "yaml"],
+	["yml", "yaml"],
+	["sql", "sql"],
+	["shell", "shell"],
+	["bash", "shell"],
+	["sh", "shell"],
+	["markdown", "markdown"],
+	["md", "markdown"],
+] as const;
+
+let highlightInstancePromise: Promise<HighlightInstance> | undefined;
+
+const loadHighlightInstance = async () => {
+	if (highlightInstancePromise) {
+		return highlightInstancePromise;
+	}
+
+	highlightInstancePromise = (async () => {
+		const [
+			{ default: hljs },
+			css,
+			go,
+			javascript,
+			json,
+			markdown,
+			python,
+			shell,
+			sql,
+			typescript,
+			xml,
+			yaml,
+		] = (await Promise.all([
+			import("highlight.js/lib/core"),
+			import("highlight.js/lib/languages/css"),
+			import("highlight.js/lib/languages/go"),
+			import("highlight.js/lib/languages/javascript"),
+			import("highlight.js/lib/languages/json"),
+			import("highlight.js/lib/languages/markdown"),
+			import("highlight.js/lib/languages/python"),
+			import("highlight.js/lib/languages/shell"),
+			import("highlight.js/lib/languages/sql"),
+			import("highlight.js/lib/languages/typescript"),
+			import("highlight.js/lib/languages/xml"),
+			import("highlight.js/lib/languages/yaml"),
+		])) as [
+			HighlightJsModule,
+			HighlightLanguageModule,
+			HighlightLanguageModule,
+			HighlightLanguageModule,
+			HighlightLanguageModule,
+			HighlightLanguageModule,
+			HighlightLanguageModule,
+			HighlightLanguageModule,
+			HighlightLanguageModule,
+			HighlightLanguageModule,
+			HighlightLanguageModule,
+			HighlightLanguageModule,
+		];
+
+		const languages = {
+			css: css.default,
+			go: go.default,
+			javascript: javascript.default,
+			json: json.default,
+			markdown: markdown.default,
+			python: python.default,
+			shell: shell.default,
+			sql: sql.default,
+			typescript: typescript.default,
+			xml: xml.default,
+			yaml: yaml.default,
+		} as const;
+
+		for (const [alias, languageKey] of languageAliases) {
+			hljs.registerLanguage(alias, languages[languageKey]);
+		}
+
+		return hljs;
+	})();
+
+	return highlightInstancePromise;
+};
+
+export async function highlightCodeBlocks(container: HTMLElement) {
 	const blocks = container.querySelectorAll<HTMLElement>(
 		"pre[data-language] code",
 	);
+	if (blocks.length === 0) {
+		return;
+	}
+
+	const hljs = await loadHighlightInstance();
 	for (const block of blocks) {
 		const language = block.parentElement?.getAttribute("data-language") ?? "";
 		if (language && hljs.getLanguage(language)) {
