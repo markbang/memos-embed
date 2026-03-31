@@ -1,5 +1,11 @@
 # @memos-embed/react
 
+## 0.4.3
+
+### Patch Changes
+
+- f07cde8: Render pre-fetched `MemoEmbed` and `MemoEmbedList` markup during SSR/SSG instead of waiting for client-side hydration.
+
 ## 0.4.2
 
 ### Patch Changes
