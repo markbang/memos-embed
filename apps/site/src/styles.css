@@ -96,10 +96,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-body.memos-embed-route > header {
-  display: none;
-}
-
 code {
   font-family:
     source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
