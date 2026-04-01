@@ -21,7 +21,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "highlight.js": "^11.11.1",
-    "lucide-react": "^0.561.0",
     "memos-embed": "workspace:*",
     "nitro": "npm:nitro-nightly@3.0.1-20260227-181935-bfbb207c",
     "react": "^19.2.4",

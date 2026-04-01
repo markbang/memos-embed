@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Code, Layout, Zap } from "lucide-react";
 import { Fragment, type ReactNode } from "react";
+import { CodeIcon, LayoutIcon, ZapIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -67,17 +67,17 @@ export function HomePageContent({
 
 	const featureCards = [
 		{
-			icon: <Layout className="h-12 w-12 text-primary" />,
+			icon: <LayoutIcon className="h-12 w-12 text-primary" />,
 			title: m.feature_beautiful_title(),
 			description: m.feature_beautiful_desc(),
 		},
 		{
-			icon: <Code className="h-12 w-12 text-primary" />,
+			icon: <CodeIcon className="h-12 w-12 text-primary" />,
 			title: m.feature_developer_title(),
 			description: m.feature_developer_desc(),
 		},
 		{
-			icon: <Zap className="h-12 w-12 text-primary" />,
+			icon: <ZapIcon className="h-12 w-12 text-primary" />,
 			title: m.feature_performance_title(),
 			description: m.feature_performance_desc(),
 		},
