@@ -1,6 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { GithubIcon, MenuIcon, MoonIcon, SunIcon } from "@/components/icons";
+import {
+	GithubIcon,
+	MenuIcon,
+	MoonIcon,
+	SunIcon,
+} from "@/components/icons/shell";
 import {
 	applySiteTheme,
 	readStoredSiteTheme,

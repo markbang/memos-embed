@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Fragment, type ReactNode } from "react";
-import { CodeIcon, LayoutIcon, ZapIcon } from "@/components/icons";
+import { CodeIcon, LayoutIcon, ZapIcon } from "@/components/icons/home";
 import {
 	Card,
 	CardContent,

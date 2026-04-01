@@ -5,7 +5,7 @@ import {
 	ChevronDownIcon,
 	CopyIcon,
 	Share2Icon,
-} from "@/components/icons";
+} from "@/components/icons/playground";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
