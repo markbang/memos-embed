@@ -1,14 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
-import {
-	CheckIcon,
-	GithubIcon,
-	MenuIcon,
-	MonitorIcon,
-	MoonIcon,
-	SunIcon,
-	XIcon,
-} from "@/components/icons";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { GithubIcon, MenuIcon, MoonIcon, SunIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
 	applySiteTheme,
@@ -18,6 +10,18 @@ import {
 } from "@/lib/site-theme";
 import { m } from "@/paraglide/messages";
 import ParaglideLocaleSwitcher from "./LocaleSwitcher";
+
+const HeaderThemeMenu = lazy(() =>
+	import("./HeaderThemeMenu").then((mod) => ({
+		default: mod.HeaderThemeMenu,
+	})),
+);
+
+const HeaderMobileNav = lazy(() =>
+	import("./HeaderMobileNav").then((mod) => ({
+		default: mod.HeaderMobileNav,
+	})),
+);
 
 const navLinks = [
 	{ to: "/", labelKey: "nav_home" },
@@ -30,25 +34,6 @@ const getNavLabel = (key: string) => {
 		nav_home: () => m.nav_home(),
 		nav_docs: () => m.nav_docs(),
 		nav_playground: () => m.nav_playground(),
-	};
-	return labels[key]?.() ?? key;
-};
-
-const themeOptions: Array<{
-	value: SiteThemeMode;
-	labelKey: string;
-	icon: typeof SunIcon;
-}> = [
-	{ value: "light", labelKey: "theme_light", icon: SunIcon },
-	{ value: "dark", labelKey: "theme_dark", icon: MoonIcon },
-	{ value: "system", labelKey: "theme_system", icon: MonitorIcon },
-];
-
-const getThemeLabel = (key: string) => {
-	const labels: Record<string, () => string> = {
-		theme_light: () => m.theme_light(),
-		theme_dark: () => m.theme_dark(),
-		theme_system: () => m.theme_system(),
 	};
 	return labels[key]?.() ?? key;
 };
@@ -235,26 +220,12 @@ export default function Header() {
 								<MoonIcon className="absolute h-[1.15rem] w-[1.15rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
 							</Button>
 							{isThemeMenuOpen ? (
-								<div className="absolute right-0 top-full z-50 mt-2 min-w-40 overflow-hidden rounded-md border bg-popover p-1 shadow-md">
-									{themeOptions.map((option) => {
-										const Icon = option.icon;
-										const isActive = themeMode === option.value;
-										return (
-											<button
-												type="button"
-												key={option.value}
-												onClick={() => handleThemeChange(option.value)}
-												className="focus:bg-accent focus:text-accent-foreground flex w-full items-center justify-between gap-6 rounded-sm px-2 py-1.5 text-sm outline-hidden"
-											>
-												<span className="inline-flex items-center gap-2">
-													<Icon className="size-4" />
-													{getThemeLabel(option.labelKey)}
-												</span>
-												{isActive ? <CheckIcon className="size-4" /> : null}
-											</button>
-										);
-									})}
-								</div>
+								<Suspense fallback={null}>
+									<HeaderThemeMenu
+										themeMode={themeMode}
+										onThemeChange={handleThemeChange}
+									/>
+								</Suspense>
 							) : null}
 						</div>
 						<div className="hidden sm:block">
@@ -265,57 +236,13 @@ export default function Header() {
 			</header>
 
 			{isMobileNavOpen ? (
-				<>
-					<button
-						type="button"
-						className="fixed inset-0 z-40 bg-black/50 md:hidden"
-						aria-label="Close menu"
-						onClick={closeMobileNav}
+				<Suspense fallback={null}>
+					<HeaderMobileNav
+						closeMobileNav={closeMobileNav}
+						getNavLabel={getNavLabel}
+						navLinks={navLinks}
 					/>
-					<div className="fixed inset-y-0 left-0 z-50 flex w-3/4 max-w-sm flex-col gap-4 border-r bg-background shadow-lg md:hidden">
-						<div className="flex items-start justify-between p-4">
-							<div className="space-y-1 pr-4">
-								<p className="font-semibold">Memos Embed</p>
-								<p className="text-sm text-muted-foreground">
-									{m.nav_explore_desc()}
-								</p>
-							</div>
-							<Button
-								variant="ghost"
-								size="icon"
-								aria-label="Close menu"
-								onClick={closeMobileNav}
-							>
-								<XIcon className="size-4" />
-							</Button>
-						</div>
-						<nav className="flex flex-col gap-4 px-4">
-							{navLinks.map((link) => (
-								<Link
-									key={link.to}
-									to={link.to}
-									className="block px-2 py-1 text-lg"
-									onClick={closeMobileNav}
-								>
-									{getNavLabel(link.labelKey)}
-								</Link>
-							))}
-						</nav>
-						<div className="mx-4 h-px bg-border" />
-						<div className="space-y-4 px-4 pb-4">
-							<ParaglideLocaleSwitcher />
-							<a
-								href="https://github.com/markbang/memos-embed"
-								target="_blank"
-								rel="noreferrer"
-								className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-							>
-								<GithubIcon className="size-4" />
-								GitHub
-							</a>
-						</div>
-					</div>
-				</>
+				</Suspense>
 			) : null}
 		</>
 	);
