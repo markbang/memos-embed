@@ -1,14 +1,17 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { PlaygroundExperience } from "@/components/PlaygroundExperience";
-import type { PlaygroundState } from "@/lib/playground-state";
+import {
+	normalizePlaygroundSearch,
+	type PlaygroundState,
+} from "@/lib/playground-state";
 
 export const Route = createLazyFileRoute("/_site/playground/")({
 	component: PlaygroundComponent,
 });
 
 function PlaygroundComponent() {
-	const search = Route.useSearch();
+	const rawSearch = Route.useSearch();
 	const [embedBaseUrl, setEmbedBaseUrl] = useState("");
 
 	useEffect(() => {
@@ -48,7 +51,9 @@ function PlaygroundComponent() {
 
 	return (
 		<PlaygroundExperience
-			initialState={search}
+			initialState={normalizePlaygroundSearch(
+				rawSearch as Record<string, unknown>,
+			)}
 			embedBaseUrl={embedBaseUrl}
 			onStateChange={handleStateChange}
 			registerWebComponent={registerWebComponent}

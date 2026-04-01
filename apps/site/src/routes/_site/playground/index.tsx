@@ -1,9 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { normalizePlaygroundSearch } from "@/lib/playground-state";
 import { buildPageHead } from "@/lib/site-meta";
 
 export const Route = createFileRoute("/_site/playground/")({
-	validateSearch: normalizePlaygroundSearch,
 	head: () =>
 		buildPageHead({
 			title: "Playground",

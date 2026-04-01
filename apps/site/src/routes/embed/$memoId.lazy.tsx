@@ -6,8 +6,7 @@ export const Route = createLazyFileRoute("/embed/$memoId")({
 });
 
 function EmbedComponent() {
-	const { html } = Route.useLoaderData();
-	const { frameId } = Route.useSearch();
+	const { html, frameId } = Route.useLoaderData();
 
 	return <EmbedPreview html={html} frameId={frameId} />;
 }

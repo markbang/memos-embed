@@ -1,31 +1,53 @@
 import { createFileRoute } from "@tanstack/react-router";
-import type { EmbedRenderOptions } from "memos-embed";
-import { normalizeBooleanSearchValue } from "@/lib/playground-state";
-
-type SearchParams = {
-	baseUrl?: string;
-	theme?: string;
-	density?: EmbedRenderOptions["density"];
-	showTags?: boolean;
-	showAttachments?: boolean;
-	showReactions?: boolean;
-	showMeta?: boolean;
-	linkTarget?: "_blank" | "_self";
-	frameId?: string;
-};
 
 export const Route = createFileRoute("/embed/$memoId")({
 	loader: async ({ params, location }) => {
-		const {
-			baseUrl,
-			theme,
-			density,
-			showTags,
-			showAttachments,
-			showReactions,
-			showMeta,
-			linkTarget,
-		} = location.search as SearchParams;
+		const search = location.search as Record<string, unknown>;
+		const baseUrl =
+			typeof search.baseUrl === "string" ? search.baseUrl : undefined;
+		const theme = typeof search.theme === "string" ? search.theme : undefined;
+		const density =
+			search.density === "compact" || search.density === "comfortable"
+				? search.density
+				: undefined;
+		const showTags =
+			typeof search.showTags === "boolean"
+				? search.showTags
+				: search.showTags === "true"
+					? true
+					: search.showTags === "false"
+						? false
+						: true;
+		const showAttachments =
+			typeof search.showAttachments === "boolean"
+				? search.showAttachments
+				: search.showAttachments === "true"
+					? true
+					: search.showAttachments === "false"
+						? false
+						: true;
+		const showReactions =
+			typeof search.showReactions === "boolean"
+				? search.showReactions
+				: search.showReactions === "true"
+					? true
+					: search.showReactions === "false"
+						? false
+						: true;
+		const showMeta =
+			typeof search.showMeta === "boolean"
+				? search.showMeta
+				: search.showMeta === "true"
+					? true
+					: search.showMeta === "false"
+						? false
+						: true;
+		const linkTarget =
+			search.linkTarget === "_self" || search.linkTarget === "_blank"
+				? search.linkTarget
+				: undefined;
+		const frameId =
+			typeof search.frameId === "string" ? search.frameId : undefined;
 		const { renderMemoHtmlSnippet, renderMemoStateHtmlSnippet } = await import(
 			"memos-embed"
 		);
@@ -33,6 +55,7 @@ export const Route = createFileRoute("/embed/$memoId")({
 		if (!baseUrl) {
 			return {
 				html: renderMemoStateHtmlSnippet("Missing baseUrl."),
+				frameId,
 			};
 		}
 
@@ -55,27 +78,15 @@ export const Route = createFileRoute("/embed/$memoId")({
 					showMeta,
 					linkTarget,
 				}),
+				frameId,
 			};
 		} catch (error) {
 			const message =
 				error instanceof Error ? error.message : "Failed to load memo.";
 			return {
 				html: renderMemoStateHtmlSnippet(message),
+				frameId,
 			};
 		}
 	},
-	validateSearch: (search: Record<string, unknown>): SearchParams => ({
-		baseUrl: search.baseUrl as string | undefined,
-		theme: search.theme as string | undefined,
-		density: search.density as EmbedRenderOptions["density"] | undefined,
-		showTags: normalizeBooleanSearchValue(search.showTags, true),
-		showAttachments: normalizeBooleanSearchValue(search.showAttachments, true),
-		showReactions: normalizeBooleanSearchValue(search.showReactions, true),
-		showMeta: normalizeBooleanSearchValue(search.showMeta, true),
-		linkTarget:
-			search.linkTarget === "_self" || search.linkTarget === "_blank"
-				? search.linkTarget
-				: undefined,
-		frameId: search.frameId as string | undefined,
-	}),
 });
