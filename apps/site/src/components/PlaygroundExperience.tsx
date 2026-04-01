@@ -1,7 +1,6 @@
-import { MemoEmbed } from "@memos-embed/react";
 import { Check, ChevronDown, Copy, Share2 } from "lucide-react";
 import { type ThemePresetName, themePresets } from "memos-embed";
-import { useEffect, useId, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -35,6 +34,12 @@ type SelectOption<T extends string> = {
 	value: T;
 	label: string;
 };
+
+const PlaygroundReactPreview = lazy(() =>
+	import("@/components/PlaygroundReactPreview").then((mod) => ({
+		default: mod.PlaygroundReactPreview,
+	})),
+);
 
 const themeOptions: SelectOption<ThemePresetName>[] = (
 	Object.keys(themePresets) as ThemePresetName[]
@@ -421,19 +426,17 @@ export function PlaygroundExperience({
 								</div>
 							</TabsContent>
 							<TabsContent value="react" className="h-full">
-								<div className="h-[460px] overflow-auto rounded-lg border bg-muted/10 p-6">
-									<MemoEmbed
-										baseUrl={state.baseUrl}
-										memoId={state.memoId}
-										theme={state.theme}
-										density={state.density}
-										linkTarget={state.linkTarget}
-										showTags={state.showTags}
-										showAttachments={state.showAttachments}
-										showReactions={state.showReactions}
-										showMeta={state.showMeta}
-									/>
-								</div>
+								<Suspense
+									fallback={
+										<div className="flex h-[460px] items-center justify-center rounded-lg border bg-muted/10 p-6 text-sm text-muted-foreground">
+											Loading React preview…
+										</div>
+									}
+								>
+									<div className="h-[460px] overflow-auto rounded-lg border bg-muted/10 p-6">
+										<PlaygroundReactPreview state={state} />
+									</div>
+								</Suspense>
 							</TabsContent>
 						</Tabs>
 					</CardContent>
