@@ -4,31 +4,51 @@ type HighlightLanguageModule = {
 };
 
 type HighlightInstance = HighlightJsModule["default"];
+type HighlightLanguageKey = keyof typeof highlightLanguageImporters;
 
-const languageAliases = [
-	["javascript", "javascript"],
-	["js", "javascript"],
-	["typescript", "typescript"],
-	["ts", "typescript"],
-	["python", "python"],
-	["py", "python"],
-	["go", "go"],
-	["css", "css"],
-	["html", "xml"],
-	["xml", "xml"],
-	["json", "json"],
-	["yaml", "yaml"],
-	["yml", "yaml"],
-	["sql", "sql"],
-	["shell", "shell"],
-	["bash", "shell"],
-	["sh", "shell"],
-	["markdown", "markdown"],
-	["md", "markdown"],
-] as const;
+const highlightLanguageImporters = {
+	css: () => import("highlight.js/lib/languages/css"),
+	go: () => import("highlight.js/lib/languages/go"),
+	javascript: () => import("highlight.js/lib/languages/javascript"),
+	json: () => import("highlight.js/lib/languages/json"),
+	markdown: () => import("highlight.js/lib/languages/markdown"),
+	python: () => import("highlight.js/lib/languages/python"),
+	shell: () => import("highlight.js/lib/languages/shell"),
+	sql: () => import("highlight.js/lib/languages/sql"),
+	typescript: () => import("highlight.js/lib/languages/typescript"),
+	xml: () => import("highlight.js/lib/languages/xml"),
+	yaml: () => import("highlight.js/lib/languages/yaml"),
+} as const satisfies Record<string, () => Promise<HighlightLanguageModule>>;
+
+const languageAliases = {
+	bash: "shell",
+	css: "css",
+	go: "go",
+	html: "xml",
+	javascript: "javascript",
+	js: "javascript",
+	json: "json",
+	markdown: "markdown",
+	md: "markdown",
+	py: "python",
+	python: "python",
+	sh: "shell",
+	shell: "shell",
+	sql: "sql",
+	ts: "typescript",
+	typescript: "typescript",
+	xml: "xml",
+	yaml: "yaml",
+	yml: "yaml",
+} as const satisfies Record<string, HighlightLanguageKey>;
 
 let highlightStylesPromise: Promise<unknown> | undefined;
 let highlightInstancePromise: Promise<HighlightInstance> | undefined;
+const registeredHighlightLanguages = new Set<string>();
+const highlightLanguagePromises = new Map<
+	HighlightLanguageKey,
+	Promise<HighlightLanguageModule>
+>();
 
 const loadHighlightStyles = () => {
 	if (highlightStylesPromise) {
@@ -44,70 +64,51 @@ const loadHighlightInstance = async () => {
 		return highlightInstancePromise;
 	}
 
-	highlightInstancePromise = (async () => {
-		const [
-			{ default: hljs },
-			css,
-			go,
-			javascript,
-			json,
-			markdown,
-			python,
-			shell,
-			sql,
-			typescript,
-			xml,
-			yaml,
-		] = (await Promise.all([
-			import("highlight.js/lib/core"),
-			import("highlight.js/lib/languages/css"),
-			import("highlight.js/lib/languages/go"),
-			import("highlight.js/lib/languages/javascript"),
-			import("highlight.js/lib/languages/json"),
-			import("highlight.js/lib/languages/markdown"),
-			import("highlight.js/lib/languages/python"),
-			import("highlight.js/lib/languages/shell"),
-			import("highlight.js/lib/languages/sql"),
-			import("highlight.js/lib/languages/typescript"),
-			import("highlight.js/lib/languages/xml"),
-			import("highlight.js/lib/languages/yaml"),
-		])) as [
-			HighlightJsModule,
-			HighlightLanguageModule,
-			HighlightLanguageModule,
-			HighlightLanguageModule,
-			HighlightLanguageModule,
-			HighlightLanguageModule,
-			HighlightLanguageModule,
-			HighlightLanguageModule,
-			HighlightLanguageModule,
-			HighlightLanguageModule,
-			HighlightLanguageModule,
-			HighlightLanguageModule,
-		];
-
-		const languages = {
-			css: css.default,
-			go: go.default,
-			javascript: javascript.default,
-			json: json.default,
-			markdown: markdown.default,
-			python: python.default,
-			shell: shell.default,
-			sql: sql.default,
-			typescript: typescript.default,
-			xml: xml.default,
-			yaml: yaml.default,
-		} as const;
-
-		for (const [alias, languageKey] of languageAliases) {
-			hljs.registerLanguage(alias, languages[languageKey]);
-		}
-
-		return hljs;
-	})();
+	highlightInstancePromise = import("highlight.js/lib/core").then(
+		(mod) => mod.default,
+	);
 
 	return highlightInstancePromise;
+};
+
+const resolveHighlightLanguage = (language: string) => {
+	return languageAliases[
+		language.toLowerCase() as keyof typeof languageAliases
+	];
+};
+
+const loadHighlightLanguage = async (language: HighlightLanguageKey) => {
+	const hljs = await loadHighlightInstance();
+	if (registeredHighlightLanguages.has(language)) {
+		return hljs;
+	}
+
+	let languagePromise = highlightLanguagePromises.get(language);
+	if (!languagePromise) {
+		languagePromise = highlightLanguageImporters[language]();
+		highlightLanguagePromises.set(language, languagePromise);
+	}
+
+	const languageModule = await languagePromise;
+	for (const [alias, languageKey] of Object.entries(languageAliases)) {
+		if (languageKey === language) {
+			hljs.registerLanguage(alias, languageModule.default);
+		}
+	}
+	registeredHighlightLanguages.add(language);
+	return hljs;
+};
+
+const getRequestedHighlightLanguages = (blocks: NodeListOf<HTMLElement>) => {
+	const languages = new Set<HighlightLanguageKey>();
+	for (const block of blocks) {
+		const language = block.parentElement?.getAttribute("data-language") ?? "";
+		const resolvedLanguage = resolveHighlightLanguage(language);
+		if (resolvedLanguage) {
+			languages.add(resolvedLanguage);
+		}
+	}
+	return languages;
 };
 
 export async function highlightCodeBlocks(container: HTMLElement) {
@@ -118,10 +119,15 @@ export async function highlightCodeBlocks(container: HTMLElement) {
 		return;
 	}
 
-	const [, hljs] = await Promise.all([
-		loadHighlightStyles(),
-		loadHighlightInstance(),
-	]);
+	await loadHighlightStyles();
+	const requestedLanguages = getRequestedHighlightLanguages(blocks);
+	const hljs = await loadHighlightInstance();
+	await Promise.all(
+		Array.from(requestedLanguages, (language) =>
+			loadHighlightLanguage(language),
+		),
+	);
+
 	for (const block of blocks) {
 		const language = block.parentElement?.getAttribute("data-language") ?? "";
 		if (language && hljs.getLanguage(language)) {

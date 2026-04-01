@@ -28,8 +28,15 @@ const createManualChunk = (id: string) => {
 		return "ui-icons";
 	}
 
-	if (id.includes("/node_modules/highlight.js/")) {
-		return "hljs-vendor";
+	if (id.includes("/node_modules/highlight.js/lib/core")) {
+		return "hljs-core";
+	}
+
+	if (id.includes("/node_modules/highlight.js/lib/languages/")) {
+		return `hljs-lang-${id
+			.split("/")
+			.pop()
+			?.replace(/\.[cm]?js$/, "")}`;
 	}
 
 	return undefined;
