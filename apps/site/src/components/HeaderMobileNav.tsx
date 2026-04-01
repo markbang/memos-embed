@@ -1,8 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { GithubIcon, XIcon } from "@/components/icons";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
 import ParaglideLocaleSwitcher from "./LocaleSwitcher";
+
+const shellIconButtonClassName =
+	"inline-flex size-9 shrink-0 items-center justify-center rounded-md outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 dark:hover:bg-accent/50";
 
 export function HeaderMobileNav({
 	closeMobileNav,
@@ -29,14 +32,14 @@ export function HeaderMobileNav({
 							{m.nav_explore_desc()}
 						</p>
 					</div>
-					<Button
-						variant="ghost"
-						size="icon"
+					<button
+						type="button"
+						className={cn(shellIconButtonClassName)}
 						aria-label="Close menu"
 						onClick={closeMobileNav}
 					>
 						<XIcon className="size-4" />
-					</Button>
+					</button>
 				</div>
 				<nav className="flex flex-col gap-4 px-4">
 					{navLinks.map((link) => (
