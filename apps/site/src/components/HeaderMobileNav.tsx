@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { GithubIcon, XIcon } from "@/components/icons";
+import { GithubIcon, XIcon } from "@/components/icons/shell";
 import { cn } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
 import ParaglideLocaleSwitcher from "./LocaleSwitcher";

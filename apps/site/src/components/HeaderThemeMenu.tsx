@@ -1,4 +1,9 @@
-import { CheckIcon, MonitorIcon, MoonIcon, SunIcon } from "@/components/icons";
+import {
+	CheckIcon,
+	MonitorIcon,
+	MoonIcon,
+	SunIcon,
+} from "@/components/icons/shell";
 import type { SiteThemeMode } from "@/lib/site-theme";
 import { m } from "@/paraglide/messages";
 

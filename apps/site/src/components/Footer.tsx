@@ -1,5 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { ExternalLinkIcon, GithubIcon, PackageIcon } from "@/components/icons";
+import {
+	ExternalLinkIcon,
+	GithubIcon,
+	PackageIcon,
+} from "@/components/icons/shell";
 import { m } from "@/paraglide/messages";
 
 const resourceLinks = [

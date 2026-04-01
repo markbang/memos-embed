@@ -26,32 +26,6 @@ export function CheckIcon(props: IconProps) {
 	);
 }
 
-export function ChevronDownIcon(props: IconProps) {
-	return (
-		<IconBase {...props}>
-			<path d="m6 9 6 6 6-6" />
-		</IconBase>
-	);
-}
-
-export function CodeIcon(props: IconProps) {
-	return (
-		<IconBase {...props}>
-			<path d="m16 18 6-6-6-6" />
-			<path d="m8 6-6 6 6 6" />
-		</IconBase>
-	);
-}
-
-export function CopyIcon(props: IconProps) {
-	return (
-		<IconBase {...props}>
-			<rect x="9" y="9" width="13" height="13" rx="2" />
-			<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-		</IconBase>
-	);
-}
-
 export function ExternalLinkIcon(props: IconProps) {
 	return (
 		<IconBase {...props}>
@@ -67,16 +41,6 @@ export function GithubIcon(props: IconProps) {
 		<IconBase {...props}>
 			<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.2c3.07-.35 6.3-1.54 6.3-7A5.44 5.44 0 0 0 19 3.77 5.07 5.07 0 0 0 18.91 1S17.73.65 15 2.48a13.38 13.38 0 0 0-6 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 3.77 5.44 5.44 0 0 0 3.7 7.6c0 5.42 3.23 6.61 6.3 7A4.8 4.8 0 0 0 9 18.2v4" />
 			<path d="M9 18c-4.51 2-5-2-7-2" />
-		</IconBase>
-	);
-}
-
-export function LayoutIcon(props: IconProps) {
-	return (
-		<IconBase {...props}>
-			<rect x="3" y="3" width="18" height="18" rx="2" />
-			<path d="M9 3v18" />
-			<path d="M9 9h12" />
 		</IconBase>
 	);
 }
@@ -120,18 +84,6 @@ export function PackageIcon(props: IconProps) {
 	);
 }
 
-export function Share2Icon(props: IconProps) {
-	return (
-		<IconBase {...props}>
-			<circle cx="18" cy="5" r="3" />
-			<circle cx="6" cy="12" r="3" />
-			<circle cx="18" cy="19" r="3" />
-			<path d="m8.59 13.51 6.83 3.98" />
-			<path d="m15.41 6.51-6.82 3.98" />
-		</IconBase>
-	);
-}
-
 export function SunIcon(props: IconProps) {
 	return (
 		<IconBase {...props}>
@@ -153,14 +105,6 @@ export function XIcon(props: IconProps) {
 		<IconBase {...props}>
 			<path d="M18 6 6 18" />
 			<path d="m6 6 12 12" />
-		</IconBase>
-	);
-}
-
-export function ZapIcon(props: IconProps) {
-	return (
-		<IconBase {...props}>
-			<path d="M13 2 3 14h7l-1 8 10-12h-7z" />
 		</IconBase>
 	);
 }
