@@ -1,6 +1,11 @@
-import { Check, ChevronDown, Copy, Share2 } from "lucide-react";
 import { type ThemePresetName, themePresets } from "memos-embed";
 import { lazy, Suspense, useEffect, useId, useRef, useState } from "react";
+import {
+	CheckIcon,
+	ChevronDownIcon,
+	CopyIcon,
+	Share2Icon,
+} from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -145,9 +150,9 @@ export function PlaygroundExperience({
 			onClick={() => void handleCopy(key, value)}
 		>
 			{copiedKey === key ? (
-				<Check className="size-4" />
+				<CheckIcon className="size-4" />
 			) : (
-				<Copy className="size-4" />
+				<CopyIcon className="size-4" />
 			)}
 			{copiedKey === key ? "Copied" : "Copy"}
 		</Button>
@@ -326,7 +331,7 @@ export function PlaygroundExperience({
 								placeholder="Share URL will appear here"
 							/>
 							<p className="flex items-center gap-2 text-sm text-muted-foreground">
-								<Share2 className="size-4" />
+								<Share2Icon className="size-4" />
 								The playground keeps your current theme, density, and visibility
 								settings in the URL.
 							</p>
@@ -495,7 +500,7 @@ function SelectField<T extends string>({
 					</option>
 				))}
 			</select>
-			<ChevronDown className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground" />
+			<ChevronDownIcon className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground" />
 		</div>
 	);
 }

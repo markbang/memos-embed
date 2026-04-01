@@ -1,17 +1,17 @@
 import { Link } from "@tanstack/react-router";
-import { ExternalLink, Github, Package } from "lucide-react";
+import { ExternalLinkIcon, GithubIcon, PackageIcon } from "@/components/icons";
 import { m } from "@/paraglide/messages";
 
 const resourceLinks = [
 	{
 		href: "https://github.com/markbang/memos-embed",
 		label: "GitHub",
-		icon: Github,
+		icon: GithubIcon,
 	},
 	{
 		href: "https://www.npmjs.com/package/memos-embed",
 		label: "npm",
-		icon: Package,
+		icon: PackageIcon,
 	},
 ];
 
@@ -75,7 +75,7 @@ export default function Footer() {
 										>
 											<Icon className="size-4" />
 											<span>{link.label}</span>
-											<ExternalLink className="size-3.5" />
+											<ExternalLinkIcon className="size-3.5" />
 										</a>
 									</li>
 								);

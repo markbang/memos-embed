@@ -1,6 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { Check, Github, Menu, Monitor, Moon, Sun, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import {
+	CheckIcon,
+	GithubIcon,
+	MenuIcon,
+	MonitorIcon,
+	MoonIcon,
+	SunIcon,
+	XIcon,
+} from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
 	applySiteTheme,
@@ -29,11 +37,11 @@ const getNavLabel = (key: string) => {
 const themeOptions: Array<{
 	value: SiteThemeMode;
 	labelKey: string;
-	icon: typeof Sun;
+	icon: typeof SunIcon;
 }> = [
-	{ value: "light", labelKey: "theme_light", icon: Sun },
-	{ value: "dark", labelKey: "theme_dark", icon: Moon },
-	{ value: "system", labelKey: "theme_system", icon: Monitor },
+	{ value: "light", labelKey: "theme_light", icon: SunIcon },
+	{ value: "dark", labelKey: "theme_dark", icon: MoonIcon },
+	{ value: "system", labelKey: "theme_system", icon: MonitorIcon },
 ];
 
 const getThemeLabel = (key: string) => {
@@ -169,7 +177,7 @@ export default function Header() {
 							setIsMobileNavOpen(true);
 						}}
 					>
-						<Menu className="size-5" />
+						<MenuIcon className="size-5" />
 					</Button>
 
 					<div className="flex min-w-0 flex-1 items-center gap-4">
@@ -212,7 +220,7 @@ export default function Header() {
 								rel="noreferrer"
 								aria-label="Open GitHub repository"
 							>
-								<Github className="size-4" />
+								<GithubIcon className="size-4" />
 							</a>
 						</Button>
 						<div ref={themeMenuRef} className="relative">
@@ -223,8 +231,8 @@ export default function Header() {
 								aria-expanded={isThemeMenuOpen}
 								onClick={toggleThemeMenu}
 							>
-								<Sun className="h-[1.15rem] w-[1.15rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-								<Moon className="absolute h-[1.15rem] w-[1.15rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+								<SunIcon className="h-[1.15rem] w-[1.15rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+								<MoonIcon className="absolute h-[1.15rem] w-[1.15rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
 							</Button>
 							{isThemeMenuOpen ? (
 								<div className="absolute right-0 top-full z-50 mt-2 min-w-40 overflow-hidden rounded-md border bg-popover p-1 shadow-md">
@@ -242,7 +250,7 @@ export default function Header() {
 													<Icon className="size-4" />
 													{getThemeLabel(option.labelKey)}
 												</span>
-												{isActive ? <Check className="size-4" /> : null}
+												{isActive ? <CheckIcon className="size-4" /> : null}
 											</button>
 										);
 									})}
@@ -278,7 +286,7 @@ export default function Header() {
 								aria-label="Close menu"
 								onClick={closeMobileNav}
 							>
-								<X className="size-4" />
+								<XIcon className="size-4" />
 							</Button>
 						</div>
 						<nav className="flex flex-col gap-4 px-4">
@@ -302,7 +310,7 @@ export default function Header() {
 								rel="noreferrer"
 								className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
 							>
-								<Github className="size-4" />
+								<GithubIcon className="size-4" />
 								GitHub
 							</a>
 						</div>
