@@ -44,6 +44,7 @@ const createManualChunk = (id: string) => {
 
 const config = defineConfig({
 	build: {
+		modulePreload: false,
 		rollupOptions: {
 			output: {
 				manualChunks: createManualChunk,
@@ -80,6 +81,9 @@ const config = defineConfig({
 		}),
 		tailwindcss(),
 		tanstackStart({
+			client: {
+				entry: "client.ts",
+			},
 			router: {
 				codeSplittingOptions: {
 					splitBehavior: ({ routeId }) =>

@@ -1,7 +1,9 @@
-import { createLazyFileRoute, Outlet } from "@tanstack/react-router";
+import { createLazyFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 import { useId } from "react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import MarketingHeader from "@/components/MarketingHeader";
+import { isStaticMarketingPath } from "@/lib/route-mode";
 import { m } from "@/paraglide/messages";
 
 export const Route = createLazyFileRoute("/_site")({
@@ -9,7 +11,9 @@ export const Route = createLazyFileRoute("/_site")({
 });
 
 function SiteLayout() {
+	const pathname = useLocation({ select: (location) => location.pathname });
 	const mainContentId = useId();
+	const isMarketingPage = isStaticMarketingPath(pathname);
 
 	return (
 		<>
@@ -19,7 +23,7 @@ function SiteLayout() {
 			>
 				{m.skip_to_content()}
 			</a>
-			<Header />
+			{isMarketingPage ? <MarketingHeader /> : <Header />}
 			<main id={mainContentId} className="flex-1">
 				<Outlet />
 			</main>

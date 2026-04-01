@@ -3,8 +3,11 @@ import {
 	createRootRouteWithContext,
 	HeadContent,
 	Scripts,
+	useLocation,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import StaticHeadContent from "@/components/StaticHeadContent";
+import { isStaticMarketingPath } from "@/lib/route-mode";
 import { buildPageHead, SITE_DESCRIPTION } from "@/lib/site-meta";
 import { buildThemeInitializationScript } from "@/lib/site-theme";
 import { getLocale } from "@/paraglide/runtime";
@@ -48,12 +51,14 @@ export const Route = createRootRouteWithContext<object>()({
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-	const showDevtools = import.meta.env.DEV;
+	const pathname = useLocation({ select: (location) => location.pathname });
+	const isMarketingPage = isStaticMarketingPath(pathname);
+	const showDevtools = import.meta.env.DEV && !isMarketingPage;
 
 	return (
 		<html lang={getLocale()}>
 			<head>
-				<HeadContent />
+				{isMarketingPage ? <StaticHeadContent /> : <HeadContent />}
 				<script>{buildThemeInitializationScript()}</script>
 			</head>
 			<body>
@@ -71,7 +76,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 						]}
 					/>
 				) : null}
-				<Scripts />
+				{isMarketingPage ? null : <Scripts />}
 			</body>
 		</html>
 	);
