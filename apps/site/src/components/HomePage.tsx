@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Fragment, type ReactNode } from "react";
 import { CodeIcon, LayoutIcon, ZapIcon } from "@/components/icons";
-import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -9,6 +8,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
 
 type LinkButton = {
@@ -19,14 +19,22 @@ type LinkButton = {
 
 type LinkRenderer = (props: LinkButton) => ReactNode;
 
+const homeLinkButtonClassName = (variant: LinkButton["variant"] = "default") =>
+	cn(
+		"inline-flex h-10 items-center justify-center rounded-md px-6 text-sm font-medium whitespace-nowrap outline-none transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+		variant === "outline"
+			? "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50"
+			: "bg-primary text-primary-foreground hover:bg-primary/90",
+	);
+
 const defaultRenderLink: LinkRenderer = ({
 	to,
 	label,
 	variant = "default",
 }) => (
-	<Button asChild size="lg" variant={variant}>
-		<a href={to}>{label}</a>
-	</Button>
+	<a href={to} className={homeLinkButtonClassName(variant)}>
+		{label}
+	</a>
 );
 
 const integrationCardCodes = {
@@ -274,9 +282,9 @@ export function HomePage() {
 	return (
 		<HomePageContent
 			renderLink={({ to, label, variant = "default" }) => (
-				<Button asChild size="lg" variant={variant}>
-					<Link to={to}>{label}</Link>
-				</Button>
+				<Link to={to} className={homeLinkButtonClassName(variant)}>
+					{label}
+				</Link>
 			)}
 		/>
 	);

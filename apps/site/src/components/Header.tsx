@@ -1,13 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { GithubIcon, MenuIcon, MoonIcon, SunIcon } from "@/components/icons";
-import { Button } from "@/components/ui/button";
 import {
 	applySiteTheme,
 	readStoredSiteTheme,
 	SITE_THEME_MEDIA_QUERY,
 	type SiteThemeMode,
 } from "@/lib/site-theme";
+import { cn } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
 import ParaglideLocaleSwitcher from "./LocaleSwitcher";
 
@@ -22,6 +22,9 @@ const HeaderMobileNav = lazy(() =>
 		default: mod.HeaderMobileNav,
 	})),
 );
+
+const shellIconButtonClassName =
+	"inline-flex size-9 shrink-0 items-center justify-center rounded-md outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 dark:hover:bg-accent/50";
 
 const navLinks = [
 	{ to: "/", labelKey: "nav_home" },
@@ -151,10 +154,9 @@ export default function Header() {
 		<>
 			<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70">
 				<div className="container mx-auto flex h-14 items-center gap-3 px-4">
-					<Button
-						variant="ghost"
-						size="icon"
-						className="md:hidden"
+					<button
+						type="button"
+						className={cn(shellIconButtonClassName, "md:hidden")}
 						aria-label={m.open_nav_menu()}
 						aria-expanded={isMobileNavOpen}
 						onClick={() => {
@@ -163,7 +165,7 @@ export default function Header() {
 						}}
 					>
 						<MenuIcon className="size-5" />
-					</Button>
+					</button>
 
 					<div className="flex min-w-0 flex-1 items-center gap-4">
 						<Link to="/" className="flex min-w-0 items-center gap-3">
@@ -193,32 +195,26 @@ export default function Header() {
 					</div>
 
 					<nav className="flex items-center gap-2">
-						<Button
-							asChild
-							variant="ghost"
-							size="icon"
-							className="hidden md:inline-flex"
+						<a
+							href="https://github.com/markbang/memos-embed"
+							target="_blank"
+							rel="noreferrer"
+							aria-label="Open GitHub repository"
+							className={cn(shellIconButtonClassName, "hidden md:inline-flex")}
 						>
-							<a
-								href="https://github.com/markbang/memos-embed"
-								target="_blank"
-								rel="noreferrer"
-								aria-label="Open GitHub repository"
-							>
-								<GithubIcon className="size-4" />
-							</a>
-						</Button>
+							<GithubIcon className="size-4" />
+						</a>
 						<div ref={themeMenuRef} className="relative">
-							<Button
-								variant="ghost"
-								size="icon"
+							<button
+								type="button"
+								className={shellIconButtonClassName}
 								aria-label={m.theme_toggle()}
 								aria-expanded={isThemeMenuOpen}
 								onClick={toggleThemeMenu}
 							>
 								<SunIcon className="h-[1.15rem] w-[1.15rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
 								<MoonIcon className="absolute h-[1.15rem] w-[1.15rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-							</Button>
+							</button>
 							{isThemeMenuOpen ? (
 								<Suspense fallback={null}>
 									<HeaderThemeMenu
