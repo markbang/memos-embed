@@ -1,11 +1,7 @@
-import { createFileRoute, lazyRouteComponent } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { buildPageHead } from "@/lib/site-meta";
 
 export const Route = createFileRoute("/_site/docs/")({
-	component: lazyRouteComponent(
-		() => import("@/components/DocsPage"),
-		"DocsPage",
-	),
 	head: () =>
 		buildPageHead({
 			title: "Documentation",

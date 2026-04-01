@@ -23,7 +23,7 @@ const SiteIndexRoute = SiteIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SiteRouteRoute,
-} as any)
+} as any).lazy(() => import('./routes/_site/index.lazy').then((d) => d.Route))
 const EmbedMemoIdRoute = EmbedMemoIdRouteImport.update({
   id: '/embed/$memoId',
   path: '/embed/$memoId',
@@ -33,12 +33,16 @@ const SitePlaygroundIndexRoute = SitePlaygroundIndexRouteImport.update({
   id: '/playground/',
   path: '/playground/',
   getParentRoute: () => SiteRouteRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_site/playground/index.lazy').then((d) => d.Route),
+)
 const SiteDocsIndexRoute = SiteDocsIndexRouteImport.update({
   id: '/docs/',
   path: '/docs/',
   getParentRoute: () => SiteRouteRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_site/docs/index.lazy').then((d) => d.Route),
+)
 
 export interface FileRoutesByFullPath {
   '/': typeof SiteIndexRoute
