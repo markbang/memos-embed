@@ -28,7 +28,7 @@ const EmbedMemoIdRoute = EmbedMemoIdRouteImport.update({
   id: '/embed/$memoId',
   path: '/embed/$memoId',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/embed/$memoId.lazy').then((d) => d.Route))
 const SitePlaygroundIndexRoute = SitePlaygroundIndexRouteImport.update({
   id: '/playground/',
   path: '/playground/',
