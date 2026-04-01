@@ -27,7 +27,17 @@ const languageAliases = [
 	["md", "markdown"],
 ] as const;
 
+let highlightStylesPromise: Promise<unknown> | undefined;
 let highlightInstancePromise: Promise<HighlightInstance> | undefined;
+
+const loadHighlightStyles = () => {
+	if (highlightStylesPromise) {
+		return highlightStylesPromise;
+	}
+
+	highlightStylesPromise = import("./highlight-theme.css");
+	return highlightStylesPromise;
+};
 
 const loadHighlightInstance = async () => {
 	if (highlightInstancePromise) {
@@ -108,7 +118,10 @@ export async function highlightCodeBlocks(container: HTMLElement) {
 		return;
 	}
 
-	const hljs = await loadHighlightInstance();
+	const [, hljs] = await Promise.all([
+		loadHighlightStyles(),
+		loadHighlightInstance(),
+	]);
 	for (const block of blocks) {
 		const language = block.parentElement?.getAttribute("data-language") ?? "";
 		if (language && hljs.getLanguage(language)) {
