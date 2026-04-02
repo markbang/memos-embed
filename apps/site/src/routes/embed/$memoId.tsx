@@ -1,5 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+const normalizeBooleanSearchValue = (value: unknown) =>
+	typeof value === "boolean" ? value : value !== "false";
+
 export const Route = createFileRoute("/embed/$memoId")({
 	loader: async ({ params, location }) => {
 		const search = location.search as Record<string, unknown>;
@@ -10,38 +13,10 @@ export const Route = createFileRoute("/embed/$memoId")({
 			search.density === "compact" || search.density === "comfortable"
 				? search.density
 				: undefined;
-		const showTags =
-			typeof search.showTags === "boolean"
-				? search.showTags
-				: search.showTags === "true"
-					? true
-					: search.showTags === "false"
-						? false
-						: true;
-		const showAttachments =
-			typeof search.showAttachments === "boolean"
-				? search.showAttachments
-				: search.showAttachments === "true"
-					? true
-					: search.showAttachments === "false"
-						? false
-						: true;
-		const showReactions =
-			typeof search.showReactions === "boolean"
-				? search.showReactions
-				: search.showReactions === "true"
-					? true
-					: search.showReactions === "false"
-						? false
-						: true;
-		const showMeta =
-			typeof search.showMeta === "boolean"
-				? search.showMeta
-				: search.showMeta === "true"
-					? true
-					: search.showMeta === "false"
-						? false
-						: true;
+		const showTags = normalizeBooleanSearchValue(search.showTags);
+		const showAttachments = normalizeBooleanSearchValue(search.showAttachments);
+		const showReactions = normalizeBooleanSearchValue(search.showReactions);
+		const showMeta = normalizeBooleanSearchValue(search.showMeta);
 		const linkTarget =
 			search.linkTarget === "_self" || search.linkTarget === "_blank"
 				? search.linkTarget

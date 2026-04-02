@@ -72,7 +72,10 @@ export default function MarketingHeader() {
 								<a
 									key={link.to}
 									href={localizeHref(link.to)}
-									className={cn(navLinkClassName, isActive && "text-foreground")}
+									className={cn(
+										navLinkClassName,
+										isActive && "text-foreground",
+									)}
 									aria-current={isActive ? "page" : undefined}
 								>
 									{link.label()}

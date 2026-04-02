@@ -1,4 +1,8 @@
-import { createLazyFileRoute, Outlet, useLocation } from "@tanstack/react-router";
+import {
+	createLazyFileRoute,
+	Outlet,
+	useLocation,
+} from "@tanstack/react-router";
 import { useId } from "react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
