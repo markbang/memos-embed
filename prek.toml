@@ -1,0 +1,23 @@
+minimum_prek_version = "0.3.8"
+default_install_hook_types = ["pre-commit", "pre-push"]
+
+[[repos]]
+repo = "local"
+
+[[repos.hooks]]
+id = "workspace-check"
+name = "workspace check"
+entry = "pnpm check"
+language = "system"
+pass_filenames = false
+always_run = true
+stages = ["pre-commit"]
+
+[[repos.hooks]]
+id = "workspace-validate"
+name = "workspace validate"
+entry = "pnpm validate"
+language = "system"
+pass_filenames = false
+always_run = true
+stages = ["pre-push"]

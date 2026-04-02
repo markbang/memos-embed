@@ -21,12 +21,16 @@
     "format": "pnpm -r format",
     "check": "pnpm -r check",
     "validate": "pnpm lint && pnpm check && pnpm test && pnpm test:artifacts && pnpm build",
+    "prek:install": "prek install --prepare-hooks",
+    "prek:run": "prek run --all-files",
+    "prepare": "node ./scripts/prepare-prek.mjs",
     "version-packages": "changeset version",
     "release": "changeset publish",
     "release:github": "changelogithub"
   },
   "devDependencies": {
     "@changesets/cli": "^2.30.0",
+    "@j178/prek": "^0.3.8",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "changelogithub": "^14.0.0",
