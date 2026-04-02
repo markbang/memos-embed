@@ -42,6 +42,15 @@ const createManualChunk = (id: string) => {
 	return undefined;
 };
 
+const prerenderedMarketingPages = [
+	{ path: "/" },
+	{ path: "/docs" },
+	{ path: "/de/" },
+	{ path: "/de/docs" },
+	{ path: "/zh/" },
+	{ path: "/zh/docs" },
+];
+
 const config = defineConfig({
 	build: {
 		modulePreload: false,
@@ -83,6 +92,12 @@ const config = defineConfig({
 		tanstackStart({
 			client: {
 				entry: "client.ts",
+			},
+			pages: prerenderedMarketingPages,
+			prerender: {
+				enabled: true,
+				autoStaticPathsDiscovery: false,
+				crawlLinks: false,
 			},
 			router: {
 				codeSplittingOptions: {
