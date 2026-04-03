@@ -59,7 +59,15 @@ try {
 	]);
 
 	for (const pkg of ["memos-embed", "@memos-embed/react", "@memos-embed/wc"]) {
-		run(pnpmCmd, ["--filter", pkg, "pack", "--pack-destination", packsDir]);
+		const pkgDir = join(
+			repoDir,
+			pkg === "memos-embed"
+				? "packages/memos-embed"
+				: pkg === "@memos-embed/react"
+					? "packages/memos-embed-react"
+					: "packages/memos-embed-wc",
+		);
+		run(pnpmCmd, ["pack", "--pack-destination", packsDir], pkgDir);
 	}
 
 	const coreTarball = await findTarball(packsDir, "memos-embed-");

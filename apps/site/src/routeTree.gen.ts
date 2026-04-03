@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SplatRouteImport } from './routes/$'
 import { Route as SiteRouteRouteImport } from './routes/_site/route'
 import { Route as SiteIndexRouteImport } from './routes/_site/index'
 import { Route as EmbedMemoIdRouteImport } from './routes/embed/$memoId'
 import { Route as SitePlaygroundIndexRouteImport } from './routes/_site/playground/index'
 import { Route as SiteDocsIndexRouteImport } from './routes/_site/docs/index'
 
+const SplatRoute = SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SiteRouteRoute = SiteRouteRouteImport.update({
   id: '/_site',
   getParentRoute: () => rootRouteImport,
@@ -46,11 +52,13 @@ const SiteDocsIndexRoute = SiteDocsIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof SiteIndexRoute
+  '/$': typeof SplatRoute
   '/embed/$memoId': typeof EmbedMemoIdRoute
   '/docs/': typeof SiteDocsIndexRoute
   '/playground/': typeof SitePlaygroundIndexRoute
 }
 export interface FileRoutesByTo {
+  '/$': typeof SplatRoute
   '/embed/$memoId': typeof EmbedMemoIdRoute
   '/': typeof SiteIndexRoute
   '/docs': typeof SiteDocsIndexRoute
@@ -59,6 +67,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_site': typeof SiteRouteRouteWithChildren
+  '/$': typeof SplatRoute
   '/embed/$memoId': typeof EmbedMemoIdRoute
   '/_site/': typeof SiteIndexRoute
   '/_site/docs/': typeof SiteDocsIndexRoute
@@ -66,12 +75,13 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/embed/$memoId' | '/docs/' | '/playground/'
+  fullPaths: '/' | '/$' | '/embed/$memoId' | '/docs/' | '/playground/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/embed/$memoId' | '/' | '/docs' | '/playground'
+  to: '/$' | '/embed/$memoId' | '/' | '/docs' | '/playground'
   id:
     | '__root__'
     | '/_site'
+    | '/$'
     | '/embed/$memoId'
     | '/_site/'
     | '/_site/docs/'
@@ -80,11 +90,19 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   SiteRouteRoute: typeof SiteRouteRouteWithChildren
+  SplatRoute: typeof SplatRoute
   EmbedMemoIdRoute: typeof EmbedMemoIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_site': {
       id: '/_site'
       path: ''
@@ -141,6 +159,7 @@ const SiteRouteRouteWithChildren = SiteRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   SiteRouteRoute: SiteRouteRouteWithChildren,
+  SplatRoute: SplatRoute,
   EmbedMemoIdRoute: EmbedMemoIdRoute,
 }
 export const routeTree = rootRouteImport

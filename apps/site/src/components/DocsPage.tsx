@@ -1,4 +1,5 @@
 import { type ThemePresetName, themePresets } from "memos-embed";
+import { useEffect } from "react";
 import {
 	Card,
 	CardContent,
@@ -6,6 +7,64 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+
+const copyScript = `
+(function() {
+  function initCopyButtons() {
+    document.querySelectorAll('pre[data-copyable="true"]').forEach(function(pre) {
+      if (pre.querySelector('.copy-btn')) return;
+      var btn = document.createElement('button');
+      btn.className = 'copy-btn absolute right-2 top-2 rounded border border-border bg-background px-2 py-1 text-xs opacity-0 transition-opacity hover:bg-accent focus:opacity-100 group-hover:opacity-100';
+      btn.textContent = 'Copy';
+      btn.setAttribute('aria-label', 'Copy code');
+      btn.setAttribute('type', 'button');
+      btn.onclick = function() {
+        var code = pre.querySelector('code');
+        if (!code) return;
+        navigator.clipboard.writeText(code.innerText).then(function() {
+          btn.textContent = 'Copied!';
+          setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+        });
+      };
+      pre.style.position = 'relative';
+      pre.appendChild(btn);
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCopyButtons);
+  } else {
+    initCopyButtons();
+  }
+})();
+`;
+
+const initCopyButtons = () => {
+	if (typeof window === "undefined") return;
+	document
+		.querySelectorAll('pre[data-copyable="true"]')
+		.forEach((pre: Element) => {
+			const p = pre as HTMLElement;
+			if (p.querySelector(".copy-btn")) return;
+			const btn = document.createElement("button");
+			btn.className =
+				"copy-btn absolute right-2 top-2 rounded border border-border bg-background px-2 py-1 text-xs opacity-0 transition-opacity hover:bg-accent focus:opacity-100 group-hover:opacity-100";
+			btn.textContent = "Copy";
+			btn.setAttribute("aria-label", "Copy code");
+			btn.setAttribute("type", "button");
+			btn.onclick = () => {
+				const code = p.querySelector("code");
+				if (!code) return;
+				navigator.clipboard.writeText(code.innerText).then(() => {
+					btn.textContent = "Copied!";
+					setTimeout(() => {
+						btn.textContent = "Copy";
+					}, 2000);
+				});
+			};
+			p.style.position = "relative";
+			p.appendChild(btn);
+		});
+};
 
 const themeOptions = (Object.keys(themePresets) as ThemePresetName[]).map(
 	(name) => themePresets[name],
@@ -80,8 +139,17 @@ const webComponentStylingSnippet = `<memos-embed
 </style>`;
 
 export function DocsPageContent() {
+	useEffect(() => {
+		if (typeof window === "undefined") return;
+		initCopyButtons();
+	}, []);
+
 	return (
 		<div className="container mx-auto space-y-8 px-4 py-10">
+			{/* Script tag for prerendered static pages */}
+			{/* biome-ignore lint/security/noDangerouslySetInnerHtml: Static script for client-side copy functionality */}
+			<script dangerouslySetInnerHTML={{ __html: copyScript }} />
+
 			<section className="max-w-3xl space-y-4">
 				<h1 className="text-4xl font-bold tracking-tight">Documentation</h1>
 				<p className="text-lg text-muted-foreground">
@@ -398,8 +466,11 @@ const iframe = renderIframeHtml({
 							visually consistent.
 						</CardDescription>
 					</CardHeader>
-					<CardContent className="space-y-4">
-						<pre className="overflow-auto rounded-lg border bg-muted/40 p-4 text-sm">
+					<CardContent className="group space-y-4">
+						<pre
+							data-copyable="true"
+							className="relative overflow-auto rounded-lg border bg-muted/40 p-4 text-sm"
+						>
 							<code>{customThemeSnippet}</code>
 						</pre>
 						<ul className="space-y-2 text-sm text-muted-foreground">
@@ -427,8 +498,11 @@ const iframe = renderIframeHtml({
 							`::part(...)` when you want finer control.
 						</CardDescription>
 					</CardHeader>
-					<CardContent className="space-y-4">
-						<pre className="overflow-auto rounded-lg border bg-muted/40 p-4 text-sm">
+					<CardContent className="group space-y-4">
+						<pre
+							data-copyable="true"
+							className="relative overflow-auto rounded-lg border bg-muted/40 p-4 text-sm"
+						>
 							<code>{webComponentStylingSnippet}</code>
 						</pre>
 						<ul className="space-y-2 text-sm text-muted-foreground">
@@ -489,9 +563,12 @@ export function DocsPage() {
 
 function DocSection({ title, code }: { title: string; code: string }) {
 	return (
-		<div className="space-y-3">
+		<div className="group space-y-3">
 			<h2 className="text-lg font-semibold">{title}</h2>
-			<pre className="overflow-auto rounded-lg border bg-muted/40 p-4 text-sm">
+			<pre
+				data-copyable="true"
+				className="relative overflow-auto rounded-lg border bg-muted/40 p-4 text-sm"
+			>
 				<code>{code}</code>
 			</pre>
 		</div>

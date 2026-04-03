@@ -1,5 +1,5 @@
 import { useLocation } from "@tanstack/react-router";
-import { GithubIcon } from "@/components/icons/shell";
+import { GithubIcon, MenuIcon, XIcon } from "@/components/icons/shell";
 import { isStaticMarketingPath, normalizeSitePath } from "@/lib/route-mode";
 import { cn } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
@@ -23,7 +23,7 @@ const localeDisplayNames: Record<string, string> = {
 };
 
 const navLinkClassName =
-	"text-sm font-medium text-foreground/60 transition-colors hover:text-foreground";
+	"block px-2 py-1 text-lg font-medium text-foreground/80 transition-colors hover:text-foreground md:inline-block md:text-sm md:px-0";
 
 export default function MarketingHeader() {
 	const location = useLocation();
@@ -37,54 +37,42 @@ export default function MarketingHeader() {
 
 	return (
 		<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-			<div className="container mx-auto flex flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between md:py-2.5">
-				<div className="flex flex-wrap items-center gap-3">
-					<a
-						href={localizeHref("/")}
-						className="flex min-w-0 items-center gap-3"
-					>
-						<div className="hidden rounded-full border border-border/60 bg-muted/40 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground sm:inline-flex">
-							{m.open_source()}
-						</div>
-						<div className="min-w-0">
-							<p className="truncate font-semibold">Memos Embed</p>
-							<p className="hidden text-xs text-muted-foreground md:block">
-								{m.site_tagline()}
-							</p>
-						</div>
-					</a>
-					<a
-						href="https://github.com/markbang/memos-embed"
-						target="_blank"
-						rel="noreferrer"
-						className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-					>
-						<GithubIcon className="size-4" />
-						GitHub
-					</a>
-				</div>
+			<div className="container mx-auto flex h-14 items-center gap-4 px-4">
+				<a href={localizeHref("/")} className="flex min-w-0 items-center gap-3">
+					<div className="hidden rounded-full border border-border/60 bg-muted/40 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground sm:inline-flex">
+						{m.open_source()}
+					</div>
+					<div className="min-w-0">
+						<p className="truncate font-semibold">Memos Embed</p>
+						<p className="hidden text-xs text-muted-foreground md:block">
+							{m.site_tagline()}
+						</p>
+					</div>
+				</a>
 
-				<div className="flex flex-col gap-3 md:flex-row md:items-center">
-					<nav className="flex flex-wrap items-center gap-4 md:gap-6">
-						{navLinks.map((link) => {
-							const isActive = currentPath === normalizeSitePath(link.to);
-							return (
-								<a
-									key={link.to}
-									href={localizeHref(link.to)}
-									className={cn(
-										navLinkClassName,
-										isActive && "text-foreground",
-									)}
-									aria-current={isActive ? "page" : undefined}
-								>
-									{link.label()}
-								</a>
-							);
-						})}
-					</nav>
+				{/* Desktop Nav */}
+				<nav className="hidden items-center gap-6 text-sm font-medium md:flex">
+					{navLinks.map((link) => {
+						const isActive = currentPath === normalizeSitePath(link.to);
+						return (
+							<a
+								key={link.to}
+								href={localizeHref(link.to)}
+								className={cn(
+									"text-foreground/60 transition-colors hover:text-foreground",
+									isActive && "text-foreground",
+								)}
+								aria-current={isActive ? "page" : undefined}
+							>
+								{link.label()}
+							</a>
+						);
+					})}
+				</nav>
 
-					<div className="flex flex-wrap items-center gap-2">
+				<div className="ml-auto flex items-center gap-3">
+					{/* Locale Switcher */}
+					<div className="hidden items-center gap-2 sm:flex">
 						{locales.map((locale) => {
 							const isActive = locale === currentLocale;
 							return (
@@ -93,7 +81,7 @@ export default function MarketingHeader() {
 									href={localizeHref(baseHref, { locale })}
 									aria-current={isActive ? "page" : undefined}
 									className={cn(
-										"rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+										"rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors",
 										isActive
 											? "border-foreground bg-foreground text-background"
 											: "border-border/70 text-muted-foreground hover:text-foreground",
@@ -104,6 +92,67 @@ export default function MarketingHeader() {
 							);
 						})}
 					</div>
+
+					<a
+						href="https://github.com/markbang/memos-embed"
+						target="_blank"
+						rel="noreferrer"
+						className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+						aria-label="GitHub"
+					>
+						<GithubIcon className="size-4" />
+					</a>
+
+					{/* Mobile Menu (No JS) */}
+					<details className="group relative md:hidden">
+						<summary className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-md transition-colors hover:bg-accent hover:text-accent-foreground list-none [&::-webkit-details-marker]:hidden">
+							<MenuIcon className="size-5 group-open:hidden" />
+							<XIcon className="size-5 hidden group-open:block" />
+							<span className="sr-only">{m.open_nav_menu()}</span>
+						</summary>
+
+						<div className="fixed inset-0 top-14 z-50 bg-background/95 backdrop-blur md:hidden">
+							<nav className="flex flex-col gap-2 p-6">
+								{navLinks.map((link) => {
+									const isActive = currentPath === normalizeSitePath(link.to);
+									return (
+										<a
+											key={link.to}
+											href={localizeHref(link.to)}
+											className={cn(
+												navLinkClassName,
+												isActive && "text-foreground",
+											)}
+										>
+											{link.label()}
+										</a>
+									);
+								})}
+							</nav>
+							<div className="px-6">
+								<div className="flex flex-wrap gap-2">
+									{locales.map((locale) => {
+										const isActive = locale === currentLocale;
+										return (
+											<a
+												key={locale}
+												href={localizeHref(baseHref, { locale })}
+												aria-current={isActive ? "page" : undefined}
+												className={cn(
+													"rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+													isActive
+														? "border-foreground bg-foreground text-background"
+														: "border-border/70 text-muted-foreground hover:text-foreground",
+												)}
+											>
+												{localeDisplayNames[locale] ?? locale.toUpperCase()}
+											</a>
+										);
+									})}
+								</div>
+							</div>
+						</div>
+					</details>
 				</div>
 			</div>
 		</header>
