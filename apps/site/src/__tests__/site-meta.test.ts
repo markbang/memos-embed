@@ -18,7 +18,15 @@ describe("site meta helpers", () => {
 				{ title: "Docs · Memos Embed" },
 				{ name: "description", content: "Learn how to embed memo cards." },
 				{ property: "og:type", content: "website" },
-				{ name: "twitter:card", content: "summary" },
+				{ name: "twitter:card", content: "summary_large_image" },
+				{
+					property: "og:image",
+					content: "https://memos-embed.vercel.app/android-chrome-512x512.png",
+				},
+				{
+					name: "twitter:image",
+					content: "https://memos-embed.vercel.app/android-chrome-512x512.png",
+				},
 			]),
 		);
 	});

@@ -71,6 +71,17 @@ export default function MarketingHeader() {
 				</nav>
 
 				<div className="ml-auto flex items-center gap-3">
+					{/* Theme Toggle */}
+					<button
+						type="button"
+						aria-label="Toggle theme"
+						className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+						onClick="var k='memos-embed-site-theme';var d=document.documentElement;var isDark=d.classList.contains('dark');var t=isDark?'light':'dark';localStorage.setItem(k,t);d.classList.toggle('dark',!isDark);d.dataset.theme=t;"
+					>
+						<SunIcon className="size-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+						<MoonIcon className="absolute size-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+					</button>
+
 					{/* Locale Switcher */}
 					<div className="hidden items-center gap-2 sm:flex">
 						{locales.map((locale) => {

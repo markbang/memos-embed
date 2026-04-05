@@ -20,9 +20,18 @@ export const buildPageHead = ({ title, description }: PageHeadInput) => {
 			{ property: "og:title", content: pageTitle },
 			{ property: "og:description", content: description },
 			{ property: "og:type", content: "website" },
-			{ name: "twitter:card", content: "summary" },
+
 			{ name: "twitter:title", content: pageTitle },
 			{ name: "twitter:description", content: description },
+			{
+				property: "og:image",
+				content: "https://memos-embed.vercel.app/android-chrome-512x512.png",
+			},
+			{
+				name: "twitter:image",
+				content: "https://memos-embed.vercel.app/android-chrome-512x512.png",
+			},
+			{ name: "twitter:card", content: "summary_large_image" },
 		],
 	};
 };
