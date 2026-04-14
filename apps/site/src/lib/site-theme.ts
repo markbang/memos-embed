@@ -90,3 +90,8 @@ export const buildThemeInitializationScript = () =>
 	`(() => {try {const key = ${JSON.stringify(SITE_THEME_STORAGE_KEY)};const stored = localStorage.getItem(key);const theme = stored === "light" || stored === "dark" ? stored : "system";const resolved = theme === "dark" || (theme === "system" && window.matchMedia(${JSON.stringify(
 		SITE_THEME_MEDIA_QUERY,
 	)}).matches) ? "dark" : "light";document.documentElement.classList.toggle("dark", resolved === "dark");document.documentElement.dataset.theme = resolved;} catch {}})();`;
+
+export const buildThemeToggleBindingScript = () =>
+	`(() => {try {const selector = "[data-site-theme-toggle]";const bind = () => {document.querySelectorAll(selector).forEach((button) => {if (button.getAttribute("data-site-theme-toggle-bound") === "true") return;button.setAttribute("data-site-theme-toggle-bound", "true");button.addEventListener("click", () => {const root = document.documentElement;const nextTheme = root.classList.contains("dark") ? "light" : "dark";localStorage.setItem(${JSON.stringify(
+		SITE_THEME_STORAGE_KEY,
+	)}, nextTheme);root.classList.toggle("dark", nextTheme === "dark");root.dataset.theme = nextTheme;});});};if (document.readyState === "loading") {document.addEventListener("DOMContentLoaded", bind, { once: true });} else {bind();}} catch {}})();`;

@@ -37,6 +37,9 @@ describe("site smoke", () => {
 		render(createElement(DocsPageContent));
 
 		expect(screen.getByRole("heading", { name: "Documentation" })).toBeTruthy();
+		expect(screen.getByText("Choose your entry point")).toBeTruthy();
+		expect(screen.getAllByText("Core HTML API")).toHaveLength(2);
+		expect(screen.getByText("Iframe helpers")).toBeTruthy();
 		expect(screen.getByText("Quick Start")).toBeTruthy();
 		expect(screen.getByText("Multiple memos on one page")).toBeTruthy();
 		expect(screen.getByText("React memo roundup")).toBeTruthy();

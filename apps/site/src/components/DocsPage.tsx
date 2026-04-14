@@ -104,6 +104,42 @@ const integrationGuides = [
 	},
 ] as const;
 
+const entryPoints = [
+	{
+		name: "Core HTML API",
+		install: "pnpm add memos-embed",
+		bestFor:
+			"SSR/SSG pipelines, MDX blogs, custom render flows, and iframe helpers.",
+		startHref:
+			"https://github.com/markbang/memos-embed/tree/main/packages/memos-embed#readme",
+		startLabel: "Open core package docs",
+	},
+	{
+		name: "React",
+		install: "pnpm add @memos-embed/react",
+		bestFor:
+			"Next.js, TanStack Start, Astro islands, and React pages that want SSR-ready embeds.",
+		startHref: `${repoExampleBaseUrl}/next-mdx`,
+		startLabel: "Open React example",
+	},
+	{
+		name: "Web Component",
+		install: "pnpm add @memos-embed/wc",
+		bestFor:
+			"Static sites, CMS pages, and custom-element-friendly apps without a React runtime.",
+		startHref: `${repoExampleBaseUrl}/static-html`,
+		startLabel: "Open static example",
+	},
+	{
+		name: "Iframe helpers",
+		install: "pnpm add memos-embed",
+		bestFor:
+			"Copy-paste embeds, stricter style isolation, and platforms where raw HTML snippets are awkward.",
+		startHref: `${repoExampleBaseUrl}/static-html`,
+		startLabel: "Open iframe example",
+	},
+] as const;
+
 const customThemeSnippet = `import { extendTheme } from 'memos-embed'
 
 const blogTheme = extendTheme('minimal', {
@@ -153,8 +189,8 @@ export function DocsPageContent() {
 			<section className="max-w-3xl space-y-4">
 				<h1 className="text-4xl font-bold tracking-tight">Documentation</h1>
 				<p className="text-lg text-muted-foreground">
-					Memos Embed gives you three ways to ship beautiful memo cards:
-					server-rendered HTML snippets, a React component, and a Web Component.
+					Memos Embed ships flexible entry points for memo cards: core HTML
+					helper APIs, React components, a Web Component, and iframe helpers.
 				</p>
 				<div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
 					<a
@@ -173,6 +209,60 @@ export function DocsPageContent() {
 					</a>
 				</div>
 			</section>
+
+			<Card>
+				<CardHeader>
+					<CardTitle>Choose your entry point</CardTitle>
+					<CardDescription>
+						Start with the lowest-complexity integration that matches your
+						stack, then mix in the shared core APIs if you need more control.
+					</CardDescription>
+				</CardHeader>
+				<CardContent className="space-y-4">
+					<div className="overflow-x-auto">
+						<table className="w-full text-left text-sm">
+							<thead className="border-b text-muted-foreground">
+								<tr>
+									<th className="py-2 pr-4 font-medium">Entry point</th>
+									<th className="py-2 pr-4 font-medium">Install</th>
+									<th className="py-2 pr-4 font-medium">Best for</th>
+									<th className="py-2 font-medium">Start here</th>
+								</tr>
+							</thead>
+							<tbody className="align-top text-muted-foreground">
+								{entryPoints.map((entryPoint) => (
+									<tr key={entryPoint.name} className="border-b last:border-0">
+										<td className="py-3 pr-4 font-medium text-foreground">
+											{entryPoint.name}
+										</td>
+										<td className="py-3 pr-4">
+											<code className="rounded bg-muted px-1.5 py-0.5 text-[13px]">
+												{entryPoint.install}
+											</code>
+										</td>
+										<td className="py-3 pr-4">{entryPoint.bestFor}</td>
+										<td className="py-3">
+											<a
+												href={entryPoint.startHref}
+												target="_blank"
+												rel="noreferrer"
+												className="text-sm font-medium text-foreground underline underline-offset-4"
+											>
+												{entryPoint.startLabel}
+											</a>
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+					<p className="text-sm text-muted-foreground">
+						Tip: the React and Web Component packages both sit on top of the
+						shared <code>memos-embed</code> core, so you can mix wrappers,
+						prefetched memo data, and iframe helpers in the same project.
+					</p>
+				</CardContent>
+			</Card>
 
 			<div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
 				<Card>

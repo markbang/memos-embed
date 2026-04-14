@@ -25,6 +25,17 @@ Embeddable memo cards for Memos, delivered as a website and npm packages.
 - `packages/memos-embed-react`: React component wrapper
 - `packages/memos-embed-wc`: Web Component wrapper
 
+## Choose the right integration
+
+| Entry point | Install | Best for | Start here |
+| --- | --- | --- | --- |
+| Core HTML API | `pnpm add memos-embed` | SSR/SSG pipelines, MDX blogs, custom render flows, and iframe helpers | [`packages/memos-embed`](./packages/memos-embed/README.md) |
+| React | `pnpm add @memos-embed/react` | Next.js, TanStack Start, Astro islands, and React pages that want SSR-ready embeds | [`examples/next-mdx`](./examples/next-mdx/README.md) |
+| Web Component | `pnpm add @memos-embed/wc` | Static sites, CMS pages, and custom-element-friendly apps without a React runtime | [`packages/memos-embed-wc`](./packages/memos-embed-wc/README.md) |
+| Iframe helpers | `pnpm add memos-embed` | Copy-paste embeds, stricter style isolation, and platforms where raw HTML snippets are awkward | [`examples/static-html`](./examples/static-html/README.md) |
+
+The React and Web Component packages both build on top of the shared `memos-embed` core, so you can mix wrappers, pre-fetched memo data, and iframe helpers in the same project.
+
 ## Quick Start
 ```bash
 pnpm install

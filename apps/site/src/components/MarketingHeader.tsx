@@ -1,6 +1,13 @@
 import { useLocation } from "@tanstack/react-router";
-import { GithubIcon, MenuIcon, XIcon } from "@/components/icons/shell";
+import {
+	GithubIcon,
+	MenuIcon,
+	MoonIcon,
+	SunIcon,
+	XIcon,
+} from "@/components/icons/shell";
 import { isStaticMarketingPath, normalizeSitePath } from "@/lib/route-mode";
+import { buildThemeToggleBindingScript } from "@/lib/site-theme";
 import { cn } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
 import {
@@ -24,6 +31,7 @@ const localeDisplayNames: Record<string, string> = {
 
 const navLinkClassName =
 	"block px-2 py-1 text-lg font-medium text-foreground/80 transition-colors hover:text-foreground md:inline-block md:text-sm md:px-0";
+const themeToggleScript = buildThemeToggleBindingScript();
 
 export default function MarketingHeader() {
 	const location = useLocation();
@@ -37,6 +45,8 @@ export default function MarketingHeader() {
 
 	return (
 		<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+			{/* biome-ignore lint/security/noDangerouslySetInnerHtml: static script enables theme toggling on prerendered marketing pages */}
+			<script dangerouslySetInnerHTML={{ __html: themeToggleScript }} />
 			<div className="container mx-auto flex h-14 items-center gap-4 px-4">
 				<a href={localizeHref("/")} className="flex min-w-0 items-center gap-3">
 					<div className="hidden rounded-full border border-border/60 bg-muted/40 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground sm:inline-flex">
@@ -75,8 +85,8 @@ export default function MarketingHeader() {
 					<button
 						type="button"
 						aria-label="Toggle theme"
-						className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-						onClick="var k='memos-embed-site-theme';var d=document.documentElement;var isDark=d.classList.contains('dark');var t=isDark?'light':'dark';localStorage.setItem(k,t);d.classList.toggle('dark',!isDark);d.dataset.theme=t;"
+						data-site-theme-toggle="true"
+						className="relative flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
 					>
 						<SunIcon className="size-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
 						<MoonIcon className="absolute size-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
