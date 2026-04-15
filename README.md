@@ -7,6 +7,12 @@
 
 Embeddable memo cards for Memos, delivered as a website and npm packages.
 
+## Try it live
+- Website: [memos-embed.bangwu.top](https://memos-embed.bangwu.top)
+- Docs: [memos-embed.bangwu.top/docs](https://memos-embed.bangwu.top/docs)
+- Playground: [memos-embed.bangwu.top/playground](https://memos-embed.bangwu.top/playground)
+- Example gallery: [`examples/`](./examples/README.md)
+
 ## Features
 - Rich memo cards with themes, density presets, and extendable design tokens
 - Core HTML renderer for SSR and static-site workflows

@@ -7,6 +7,11 @@ React wrapper for Memos embed cards.
 pnpm add @memos-embed/react
 ```
 
+## Docs and examples
+- Live docs: [memos-embed.bangwu.top/docs](https://memos-embed.bangwu.top/docs)
+- Playground: [memos-embed.bangwu.top/playground](https://memos-embed.bangwu.top/playground)
+- Example patterns: [`../../examples/next-mdx`](../../examples/next-mdx/README.md) and [`../../examples/mdx-components`](../../examples/mdx-components/README.md)
+
 ## Usage
 ```tsx
 import { MemoEmbed } from '@memos-embed/react'

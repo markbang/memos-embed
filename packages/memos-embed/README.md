@@ -7,6 +7,11 @@ Core embed utilities for Memos.
 pnpm add memos-embed
 ```
 
+## Docs and examples
+- Live docs: [memos-embed.bangwu.top/docs](https://memos-embed.bangwu.top/docs)
+- Playground: [memos-embed.bangwu.top/playground](https://memos-embed.bangwu.top/playground)
+- Example gallery: [`../../examples/`](../../examples/README.md)
+
 ## What it includes
 - `fetchMemo` / `fetchMemos` for loading and normalizing memo data from a Memos instance
 - `renderMemoHtml` / `renderMemoHtmlSnippet` for generating themed embed markup

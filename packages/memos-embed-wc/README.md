@@ -7,6 +7,11 @@ Web Component wrapper for Memos embed cards.
 pnpm add @memos-embed/wc
 ```
 
+## Docs and examples
+- Live docs: [memos-embed.bangwu.top/docs](https://memos-embed.bangwu.top/docs)
+- Playground: [memos-embed.bangwu.top/playground](https://memos-embed.bangwu.top/playground)
+- Static site pattern: [`../../examples/static-html`](../../examples/static-html/README.md)
+
 ## Browser usage
 ```html
 <script type="module" src="https://unpkg.com/@memos-embed/wc@latest/dist/register.js"></script>
