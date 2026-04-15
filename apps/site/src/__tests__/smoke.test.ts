@@ -38,6 +38,27 @@ describe("site smoke", () => {
 
 		expect(screen.getByRole("heading", { name: "Documentation" })).toBeTruthy();
 		expect(screen.getByText("Choose your entry point")).toBeTruthy();
+		const playgroundLink = screen.getByRole("link", {
+			name: "Open the playground",
+		});
+		const exampleGalleryLink = screen.getByRole("link", {
+			name: "Browse example gallery",
+		});
+		const npmPackageLink = screen.getByRole("link", {
+			name: "View npm package",
+		});
+
+		expect(playgroundLink.getAttribute("href")).toBe("/playground");
+		expect(exampleGalleryLink.getAttribute("href")).toBe(
+			"https://github.com/markbang/memos-embed/tree/main/examples",
+		);
+		expect(exampleGalleryLink.getAttribute("target")).toBe("_blank");
+		expect(exampleGalleryLink.getAttribute("rel")).toBe("noreferrer");
+		expect(npmPackageLink.getAttribute("href")).toBe(
+			"https://www.npmjs.com/package/memos-embed",
+		);
+		expect(npmPackageLink.getAttribute("target")).toBe("_blank");
+		expect(npmPackageLink.getAttribute("rel")).toBe("noreferrer");
 		expect(screen.getAllByText("Core HTML API")).toHaveLength(2);
 		expect(screen.getByText("Iframe helpers")).toBeTruthy();
 		expect(screen.getByText("Quick Start")).toBeTruthy();

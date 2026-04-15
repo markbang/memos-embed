@@ -200,6 +200,14 @@ export function DocsPageContent() {
 						Open the playground
 					</a>
 					<a
+						href={repoExampleBaseUrl}
+						target="_blank"
+						rel="noreferrer"
+						className="rounded-full border border-border/70 bg-background px-3 py-1 transition-colors hover:text-foreground"
+					>
+						Browse example gallery
+					</a>
+					<a
 						href="https://www.npmjs.com/package/memos-embed"
 						target="_blank"
 						rel="noreferrer"
