@@ -3,7 +3,9 @@
 # Memos Embed
 
 [![CI](https://github.com/markbang/memos-embed/actions/workflows/ci.yml/badge.svg)](https://github.com/markbang/memos-embed/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/memos-embed.svg)](https://www.npmjs.com/package/memos-embed)
+[![npm memos-embed](https://img.shields.io/npm/v/memos-embed.svg?label=memos-embed)](https://www.npmjs.com/package/memos-embed)
+[![npm @memos-embed/react](https://img.shields.io/npm/v/%40memos-embed%2Freact.svg?label=%40memos-embed%2Freact)](https://www.npmjs.com/package/@memos-embed/react)
+[![npm @memos-embed/wc](https://img.shields.io/npm/v/%40memos-embed%2Fwc.svg?label=%40memos-embed%2Fwc)](https://www.npmjs.com/package/@memos-embed/wc)
 
 Embeddable memo cards for Memos, delivered as a website and npm packages.
 

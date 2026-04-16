@@ -73,6 +73,21 @@ const themeOptions = (Object.keys(themePresets) as ThemePresetName[]).map(
 const repoExampleBaseUrl =
 	"https://github.com/markbang/memos-embed/tree/main/examples";
 
+const packageRegistryLinks = [
+	{
+		label: "View core npm package",
+		href: "https://www.npmjs.com/package/memos-embed",
+	},
+	{
+		label: "View React npm package",
+		href: "https://www.npmjs.com/package/@memos-embed/react",
+	},
+	{
+		label: "View Web Component npm package",
+		href: "https://www.npmjs.com/package/@memos-embed/wc",
+	},
+] as const;
+
 const integrationGuides = [
 	{
 		title: "Next.js App Router",
@@ -207,14 +222,17 @@ export function DocsPageContent() {
 					>
 						Browse example gallery
 					</a>
-					<a
-						href="https://www.npmjs.com/package/memos-embed"
-						target="_blank"
-						rel="noreferrer"
-						className="rounded-full border border-border/70 bg-background px-3 py-1 transition-colors hover:text-foreground"
-					>
-						View npm package
-					</a>
+					{packageRegistryLinks.map((pkg) => (
+						<a
+							key={pkg.href}
+							href={pkg.href}
+							target="_blank"
+							rel="noreferrer"
+							className="rounded-full border border-border/70 bg-background px-3 py-1 transition-colors hover:text-foreground"
+						>
+							{pkg.label}
+						</a>
+					))}
 				</div>
 			</section>
 

@@ -44,8 +44,14 @@ describe("site smoke", () => {
 		const exampleGalleryLink = screen.getByRole("link", {
 			name: "Browse example gallery",
 		});
-		const npmPackageLink = screen.getByRole("link", {
-			name: "View npm package",
+		const coreNpmPackageLink = screen.getByRole("link", {
+			name: "View core npm package",
+		});
+		const reactNpmPackageLink = screen.getByRole("link", {
+			name: "View React npm package",
+		});
+		const wcNpmPackageLink = screen.getByRole("link", {
+			name: "View Web Component npm package",
 		});
 
 		expect(playgroundLink.getAttribute("href")).toBe("/playground");
@@ -54,11 +60,21 @@ describe("site smoke", () => {
 		);
 		expect(exampleGalleryLink.getAttribute("target")).toBe("_blank");
 		expect(exampleGalleryLink.getAttribute("rel")).toBe("noreferrer");
-		expect(npmPackageLink.getAttribute("href")).toBe(
+		expect(coreNpmPackageLink.getAttribute("href")).toBe(
 			"https://www.npmjs.com/package/memos-embed",
 		);
-		expect(npmPackageLink.getAttribute("target")).toBe("_blank");
-		expect(npmPackageLink.getAttribute("rel")).toBe("noreferrer");
+		expect(coreNpmPackageLink.getAttribute("target")).toBe("_blank");
+		expect(coreNpmPackageLink.getAttribute("rel")).toBe("noreferrer");
+		expect(reactNpmPackageLink.getAttribute("href")).toBe(
+			"https://www.npmjs.com/package/@memos-embed/react",
+		);
+		expect(reactNpmPackageLink.getAttribute("target")).toBe("_blank");
+		expect(reactNpmPackageLink.getAttribute("rel")).toBe("noreferrer");
+		expect(wcNpmPackageLink.getAttribute("href")).toBe(
+			"https://www.npmjs.com/package/@memos-embed/wc",
+		);
+		expect(wcNpmPackageLink.getAttribute("target")).toBe("_blank");
+		expect(wcNpmPackageLink.getAttribute("rel")).toBe("noreferrer");
 		expect(screen.getAllByText("Core HTML API")).toHaveLength(2);
 		expect(screen.getByText("Iframe helpers")).toBeTruthy();
 		expect(screen.getByText("Quick Start")).toBeTruthy();
