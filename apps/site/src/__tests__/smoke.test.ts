@@ -31,6 +31,30 @@ describe("site smoke", () => {
 		expect(
 			screen.getByRole("heading", { name: "feature_developer_title" }),
 		).toBeTruthy();
+		const iframeExampleLink = screen.getByRole("link", {
+			name: "Open integration_iframe example",
+		});
+		const wcExampleLink = screen.getByRole("link", {
+			name: "Open integration_wc example",
+		});
+		const reactExampleLink = screen.getByRole("link", {
+			name: "Open integration_react example",
+		});
+		expect(iframeExampleLink.getAttribute("href")).toBe(
+			"https://github.com/markbang/memos-embed/tree/main/examples/static-html",
+		);
+		expect(iframeExampleLink.getAttribute("target")).toBe("_blank");
+		expect(iframeExampleLink.getAttribute("rel")).toBe("noreferrer");
+		expect(wcExampleLink.getAttribute("href")).toBe(
+			"https://github.com/markbang/memos-embed/tree/main/examples/static-html",
+		);
+		expect(wcExampleLink.getAttribute("target")).toBe("_blank");
+		expect(wcExampleLink.getAttribute("rel")).toBe("noreferrer");
+		expect(reactExampleLink.getAttribute("href")).toBe(
+			"https://github.com/markbang/memos-embed/tree/main/examples/next-mdx",
+		);
+		expect(reactExampleLink.getAttribute("target")).toBe("_blank");
+		expect(reactExampleLink.getAttribute("rel")).toBe("noreferrer");
 	});
 
 	it("renders docs quick start, customization, and integration guide sections", () => {

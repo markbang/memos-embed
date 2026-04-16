@@ -51,6 +51,7 @@
   "integration_react": "React",
   "integration_react_best": "Dashboards, product surfaces, and app shells",
   "integration_react_body": "Reach for the React wrapper when you want stateful configuration and callbacks.",
+  "integration_example_link": "Open {integration} example",
   "section_why_title": "Why teams pick Memos Embed",
   "section_why_desc": "Designed for product updates, personal publishing, and internal docs that still need a production-ready presentation layer.",
   "feature_beautiful_title": "Beautiful Embeds",

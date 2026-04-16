@@ -51,6 +51,7 @@
   "integration_react": "React",
   "integration_react_best": "Dashboards, Produktoberflächen und App-Shells",
   "integration_react_body": "Verwende den React-Wrapper, wenn du zustandsbehaftete Konfiguration und Callbacks brauchst.",
+  "integration_example_link": "Beispiel für {integration} öffnen",
   "section_why_title": "Warum Teams Memos Embed wählen",
   "section_why_desc": "Entwickelt für Produktupdates, persönliches Publishing und interne Dokumentationen, die trotzdem eine produktionsreife Präsentationsschicht brauchen.",
   "feature_beautiful_title": "Ansprechende Einbettungen",

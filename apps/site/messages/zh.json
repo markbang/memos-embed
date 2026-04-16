@@ -51,6 +51,7 @@
   "integration_react": "React",
   "integration_react_best": "仪表盘、产品界面和应用外壳",
   "integration_react_body": "当你需要有状态配置和回调时，使用 React 封装组件。",
+  "integration_example_link": "打开 {integration} 示例",
   "section_why_title": "为什么团队选择 Memos Embed",
   "section_why_desc": "为产品更新、个人发布和内部文档设计，提供生产就绪的展示层。",
   "feature_beautiful_title": "精美嵌入",

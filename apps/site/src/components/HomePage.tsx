@@ -54,6 +54,9 @@ const integrationCardCodes = {
 />`,
 } as const;
 
+const repoExampleBaseUrl =
+	"https://github.com/markbang/memos-embed/tree/main/examples";
+
 export function HomePageContent({
 	renderLink = defaultRenderLink,
 }: {
@@ -97,18 +100,21 @@ export function HomePageContent({
 			bestFor: m.integration_iframe_best(),
 			body: m.integration_iframe_body(),
 			code: integrationCardCodes.iframe,
+			exampleHref: `${repoExampleBaseUrl}/static-html`,
 		},
 		{
 			title: m.integration_wc(),
 			bestFor: m.integration_wc_best(),
 			body: m.integration_wc_body(),
 			code: integrationCardCodes.wc,
+			exampleHref: `${repoExampleBaseUrl}/static-html`,
 		},
 		{
 			title: m.integration_react(),
 			bestFor: m.integration_react_best(),
 			body: m.integration_react_body(),
 			code: integrationCardCodes.react,
+			exampleHref: `${repoExampleBaseUrl}/next-mdx`,
 		},
 	];
 
@@ -225,6 +231,14 @@ export function HomePageContent({
 									<pre className="overflow-x-auto rounded-xl border bg-muted/40 p-4 text-xs leading-6 text-muted-foreground">
 										<code>{card.code}</code>
 									</pre>
+									<a
+										href={card.exampleHref}
+										target="_blank"
+										rel="noreferrer"
+										className="inline-flex text-sm font-medium text-primary underline-offset-4 transition-colors hover:underline"
+									>
+										{m.integration_example_link({ integration: card.title })}
+									</a>
 								</CardContent>
 							</Card>
 						))}
