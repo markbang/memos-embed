@@ -23,6 +23,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          fetch-tags: true
           token: ${{ secrets.CHANGESETS_GITHUB_TOKEN || github.token }}
 
       - name: Setup pnpm
@@ -54,11 +55,6 @@ jobs:
         if: steps.changesets.outputs.has_changesets == 'true'
         run: pnpm version-packages
 
-      - name: Read release version
-        if: steps.changesets.outputs.has_changesets == 'true'
-        id: release_version
-        run: echo "tag=v$(jq -r '.version' packages/memos-embed/package.json)" >> "$GITHUB_OUTPUT"
-
       - name: Commit versioned packages to main
         if: steps.changesets.outputs.has_changesets == 'true'
         run: |
@@ -72,6 +68,10 @@ jobs:
             git push origin HEAD:main
           fi
 
+      - name: Snapshot existing package tags
+        if: steps.changesets.outputs.has_changesets == 'true'
+        run: git tag --format='%(refname:short)' | sort > /tmp/tags-before.txt
+
       - name: Publish packages
         if: steps.changesets.outputs.has_changesets == 'true'
         run: pnpm release
@@ -80,35 +80,55 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
 
-      - name: Create release tag
+      - name: Detect published package tags
         if: steps.changesets.outputs.has_changesets == 'true'
         run: |
-          git tag "${{ steps.release_version.outputs.tag }}"
-          git push origin "${{ steps.release_version.outputs.tag }}"
+          git tag --format='%(refname:short)' | sort > /tmp/tags-after.txt
+          comm -13 /tmp/tags-before.txt /tmp/tags-after.txt > /tmp/new-tags.txt
 
-      - name: Read previous release tag
+          if [ ! -s /tmp/new-tags.txt ]; then
+            echo "Expected changeset publish to create new package tags, but none were found."
+            exit 1
+          fi
+
+          echo "Published package tags:"
+          cat /tmp/new-tags.txt
+
+      - name: Push published package tags
         if: steps.changesets.outputs.has_changesets == 'true'
-        id: previous_tag
         run: |
-          previous_tag=$(git tag --sort=-v:refname | sed -n '2p')
-          echo "tag=$previous_tag" >> "$GITHUB_OUTPUT"
+          while IFS= read -r tag; do
+            git push origin "refs/tags/$tag"
+          done < /tmp/new-tags.txt
 
-      - name: Create GitHub release with changelogithub
+      - name: Create GitHub releases with changelogithub
         if: steps.changesets.outputs.has_changesets == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.CHANGESETS_GITHUB_TOKEN || github.token }}
         run: |
-          if [ -n "${{ steps.previous_tag.outputs.tag }}" ]; then
-            pnpm exec changelogithub \
-              --github "${{ github.repository }}" \
-              --from "${{ steps.previous_tag.outputs.tag }}" \
-              --to "${{ steps.release_version.outputs.tag }}" \
-              --name "${{ steps.release_version.outputs.tag }}" \
-              --contributors
-          else
-            pnpm exec changelogithub \
-              --github "${{ github.repository }}" \
-              --to "${{ steps.release_version.outputs.tag }}" \
-              --name "${{ steps.release_version.outputs.tag }}" \
-              --contributors
-          fi
+          while IFS= read -r tag; do
+            prefix="${tag%@*}"
+            previous_tag=$(
+              git for-each-ref \
+                --sort=-creatordate \
+                --format='%(refname:short)' \
+                "refs/tags/${prefix}@*" \
+                | { grep -Fvx "$tag" || true; } \
+                | head -n 1
+            )
+
+            if [ -n "$previous_tag" ]; then
+              pnpm exec changelogithub \
+                --github "${{ github.repository }}" \
+                --from "$previous_tag" \
+                --to "$tag" \
+                --name "$tag" \
+                --contributors
+            else
+              pnpm exec changelogithub \
+                --github "${{ github.repository }}" \
+                --to "$tag" \
+                --name "$tag" \
+                --contributors
+            fi
+          done < /tmp/new-tags.txt
