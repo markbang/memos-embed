@@ -2,6 +2,13 @@
 
 Use this pattern when your blog is built with the Next.js App Router and you want to avoid a client-side fetch waterfall.
 
+## Install
+```bash
+pnpm add @memos-embed/react memos-embed
+```
+
+This example imports the React wrapper together with `fetchMemo()`, `fetchMemos()`, `renderMemoListHtmlSnippet()`, and `extendTheme()` from the shared core package.
+
 ## What it demonstrates
 - fetch memo data on the server with `fetchMemo()`
 - pass the serialized memo object into `@memos-embed/react`

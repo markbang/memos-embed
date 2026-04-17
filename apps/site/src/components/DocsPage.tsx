@@ -285,7 +285,11 @@ export function DocsPageContent() {
 					<p className="text-sm text-muted-foreground">
 						Tip: the React and Web Component packages both sit on top of the
 						shared <code>memos-embed</code> core, so you can mix wrappers,
-						prefetched memo data, and iframe helpers in the same project.
+						prefetched memo data, and iframe helpers in the same project. If you
+						import <code>fetchMemo</code>, <code>fetchMemos</code>,
+						<code>createMemoClient</code>, or <code>extendTheme</code>
+						directly in a React app, add <code>memos-embed</code> to your
+						dependencies too.
 					</p>
 				</CardContent>
 			</Card>
@@ -348,7 +352,9 @@ import { MemoEmbed } from '@memos-embed/react'
 						/>
 						<DocSection
 							title="Pre-fetched React data"
-							code={`import { fetchMemo } from 'memos-embed'
+							code={`pnpm add @memos-embed/react memos-embed
+
+import { fetchMemo } from 'memos-embed'
 import { MemoEmbed } from '@memos-embed/react'
 
 const memo = await fetchMemo({
@@ -372,7 +378,9 @@ const memo = await fetchMemo({
 						/>
 						<DocSection
 							title="Shared React memo client"
-							code={`import { createMemoClient } from 'memos-embed'
+							code={`pnpm add @memos-embed/react memos-embed
+
+import { createMemoClient } from 'memos-embed'
 import { MemoClientProvider, MemoEmbed, MemoEmbedList } from '@memos-embed/react'
 
 const client = createMemoClient()

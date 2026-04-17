@@ -2,6 +2,13 @@
 
 Use this pattern when your blog system supports React components inside MDX.
 
+## Install
+```bash
+pnpm add @memos-embed/react memos-embed
+```
+
+This example uses `extendTheme()` from the shared core package alongside `MemoEmbed`.
+
 ## What it demonstrates
 - create a thin wrapper component around `MemoEmbed`
 - centralize theme and link behavior

@@ -99,6 +99,9 @@ describe("site smoke", () => {
 		);
 		expect(wcNpmPackageLink.getAttribute("target")).toBe("_blank");
 		expect(wcNpmPackageLink.getAttribute("rel")).toBe("noreferrer");
+		expect(
+			screen.getAllByText(/^pnpm add @memos-embed\/react memos-embed/m).length,
+		).toBeGreaterThanOrEqual(2);
 		expect(screen.getAllByText("Core HTML API")).toHaveLength(2);
 		expect(screen.getByText("Iframe helpers")).toBeTruthy();
 		expect(screen.getByText("Quick Start")).toBeTruthy();

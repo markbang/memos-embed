@@ -7,6 +7,12 @@ React wrapper for Memos embed cards.
 pnpm add @memos-embed/react
 ```
 
+If you also import shared core helpers like `fetchMemo()`, `fetchMemos()`, `createMemoClient()`, or `extendTheme()` in the same app, install `memos-embed` directly too:
+
+```bash
+pnpm add @memos-embed/react memos-embed
+```
+
 ## Docs and examples
 - Live docs: [memos-embed.bangwu.top/docs](https://memos-embed.bangwu.top/docs)
 - Playground: [memos-embed.bangwu.top/playground](https://memos-embed.bangwu.top/playground)
